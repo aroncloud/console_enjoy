@@ -1,49 +1,96 @@
 <template>
-  <div class="space-y-8">
-    <section>
-      <h1 class="text-xl font-semibold mb-4">Vue globale</h1>
-      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <div class="rounded-lg border bg-white p-6 shadow-sm">
-          <h2 class="text-sm font-medium text-gray-500">Total hôtels</h2>
-          <p class="mt-2 text-3xl font-semibold">128</p>
+  <div class="flex flex-col gap-6">
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <StatsCard
+        v-for="stat in stats"
+        :key="stat.title"
+        :title="stat.title"
+        :value="stat.value"
+        :trend="stat.trend"
+        :objectif="stat.objectif"
+        :icon="stat.icon"
+        :iconBg="stat.iconBg"
+        :iconColor="stat.iconColor"
+      />
+    </div>
+
+    <!-- Licences + Activations -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+      <div class="lg:col-span-2 flex flex-col gap-3">
+        <!-- Header Licences -->
+        <div class="flex items-center justify-between">
+          <h2 class=" text-lg font-bold  text-gray-800 flex items-center gap-2">
+            <TriangleAlert class="w-5 h-5 text-red-500" />
+            Alertes d'Expiration de Licence (30 jours)
+          </h2>
+          <button class="text-sm text-blue-500 hover:underline">Voir tout</button>
         </div>
-        <div class="rounded-lg border bg-white p-6 shadow-sm">
-          <h2 class="text-sm font-medium text-gray-500">MRR</h2>
-          <p class="mt-2 text-3xl font-semibold">€42 500</p>
+        <LicenseTable />
+      </div>
+
+      <div class="lg:col-span-1 flex flex-col gap-3">
+        <!-- Header Activations -->
+        <div class="flex items-center justify-between">
+          <h2 class=" text-lg font-bold text-gray-800 flex items-center gap-2">
+            <Zap class="w-5 h-5 text-blue-500" />
+            Activations Récentes
+          </h2>
         </div>
-        <div class="rounded-lg border bg-white p-6 shadow-sm">
-          <h2 class="text-sm font-medium text-gray-500">Renouvellement</h2>
-          <p class="mt-2 text-3xl font-semibold">93%</p>
-        </div>
+        <RecentActivations />
       </div>
-    </section>
-    <section class="grid gap-6 lg:grid-cols-2">
-      <div class="rounded-lg border bg-white p-6 shadow-sm">
-        <h3 class="font-medium mb-3">Licences expirant sous 30 jours</h3>
-        <ul class="divide-y">
-          <li class="py-2 flex items-center justify-between">
-            <span>Hôtel Royal</span><span class="text-sm text-red-600">J-14</span>
-          </li>
-          <li class="py-2 flex items-center justify-between">
-            <span>Sunset Resort</span><span class="text-sm text-red-600">J-21</span>
-          </li>
-          <li class="py-2 flex items-center justify-between">
-            <span>Oasis</span><span class="text-sm text-amber-600">J-28</span>
-          </li>
-        </ul>
-      </div>
-      <div class="rounded-lg border bg-white p-6 shadow-sm">
-        <h3 class="font-medium mb-3">Activations récentes</h3>
-        <ul class="space-y-2">
-          <li class="text-sm">Hôtel Royal a activé Application Mobile</li>
-          <li class="text-sm">LakeView a activé Channel Manager</li>
-          <li class="text-sm">Oasis a augmenté quota POS</li>
-        </ul>
-      </div>
-    </section>
+
+    </div>
+
+    <!-- Chart -->
+    <RevenueChart />
+
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { Building2, BadgeDollarSign, RefreshCcw, TriangleAlert, Zap } from 'lucide-vue-next'
+import StatsCard from '../components/Dashboard/StatsCard.vue'
+import LicenseTable from '../components/Dashboard/LicenseTable.vue'
+import RecentActivations from '../components/Dashboard/RecentActivations.vue'
+import RevenueChart from '../components/Dashboard/RevenueChart.vue'
 
-<style scoped></style>
+interface Stat {
+  title: string
+  value: string
+  trend?: string
+  objectif?: string
+  icon: unknown
+  iconBg: string
+  iconColor: string
+}
+
+const stats: Stat[] = [
+  {
+    title: 'Total Hôtels',
+    value: '154',
+    trend: '+4 ce mois',
+    icon: Building2,
+    iconBg: 'bg-blue-50',
+    iconColor: 'text-blue-500',
+  },
+  {
+    title: 'Revenu Mensuel (MRR)',
+    value: '45 200 F',
+    trend: '+12.5% vs mois dernier',
+    icon: BadgeDollarSign,
+    iconBg: 'bg-green-50',
+    iconColor: 'text-green-500',
+  },
+  {
+    title: 'Taux de Renouvellement',
+    value: '98.5%',
+    objectif: 'Objectif: 99%',
+    icon: RefreshCcw,
+    iconBg: 'bg-purple-50',
+    iconColor: 'text-purple-500',
+  },
+]
+</script>

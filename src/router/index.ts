@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import AdminLayout from '../views/layouts/AdminLayout.vue'
+import AdminLayout from '../components/Layout/AdminLayout.vue'
 import Dashboard from '../views/Dashboard.vue'
 import Login from '../views/auth/Login.vue'
 import Clients from '../views/clients/Clients.vue'
@@ -19,7 +19,7 @@ const router = createRouter({
       children: [
         { path: '', name: 'dashboard', component: Dashboard, meta: { roles: ['super-admin', 'support', 'commercial'] } },
         { path: 'clients', name: 'clients', component: Clients, meta: { roles: ['super-admin', 'support', 'commercial'] } },
-        { path: 'clients/:id', name: 'client-detail', component: ClientDetail, meta: { roles: ['super-admin', 'support', 'commercial'] } },
+        { path: 'details', name: 'client-detail', component: ClientDetail, meta: { roles: ['super-admin', 'support', 'commercial'] } },
         { path: 'support', name: 'support', component: Support, meta: { roles: ['super-admin', 'support'] } },
         { path: 'billing', name: 'billing', component: Billing, meta: { roles: ['super-admin', 'commercial'] } },
         { path: 'security', name: 'security', component: Security, meta: { roles: ['super-admin'] } },

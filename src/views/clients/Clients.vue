@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import ButtonComponent from '../../components/Button/ButtonComponent.vue';
 import BaseTable, { type Column } from '../../components/Table/BaseTable.vue';
 import PaginationTable from '../../components/Pagination/PaginationTable.vue';
+
 import { 
   Plus, 
   BedDouble, 

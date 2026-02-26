@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import router from '../../router'
+import Toggle from '../../components/FormElements/Toggle.vue';
+import CheckboxInput from '../../components/FormElements/CheckboxInput.vue';
+import Input from '../../components/FormElements/Input.vue';
 import { 
   ArrowLeft , 
  ArrowLeftRight ,
@@ -10,7 +14,8 @@ import {
   LogIn ,
   ListChecks ,
   Utensils ,
-  Banknote 
+  Banknote, 
+  OctagonAlert
 
 } from 'lucide-vue-next' 
 
@@ -67,7 +72,9 @@ const saveChanges = () => {
       <section class="gap-4 items-center bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <div class="flex justify-between">
         <div class="flex flex-col">
+        
           <div class="flex items-center gap-3">
+              <ArrowLeft @click="router.back()" class="cursor-pointer"/>
             <h2 class="text-xl font-bold text-slate-900 dark:text-white">{{ hotelInfo.name }}</h2>
             <span class="inline-flex items-center rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400">
               {{ hotelInfo.status }}
@@ -77,12 +84,12 @@ const saveChanges = () => {
 
           <div class="flex flex-wrap ">
        
-        <button class="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+        <button class="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer">
           <LogIn  class="w-4 h-4" /> Se connecter en tant que
         </button>
         <div class="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-2"></div>
-        <button class="flex items-center gap-2 px-4 py-2 bg-rose-500 text-white rounded-lg text-sm font-semibold hover:bg-rose-600 transition-colors shadow-lg shadow-rose-500/20">
-          <EmergencyHome class="w-4 h-4" /> Kill-Switch (Suspendre API)
+        <button class="flex items-center gap-2 px-4 py-2 bg-rose-500 text-white rounded-lg text-sm font-semibold hover:bg-rose-600 transition-colors shadow-lg shadow-rose-500/20 cursor-pointer">
+          <OctagonAlert class="w-4 h-4" /> Kill-Switch (Suspendre API)
         </button>
         </div>
         </div>
@@ -96,9 +103,9 @@ const saveChanges = () => {
           <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
             <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
               <h3 class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <Info class="w-5 h-5 text-blue-600" /> Informations Générales
+                <Info class="w-5 h-5 text-yellow-600" /> Informations Générales
               </h3>
-              <button class="text-blue-600 hover:bg-blue-50 p-1.5 rounded-lg transition-colors">
+              <button class="text-yellow-600 hover:bg-yellow-50 p-1.5 rounded-lg transition-colors cursor-pointer">
                 <Edit class="w-4 h-4" />
               </button>
             </div>
@@ -114,7 +121,7 @@ const saveChanges = () => {
               <div class="space-y-1">
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Contact Manager</p>
                 <div class="flex items-center gap-3 mt-1">
-                  <div class="h-8 w-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs">
+                  <div class="h-8 w-8 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center font-bold text-xs">
                     {{ hotelInfo.manager.initials }}
                   </div>
                   <div class="flex flex-col">
@@ -130,7 +137,7 @@ const saveChanges = () => {
           <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
             <div class="p-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
               <h3 class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <Banknote  class="w-5 h-5 text-blue-600" /> Technique & Facturation
+                <Banknote  class="w-5 h-5 text-yellow-600" /> Technique & Facturation
               </h3>
             </div>
             <div class="p-5 space-y-6">
@@ -139,7 +146,7 @@ const saveChanges = () => {
                   <p class="text-[10px] font-bold text-slate-400 uppercase">Version Actuelle</p>
                   <p class="text-lg font-bold text-slate-900 dark:text-white">{{ hotelInfo.version }}</p>
                 </div>
-                <button class="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-700 transition-colors">
+                <button class="bg-yellow-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-yellow-700 transition-colors cursor-pointer">
                   Mettre à jour
                 </button>
               </div>
@@ -154,7 +161,7 @@ const saveChanges = () => {
                     <p class="text-sm font-bold text-slate-700 dark:text-slate-300">{{ hotelInfo.nextInvoice }}</p>
                   </div>
                 </div>
-                <button class="w-full py-2.5 border border-blue-600 text-blue-600 font-bold rounded-lg text-sm hover:bg-blue-50 transition-all">
+                <button class="w-full py-2.5 border border-yellow-600 text-yellow-600 font-bold rounded-lg text-sm hover:bg-yellow-50 transition-all cursor-pointer">
                   Générer Gratuité
                 </button>
               </div>
@@ -167,12 +174,12 @@ const saveChanges = () => {
           <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden h-full">
             <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
               <div class="flex items-center gap-3">
-                <div class="h-10 w-10 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
-                  <ListChecks  class="text-blue-600 w-5 h-5" />
+                <div class="h-10 w-10 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg flex items-center justify-center">
+                  <ListChecks  class="text-yellow-600 w-5 h-5" />
                 </div>
                 <h3 class="font-bold text-lg text-slate-900 dark:text-white">Configuration des Licences</h3>
               </div>
-              <button @click="saveChanges" class="bg-slate-900 dark:bg-blue-600 text-white px-6 py-2 rounded-lg font-bold text-sm hover:opacity-90 transition-opacity">
+              <button @click="saveChanges" class="bg-slate-900 dark:bg-yellow-600 text-white px-6 py-2 rounded-lg font-bold text-sm hover:opacity-90 transition-opacity cursor-pointer">
                 Enregistrer les modifications
               </button>
             </div>
@@ -190,9 +197,9 @@ const saveChanges = () => {
                 <div class="space-y-4">
                   <div class="flex justify-between items-center">
                     <p class="text-sm font-medium text-slate-500">Nombre de chambres</p>
-                    <span class="text-sm font-bold text-blue-600">{{ licenses.pms.rooms }}</span>
+                    <span class="text-sm font-bold text-yellow-600">{{ licenses.pms.rooms }}</span>
                   </div>
-                  <input type="range" min="0" max="250" v-model="licenses.pms.rooms" class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-600" />
+                  <input type="range" min="0" max="250" v-model="licenses.pms.rooms" class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-yellow-600" />
                 </div>
               </div>
 
@@ -208,7 +215,7 @@ const saveChanges = () => {
                 <div class="space-y-2">
                   <p class="text-sm font-medium text-slate-500">Licences de caisse</p>
                   <div class="flex items-center gap-3">
-                    <input type="number" v-model="licenses.pos.units" class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm p-2 outline-none focus:ring-1 focus:ring-blue-600" />
+                    <Input type="number" v-model="licenses.pos.units"  />
                     <span class="text-[10px] font-bold text-slate-400 whitespace-nowrap">UNITÉS</span>
                   </div>
                 </div>
@@ -228,7 +235,8 @@ const saveChanges = () => {
                   <div v-for="ota in licenses.channelManager.otas" :key="ota.name" 
                     class="flex items-center gap-3 p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800"
                     :class="!ota.checked && 'opacity-60'">
-                    <input type="checkbox" v-model="ota.checked" class="rounded text-blue-600 focus:ring-blue-500" />
+                    <CheckboxInput v-model="ota.checked" />
+                    <!-- <input type="checkbox" v-model="ota.checked" class="rounded text-yellow-600 focus:ring-yellow-500" /> -->
                     <span class="text-sm font-medium">{{ ota.name }}</span>
                   </div>
                 </div>
@@ -246,14 +254,15 @@ const saveChanges = () => {
                 <div class="space-y-4">
                   <div class="space-y-1">
                     <p class="text-xs font-medium text-slate-500">Quota staff</p>
-                    <input type="number" v-model="licenses.mobileApp.staffQuota" class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-2 text-sm" />
+                    <Input type="number" v-model="licenses.mobileApp.staffQuota" />
                   </div>
-                  <div class="flex items-center justify-between p-3 rounded-lg border border-blue-100 bg-blue-50/50 dark:bg-blue-900/10">
+                  <div class="flex items-center justify-between p-3 rounded-lg border border-yellow-100 bg-yellow-50/50 dark:bg-yellow-900/10">
                     <div class="flex items-center gap-2">
-                      <PersonPin class="text-blue-600 w-4 h-4" />
+                      <PersonPin class="text-yellow-600 w-4 h-4" />
                       <span class="text-xs font-semibold text-slate-700 dark:text-slate-200">Guest App Option</span>
                     </div>
-                    <input type="checkbox" v-model="licenses.mobileApp.guestApp" class="rounded text-blue-600 h-4 w-4" />
+                    
+                    <CheckboxInput v-model="licenses.mobileApp.guestApp" />
                   </div>
                 </div>
               </div>
@@ -266,15 +275,15 @@ const saveChanges = () => {
       <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
         <div class="flex items-center gap-4">
           <div class="flex -space-x-2">
-            <div class="h-8 w-8 rounded-full border-2 border-white dark:border-slate-900 bg-blue-100 flex items-center justify-center text-[10px] font-bold">SM</div>
+            <div class="h-8 w-8 rounded-full border-2 border-white dark:border-slate-900 bg-yellow-100 flex items-center justify-center text-[10px] font-bold">SM</div>
             <div class="h-8 w-8 rounded-full border-2 border-white dark:border-slate-900 bg-emerald-100 flex items-center justify-center text-[10px] font-bold">AL</div>
             <div class="h-8 w-8 rounded-full border-2 border-white dark:border-slate-900 bg-amber-100 flex items-center justify-center text-[10px] font-bold text-amber-700">+3</div>
           </div>
           <p class="text-sm text-slate-500">Dernière modification par <span class="font-bold text-slate-900 dark:text-white">Admin (Sarah M.)</span> il y a 2 heures</p>
         </div>
         <div class="flex gap-3">
-          <button class="px-4 py-2 text-sm font-bold text-slate-500 hover:text-slate-700">Exporter le profil (PDF)</button>
-          <button class="px-4 py-2 text-sm font-bold bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 transition-colors">Historique complet</button>
+          <button class="px-4 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 cursor-pointer">Exporter le profil (PDF)</button>
+          <button class="px-4 py-2 text-sm font-bold bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 transition-colors cursor-pointer">Historique complet</button>
         </div>
       </div>
     </div>
@@ -284,9 +293,5 @@ const saveChanges = () => {
 
 
 <style scoped>
-/* On peut ajouter des styles spécifiques ici si nécessaire */
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  opacity: 1;
-}
+
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-white rounded-2xl p-5 flex items-center justify-between shadow-sm border border-gray-100"
+    class="bg-white rounded-2xl p-5 flex items-center justify-between  border border-gray-100"
   >
     <!-- Infos -->
     <div class="flex flex-col gap-1">

@@ -1,6 +1,6 @@
 <!-- src/components/dashboard/RecentActivations.vue -->
 <template>
-  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-4">
+  <div class="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col gap-4">
 
    
 

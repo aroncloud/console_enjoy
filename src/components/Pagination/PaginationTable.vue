@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-between items-center py-1">
+  <div class="flex justify-between items-center py-1 space-x-2">
     <span class="text-xs text-gray-400 font-medium">
       Affichage de {{ startItem }} à {{ endItem }} sur {{ totalItems.toLocaleString() }}
     </span>

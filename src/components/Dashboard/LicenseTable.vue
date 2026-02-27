@@ -6,6 +6,8 @@
   <BaseTable
     :columns="columns"
     :data="pagedLicenses"
+    :sortable="false"
+    :searchable="false"
   >
 
     <!-- Colonne Hôtel -->

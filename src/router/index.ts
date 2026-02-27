@@ -7,33 +7,47 @@ import ClientDetail from '../views/clients/ClientDetail.vue'
 import Support from '../views/support/Support.vue'
 import Billing from '../views/billing/Billing.vue'
 import Security from '../views/security/Security.vue'
-import { useAuth } from '../composables/useAuth'
+import { useAuthStore } from '../composables/useAuth'
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: '/login', name: 'login', component: Login, meta: { public: true } },
+    {
+      path: '/login',
+      name: 'login',
+      component: Login,
+      meta: { public: true },
+    },
     {
       path: '/',
       component: AdminLayout,
       children: [
-        { path: '', name: 'dashboard', component: Dashboard, meta: { roles: ['super-admin', 'support', 'commercial'] } },
-        { path: 'clients', name: 'clients', component: Clients, meta: { roles: ['super-admin', 'support', 'commercial'] } },
-        { path: 'details', name: 'client-detail', component: ClientDetail, meta: { roles: ['super-admin', 'support', 'commercial'] } },
-        { path: 'support', name: 'support', component: Support, meta: { roles: ['super-admin', 'support'] } },
-        { path: 'billing', name: 'billing', component: Billing, meta: { roles: ['super-admin', 'commercial'] } },
-        { path: 'security', name: 'security', component: Security, meta: { roles: ['super-admin'] } },
+        { path: '',            name: 'dashboard',     component: Dashboard },
+        { path: 'clients',     name: 'clients',       component: Clients },
+        { path: 'clients/:id', name: 'client-detail', component: ClientDetail },
+        { path: 'support',     name: 'support',       component: Support },
+        { path: 'billing',     name: 'billing',       component: Billing },
+        { path: 'security',    name: 'security',      component: Security },
       ],
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      redirect: '/login',
     },
   ],
 })
 
 router.beforeEach((to) => {
-  const { state, restore, hasRole } = useAuth()
-  if (!state.isAuthenticated) restore()
-  if (to.meta.public) return true
-  if (!state.isAuthenticated) return { name: 'login' }
-  if (to.meta.roles && !hasRole(to.meta.roles as any)) return { name: 'dashboard' }
+  const authStore = useAuthStore()
+
+  if (to.meta.public) {
+    if (authStore.isAuthenticated && to.name === 'login') return { name: 'dashboard' }
+    return true
+  }
+
+  if (!authStore.isAuthenticated) return { name: 'login' }
+
   return true
 })
 

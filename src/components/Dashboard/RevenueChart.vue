@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+  <div class="bg-white rounded-xl border border-gray-100 p-6 ">
 
     <!-- Header -->
     <div class="flex items-center justify-between mb-8">
@@ -43,7 +43,7 @@
       <Transition name="fade">
         <div
           v-if="tooltip.visible"
-          class="absolute z-50 bg-gray-900 text-white rounded-xl px-4 py-3 shadow-xl pointer-events-none min-w-[140px]"
+          class="absolute z-50 bg-gray-900 text-white rounded-xl px-4 py-3 pointer-events-none min-w-[140px]"
           :style="{ left: tooltip.x + 'px', top: tooltip.y + 'px', transform: 'translateX(-50%)' }"
         >
           <!-- Mois -->

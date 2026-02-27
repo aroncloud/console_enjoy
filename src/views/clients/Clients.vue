@@ -1,196 +1,287 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import ButtonComponent from '../../components/Button/ButtonComponent.vue';
-import BaseTable, { type Column } from '../../components/Table/BaseTable.vue';
-import PaginationTable from '../../components/Pagination/PaginationTable.vue';
+import { ref, computed, onMounted } from 'vue'
+import AddHotelForm from '../../components/Clients/AddHotelForm.vue'
+import ButtonComponent from '../../components/Button/ButtonComponent.vue'
+import BaseTable, { type Column } from '../../components/Table/BaseTable.vue'
+import PaginationTable from '../../components/Pagination/PaginationTable.vue'
+import { Plus, BedDouble, Utensils, RefreshCcw, Smartphone, ExternalLink } from 'lucide-vue-next'
+import { hotelService } from '../../servicesAPI/clientService'
 
-import { 
-  Plus, 
-  BedDouble, 
-  Utensils, 
-  RefreshCcw, 
-  Smartphone, 
-  ChevronLeft, 
-  ChevronRight 
-} from 'lucide-vue-next';
-
-// Types
-type Status = 'Actif' | 'Démo' | 'Suspendu' | 'Maintenance';
-
+// ── Types 
 interface Hotel {
-  id: string;
-  name: string;
-  internalId: string;
-  status: Status;
-  products: string[];
-  capacity: number;
-  contactName: string;
-  contactRole: string;
+  id: number
+  hotelName: string
+  hotelCode: string
+  city: string
+  country: string
+  email: string
+  phoneNumber: string
+  status: string
+  propertyType: string
+  grade: number
+  totalRooms: number
+  currencyCode: string
+  channelEnable: boolean
+  migrated: boolean
+  currentWorkingDate: string | null
 }
+
+// ── State 
+const hotels    = ref<Hotel[]>([])
+const loading   = ref(false)
+const error     = ref<string | null>(null)
+const showForm  = ref(false)
+
+// ── Colonnes table 
 const columns: Column[] = [
-  { key: 'hotel', label: 'Hôtel' },
-  { key: 'status', label: 'Statut' },
+  { key: 'hotel',    label: 'Hôtel' },
+  { key: 'location', label: 'Localisation' },
+  { key: 'status',   label: 'Statut' },
   { key: 'products', label: 'Produits Actifs' },
-  { key: 'capacity', label: 'Capacité' },
-  { key: 'contact', label: 'Contact' },
-  { key: 'actions', label: 'Actions', tdClass: 'text-right' },
+  { key: 'infos',    label: 'Infos' },
+  { key: 'contact',  label: 'Contact' },
+  { key: 'actions',  label: 'Actions', tdClass: 'text-right' },
 ]
-// Données simulées
-const hotels = ref<Hotel[]>([
-  {
-    id: '1',
-    name: 'Grand Plaza Hotel',
-    internalId: 'T-882-GP',
-    status: 'Actif',
-    products: ['bed', 'food', 'sync', 'device'],
-    capacity: 120,
-    contactName: 'Marc Leroy',
-    contactRole: 'Directeur Général'
-  },
-  {
-    id: '2',
-    name: 'Auberge du Lac',
-    internalId: 'T-415-AL',
-    status: 'Démo',
-    products: ['bed', 'food', 'sync', 'device-off'],
-    capacity: 45,
-    contactName: 'Sophie Morel',
-    contactRole: 'Propriétaire'
-  },
-  {
-    id: '3',
-    name: 'Hôtel Royal',
-    internalId: 'T-901-HR',
-    status: 'Suspendu',
-    products: ['bed-off'],
-    capacity: 210,
-    contactName: 'Jean Dupont',
-    contactRole: 'Admin Réseau'
-  },
-  {
-    id: '4',
-    name: 'City Hub Brussels',
-    internalId: 'T-223-CH',
-    status: 'Actif',
-    products: ['bed', 'food', 'sync', 'device'],
-    capacity: 85,
-    contactName: 'Lucie Bernard',
-    contactRole: 'Directrice Opérationnelle'
-  },
-  {
-    id: '5',
-    name: 'Marine Resort Spa',
-    internalId: 'T-556-MR',
-    status: 'Maintenance',
-    products: ['bed', 'food', 'sync', 'device-off'],
-    capacity: 150,
-    contactName: 'Antoine Petit',
-    contactRole: 'Resp. Technique'
+
+// ── Chargement 
+onMounted(async () => {
+  loading.value = true
+  try {
+    const response = await hotelService.getAll()
+    hotels.value = response.data?.data || response.data || []
+    console.log('Hôtels chargés :', hotels.value)
+  } catch (e: any) {
+    error.value = e.message
+  } finally {
+    loading.value = false
   }
-]);
-
-// pagination state
-
-const currentPage = ref(1)
-const pageSize = ref(5)
-const pagedHotels = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value
-  return hotels.value.slice(start, start + pageSize.value)
 })
 
+// ── Formulaire 
+const openForm  = () => { showForm.value = true }
+const closeForm = () => { showForm.value = false }
+const handleSubmit = (data: Record<string, unknown>) => {
+  console.log('Nouvel établissement :', data)
+  closeForm()
+}
+
+// ── Filtres 
+// Le backend renvoie status: 'active' | 'inactive' | 'suspended' etc.
+const activeFilter = ref('all')
+const currentPage  = ref(1)
+const pageSize     = ref(5)
+
+const filteredHotels = computed(() => {
+  if (activeFilter.value === 'all') return hotels.value
+  return hotels.value.filter(h => h.status === activeFilter.value)
+})
+
+const pagedHotels = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  return filteredHotels.value.slice(start, start + pageSize.value)
+})
+
+// Compteurs basés sur les vrais statuts backend
+const countActive    = computed(() => hotels.value.filter(h => h.status === 'active').length)
+const countInactive  = computed(() => hotels.value.filter(h => h.status === 'inactive').length)
+const countSuspended = computed(() => hotels.value.filter(h => h.status === 'suspended').length)
+
+const setFilter = (key: string) => {
+  activeFilter.value = key
+  currentPage.value = 1
+}
+
+// ── Styles statut 
 const getStatusStyles = (status: string) => {
   switch (status) {
-    case 'Actif': return 'bg-green-100 text-green-700'
-    case 'Démo': return 'bg-orange-100 text-orange-700'
-    case 'Suspendu': return 'bg-red-100 text-red-700'
-    case 'Maintenance': return 'bg-orange-50 text-orange-600 border border-orange-200'
-    default: return 'bg-gray-100 text-gray-600'
+    case 'active':    return 'bg-green-100 text-green-700'
+    case 'inactive':  return 'bg-gray-100 text-gray-600'
+    case 'suspended': return 'bg-red-100 text-red-700'
+    case 'demo':      return 'bg-orange-100 text-orange-700'
+    default:          return 'bg-gray-100 text-gray-500'
   }
+}
+
+const getStatusLabel = (status: string) => {
+  switch (status) {
+    case 'active':    return 'Actif'
+    case 'inactive':  return 'Inactif'
+    case 'suspended': return 'Suspendu'
+    case 'demo':      return 'Démo'
+    default:          return status
+  }
+}
+
+// ── Étoiles 
+const renderStars = (grade: number) => '★'.repeat(grade) + '☆'.repeat(5 - grade)
+
+// ── Produits 
+const getProducts = (row: Hotel) => {
+  if ((row as any).products) return (row as any).products
+  return ['pms']
 }
 </script>
 
 <template>
-  <main class="p-8 bg-gray-50 min-h-screen font-sans">
-    <!-- Header Section -->
-    <div class="flex justify-between items-start mb-8">
-      
 
+  <!-- ── Vue Formulaire ── -->
+  <AddHotelForm
+    v-if="showForm"
+    @submit="handleSubmit"
+    @cancel="closeForm"
+    @back="closeForm"
+  />
+
+  <!-- ── Vue Liste ── -->
+  <div v-else class="p-4 md:p-8 bg-gray-50 min-h-screen font-sans">
+
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between md:items-start mb-8 gap-4">
       <div>
         <h1 class="text-2xl font-bold text-gray-900">Gestion du Parc Client</h1>
-        <p class="text-gray-500 text-sm mt-1">Gérez les abonnements et les accès des établissements hôteliers.</p>
+        <p class="text-gray-500 text-sm mt-1">
+          Gérez les abonnements et les accès des établissements hôteliers.
+        </p>
       </div>
       <ButtonComponent
         label="Ajouter un Hôtel"
         variant="primary"
         :iconLeft="Plus"
-       />
+        @click="openForm"
+      />
     </div>
 
-    <!-- Filters / Tabs -->
-    <div class="flex gap-3 mb-6">
-      <button class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium">Tous (1,248)</button>
-      <button class="px-4 py-2 rounded-lg bg-white border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50">Actifs (1,102)</button>
-      <button class="px-4 py-2 rounded-lg bg-white border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50">Suspendus (14)</button>
-      <button class="px-4 py-2 rounded-lg bg-white border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50">Démo (132)</button>
+    <!-- Erreur -->
+    <div v-if="error" class="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+      {{ error }}
     </div>
 
-    <!-- Table Container -->
-    <BaseTable :columns="columns" :data="hotels">
-      
-      <!-- Slot: Cellule Hôtel -->
+    <!-- Filtres -->
+    <div class="flex gap-3 mb-6 overflow-x-auto pb-2">
+      <button
+        v-for="filter in [
+          { key: 'all',       label: `Tous (${hotels.length})` },
+          { key: 'active',    label: `Actifs (${countActive})` },
+          { key: 'suspended', label: `Suspendus (${countSuspended})` },
+          { key: 'inactive',  label: `Inactifs (${countInactive})` },
+        ]"
+        :key="filter.key"
+        @click="setFilter(filter.key)"
+        :class="[
+          'px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors cursor-pointer',
+          activeFilter === filter.key
+            ? 'bg-purple-600 text-white'
+            : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+        ]"
+      >
+        {{ filter.label }}
+      </button>
+    </div>
+
+    <!-- Table -->
+    <BaseTable
+      :columns="columns"
+      :data="pagedHotels"
+      :loading="loading"
+    >
+
+      <!-- Hôtel -->
       <template #cell-hotel="{ row }">
-        <div class="flex flex-col">
-          <span class="font-normal text-gray-900">{{ row.name }}</span>
-          <span class="text-[10px] text-gray-400 font-medium">ID: {{ row.id }}</span>
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-purple-100 flex items-center justify-center shrink-0">
+            <BedDouble class="w-4 h-4 text-purple-600" />
+          </div>
+          <div>
+            <p class="font-semibold text-gray-900 text-sm">{{ row.hotelName }}</p>
+            <p class="text-[11px] text-gray-400 font-mono">{{ row.hotelCode }}</p>
+          </div>
         </div>
       </template>
 
-      <!-- Slot: Cellule Statut -->
-      <template #cell-status="{ value }">
-        <span :class="['px-3 py-1 rounded-full text-[11px] font-bold inline-flex items-center gap-1.5', getStatusStyles(value)]">
+      <!-- Localisation -->
+      <template #cell-location="{ row }">
+        <div class="flex flex-col">
+          <span class="text-sm text-gray-800">{{ row.city }}</span>
+          <span class="text-xs text-gray-400">{{ row.country }}</span>
+        </div>
+      </template>
+
+      <!-- Produits actifs (mock en attendant le back) -->
+      <template #cell-products="{ row }">
+        <div class="flex items-center gap-2.5 text-gray-300">
+          <!-- PMS / Hébergement -->
+          <BedDouble
+            :size="17"
+            :class="getProducts(row).includes('pms') ? 'text-purple-500' : 'text-gray-200'"
+            title="PMS"
+          />
+          <!-- Restauration -->
+          <Utensils
+            :size="17"
+            :class="getProducts(row).includes('pos') ? 'text-orange-400' : 'text-gray-200'"
+            title="Point de vente"
+          />
+          <!-- Channel Manager -->
+          <RefreshCcw
+            :size="17"
+            :class="row.channelEnable ? 'text-green-500' : 'text-gray-200'"
+            title="Channel Manager"
+          />
+          <!-- App mobile -->
+          <Smartphone
+            :size="17"
+            :class="getProducts(row).includes('app') ? 'text-blue-400' : 'text-gray-200'"
+            title="App mobile"
+          />
+        </div>
+      </template>
+
+      <!-- Statut -->
+      <template #cell-status="{ row }">
+        <span :class="['px-2.5 py-1 rounded-full text-[11px] font-bold inline-flex items-center gap-1.5', getStatusStyles(row.status)]">
           <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
-          {{ value }}
+          {{ getStatusLabel(row.status) }}
         </span>
       </template>
 
-      <!-- Slot: Cellule Produits -->
-      <template #cell-products="{ row }">
-        <div class="flex gap-3 text-blue-500">
-          <BedDouble :size="18" :class="row.products.includes('bed-off') ? 'text-gray-200' : ''" />
-          <Utensils v-if="row.products.includes('food')" :size="18" />
-          <RefreshCcw v-if="row.products.includes('sync')" :size="18" />
-          <Smartphone :size="18" :class="row.products.includes('device-off') ? 'text-gray-200' : (row.products.includes('device') ? '' : 'hidden')" />
+      <!-- Infos -->
+      <template #cell-infos="{ row }">
+        <div class="flex flex-col gap-0.5">
+          <span class="text-xs text-amber-500 tracking-wide">{{ renderStars(row.grade ?? 0) }}</span>
+          <span class="text-xs text-gray-500">{{ row.currencyCode }}</span>
         </div>
       </template>
 
-      <!-- Slot: Cellule Capacité -->
-      <template #cell-capacity="{ value }">
-        <span class="text-gray-600">{{ value }}</span>
-      </template>
-
-      <!-- Slot: Cellule Contact -->
+      <!-- Contact -->
       <template #cell-contact="{ row }">
         <div class="flex flex-col">
-          <span class="font-semibold text-gray-900">{{ row.contactName }}</span>
-          <span class="text-xs text-gray-400">{{ row.contactRole }}</span>
+          <span class="text-xs text-gray-700 truncate max-w-[140px]">{{ row.email }}</span>
+          <span class="text-xs text-gray-400">{{ row.phoneNumber }}</span>
         </div>
       </template>
 
-      <!-- Slot: Cellule Actions -->
-      <template #cell-actions>
-        <router-link to="/details" class="text-purple-500 hover:text-purple-800 text-sm font-bold ">Détails</router-link>
+      <!-- Actions -->
+      <template #cell-actions="{ row }">
+        <router-link
+          :to="`/clients/${row.id}`"
+          class="inline-flex items-center gap-1 text-purple-600 hover:text-purple-800 text-sm font-semibold transition-colors"
+        >
+          Détails
+          <ExternalLink class="w-3 h-3" />
+        </router-link>
       </template>
 
-      <!-- Slot: Footer (Pagination) -->
+      <!-- Pagination dans le footer de la table -->
       <template #footer>
         <PaginationTable
           :currentPage="currentPage"
           :pageSize="pageSize"
-          :totalItems="hotels.length"
+          :totalItems="filteredHotels.length"
           @update:currentPage="currentPage = $event"
         />
       </template>
 
     </BaseTable>
-  </main>
+
+  </div>
 </template>

@@ -1,43 +1,85 @@
-import { reactive, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { defineStore } from 'pinia'
 
-type Role = 'super-admin' | 'support' | 'commercial'
+export const useAuthStore = defineStore('auth', {
+  state: () => ({
+    token: null as string | null,
+    refreshToken: null as string | null,
+    tokenData: null as any,
+    refreshTokenData: null as any,
+    user: null as Record<string, any> | null,
+    roleId: null as number | null,
+    UserId: null as number | null,
+    reauthRequired: false as boolean,
+    activeHotelId: null as number | null,
+  }),
 
-const state = reactive({
-  isAuthenticated: false,
-  role: null as Role | null,
-  user: null as null | { name: string },
+  getters: {
+    isLoggedIn: (state) => !!state.user,
+    isFullyAuthenticated: (state) => !!(state.token && state.user && state.UserId),
+    getUser: (state) => state.user,
+    isAuthenticated: (state) => !!state.token,
+    isSuperAdmin: (state) => state.roleId === 1,
+  },
+
+  actions: {
+
+    login(user: any, token: string) {
+      this.user = { ...user }
+      this.token = token
+      this.roleId = user.roleId
+      this.UserId = user.id ?? user.UserId
+    },
+
+    setReauthRequired(flag: boolean) {
+      this.reauthRequired = flag
+    },
+
+    /** Définit l'hôtel actif consulté dans la console (navigation admin) */
+    setActiveHotelId(hotelId: number | null) {
+      this.activeHotelId = hotelId
+    },
+
+    logout() {
+      this.token = null
+      this.refreshToken = null
+      this.user = null
+      this.roleId = null
+      this.UserId = null
+      this.tokenData = null
+      this.refreshTokenData = null
+      this.reauthRequired = false
+      this.activeHotelId = null
+    },
+
+    forceLogout() {
+      this.$reset()
+    },
+
+    setRoleId(roleId: number) {
+      this.roleId = roleId
+    },
+
+    setUserId(UserId: number) {
+      this.UserId = UserId
+    },
+
+
+    updateToken(token: string, tokenData: any) {
+      this.token = token
+      this.tokenData = tokenData
+    },
+
+    updateRefreshToken(refreshToken: string, refreshTokenData: any) {
+      this.refreshToken = refreshToken
+      this.refreshTokenData = refreshTokenData
+    },
+
+   
+
+    clearsetRoleId() { this.roleId = null },
+    clearsetUserId() { this.UserId = null },
+    clearsetUser() { this.user = null },
+  },
+
+  persist: true,
 })
-
-export function useAuth() {
-  const router = useRouter()
-  const login = async (role: Role, code: string) => {
-    if (!code || code.length < 4) return false
-    state.isAuthenticated = true
-    state.role = role
-    state.user = { name: role }
-    localStorage.setItem('enjoy_console_role', role)
-    return true
-  }
-  const logout = () => {
-    state.isAuthenticated = false
-    state.role = null
-    state.user = null
-    localStorage.removeItem('enjoy_console_role')
-    router.push('/login')
-  }
-  const hasRole = (roles: Role[] | Role) => {
-    const arr = Array.isArray(roles) ? roles : [roles]
-    return !!state.role && arr.includes(state.role)
-  }
-  const restore = () => {
-    const r = localStorage.getItem('enjoy_console_role') as Role | null
-    if (r) {
-      state.isAuthenticated = true
-      state.role = r
-      state.user = { name: r }
-    }
-  }
-  const currentRole = computed(() => state.role)
-  return { state, login, logout, hasRole, restore, currentRole }
-}

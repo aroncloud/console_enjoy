@@ -27,7 +27,7 @@
             placeholder="Rechercher…"
             class="pl-8 pr-7 py-1.5 text-sm bg-gray-50 border border-gray-200 rounded-lg outline-none
                    text-gray-800 placeholder-gray-400 w-52
-                   focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:w-64
+                   focus:border-purple-500 focus:ring-2 focus:ring-purple-100 focus:w-64
                    transition-all duration-150"
           />
           <button
@@ -182,14 +182,14 @@
     </div>
 
     <!-- ── FOOTER -->
-    <div class="flex items-center justify-between flex-wrap gap-3 px-5 py-3 border-t border-gray-200 bg-gray-50">
+    <div class="flex items-center justify-between flex-wrap gap-3 px-5 py-3 border-t border-gray-200 bg-white">
       <!-- Page size -->
       <div class="flex items-center gap-2 text-xs text-gray-400">
         <span>Lignes :</span>
         <select
           v-model="pageSize"
           class="text-xs text-gray-700 bg-white border border-gray-200 rounded-md px-2 py-1 outline-none
-                 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 cursor-pointer transition-all"
+                 focus:border-purple-500 focus:ring-2 focus:ring-purple-100 cursor-pointer transition-all"
         >
           <option v-for="n in pageSizeOptions" :key="n" :value="n">{{ n }}</option>
         </select>

@@ -12,6 +12,34 @@ export interface Hotel {
 
 }
 
+export interface CreateHotelPayload {
+  name: string
+  description?: string
+  address: string
+  city: string
+  state?: string
+  country: string
+  postalCode?: string
+  email: string
+  website?: string
+  phone: string
+  totalRooms?: number
+  totalFloors?: number
+  starRating?: number
+  timezone?: string
+  currency?: string
+  taxRate?: number
+  checkInTime?: string
+  checkOutTime?: string
+  cancellationPolicy?: string
+  policies?: string
+  isActive?: boolean
+  adminFirstName: string
+  adminLastName: string
+  adminEmail: string
+  adminPhoneNumber?: string
+}
+
 export const hotelService = {
   getAll: () =>
     api.get<any>('/hotels').then(r => r.data),
@@ -19,7 +47,7 @@ export const hotelService = {
   getById: (id: number) =>
     api.get<any>(`/hotels/${id}`).then(r => r.data),
 
-  create: (payload: Omit<Hotel, 'id'>) =>
+   create: (payload: CreateHotelPayload) =>
     api.post<Hotel>('/hotels', payload).then(r => r.data),
 
   update: (id: number, payload: Partial<Hotel>) =>

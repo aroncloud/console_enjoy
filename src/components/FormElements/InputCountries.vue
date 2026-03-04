@@ -1,10 +1,26 @@
 <template>
-  <div class="country-autocomplete w-full ">
+  <div class="country-autocomplete w-full">
     <label for="country-input" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 truncate">
       {{ $t(lb) }}
       <span v-if="isRequired" class="text-red-500">*</span>
     </label>
     <div class="relative">
+
+      <!-- Selected flag (shown inside input on left) -->
+      <span
+        v-if="selectedCountry"
+        class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center"
+      >
+        <img
+          :src="`https://flagcdn.com/20x15/${selectedCountry.value.toLowerCase()}.png`"
+          :srcset="`https://flagcdn.com/40x30/${selectedCountry.value.toLowerCase()}.png 2x`"
+          width="20"
+          height="15"
+          :alt="selectedCountry.label"
+          class="rounded-sm object-cover"
+        />
+      </span>
+
       <input
         id="country-input"
         type="text"
@@ -13,37 +29,44 @@
         @focus="handleFocus"
         @blur="handleBlur"
         :disabled="disabled"
-       :class="[
-
-          'flex justify-between h-11 w-full rounded-lg  border bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-purple-500 focus:outline-hidden focus:ring-3 focus:ring-purple-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30',
+        :class="[
+          'flex justify-between h-11 w-full rounded-lg border bg-transparent py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-purple-500 focus:outline-hidden focus:ring-3 focus:ring-purple-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 transition-all',
+          selectedCountry ? 'pl-10 pr-4' : 'px-4',
           {
             'opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800': disabled,
             'border-gray-300': !disabled,
-            'border-gray-200': disabled
+            'border-gray-200': disabled,
           },
-          props.customClass
+          props.customClass,
         ]"
-
         :placeholder="computedPlaceholder"
         autocomplete="off"
       />
 
-      <!-- Dropdown only shows when not disabled -->
+      <!-- Dropdown -->
       <ul
         v-if="isOpen && filteredCountries.length && !disabled"
-        class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm dark:bg-gray-800 dark:ring-gray-600"
+        class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-gray-200 ring-opacity-5 overflow-auto focus:outline-none sm:text-sm dark:bg-gray-800 dark:ring-gray-600"
       >
         <li
           v-for="country in filteredCountries"
           :key="country.value"
           @mousedown.prevent="selectCountry(country)"
-          class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500 transition-colors duration-150 ease-in-out rounded-md"
+          class="cursor-pointer select-none py-2 pl-3 pr-4 hover:bg-purple-100 hover:text-purple-800 dark:hover:bg-purple-500 dark:hover:text-white transition-colors duration-150 rounded-sm flex items-center gap-3"
         >
-          <span class="block truncate">{{ country.label }}</span>
+          <img
+            :src="`https://flagcdn.com/20x15/${country.value.toLowerCase()}.png`"
+            :srcset="`https://flagcdn.com/40x30/${country.value.toLowerCase()}.png 2x`"
+            width="20"
+            height="15"
+            :alt="country.label"
+            class="rounded-sm object-cover shrink-0"
+          />
+          <span class="truncate">{{ country.label }}</span>
         </li>
       </ul>
 
-      <!-- No results message -->
+      <!-- No results -->
       <div
         v-else-if="isOpen && !filteredCountries.length && searchQuery && !disabled"
         class="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 shadow-lg rounded-md py-2 px-3 text-sm text-gray-500 dark:text-gray-400"
@@ -61,41 +84,22 @@ import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
 const props = defineProps({
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-  modelValue: {
-    type: String,
-  },
-  isRequired: {
-    type: Boolean,
-    default: false,
-  },
-  lb: {
-    type: String,
-    default: 'country',
-  },
-  customClass: {
-    type: String,
-    default: '',
-  },
-  placeholder:{
-    type: String,
-    default: ''
-  }
+  disabled: { type: Boolean, default: false },
+  modelValue: { type: String },
+  isRequired: { type: Boolean, default: false },
+  lb: { type: String, default: 'country' },
+  customClass: { type: String, default: '' },
+  placeholder: { type: String, default: '' },
 });
 
 const emits = defineEmits(['update:modelValue', 'select', 'change']);
 
 const searchQuery = ref<string>('');
 const isOpen = ref<boolean>(false);
-const selectedCountry = ref<any | null>(null);
-const computedPlaceholder = computed(() => {
-  return props.placeholder || t('search_country');
-});
+const selectedCountry = ref<{ value: string; label: string } | null>(null);
 
-// A comprehensive list of all countries
+const computedPlaceholder = computed(() => props.placeholder || t('search_country'));
+
 const allCountries = computed(() => [
   { value: 'AF', label: t('countries_lists.af') || 'Afghanistan' },
   { value: 'AL', label: t('countries_lists.al') || 'Albania' },
@@ -138,7 +142,7 @@ const allCountries = computed(() => [
   { value: 'CD', label: t('countries_lists.cd') || 'Congo, Dem. Rep.' },
   { value: 'CG', label: t('countries_lists.cg') || 'Congo, Rep.' },
   { value: 'CR', label: t('countries_lists.cr') || 'Costa Rica' },
-  { value: 'CI', label: t('countries_lists.ci') || 'Cote d\'Ivoire' },
+  { value: 'CI', label: t('countries_lists.ci') || "Cote d'Ivoire" },
   { value: 'HR', label: t('countries_lists.hr') || 'Croatia' },
   { value: 'CU', label: t('countries_lists.cu') || 'Cuba' },
   { value: 'CY', label: t('countries_lists.cy') || 'Cyprus' },
@@ -186,7 +190,7 @@ const allCountries = computed(() => [
   { value: 'KZ', label: t('countries_lists.kz') || 'Kazakhstan' },
   { value: 'KE', label: t('countries_lists.ke') || 'Kenya' },
   { value: 'KI', label: t('countries_lists.ki') || 'Kiribati' },
-  { value: 'KP', label: t('countries_lists.kp') || 'Korea, Dem. People\'s Rep.' },
+  { value: 'KP', label: t('countries_lists.kp') || "Korea, Dem. People's Rep." },
   { value: 'KR', label: t('countries_lists.kr') || 'Korea, Rep.' },
   { value: 'KW', label: t('countries_lists.kw') || 'Kuwait' },
   { value: 'KG', label: t('countries_lists.kg') || 'Kyrgyzstan' },
@@ -293,74 +297,64 @@ const allCountries = computed(() => [
   { value: 'ZW', label: t('countries_lists.zw') || 'Zimbabwe' },
 ]);
 
-// Filters the list of all countries based on the search query
 const filteredCountries = computed(() => {
-  if (!searchQuery.value) {
-    return allCountries.value;
-  }
+  if (!searchQuery.value) return allCountries.value;
   const query = searchQuery.value.toLowerCase();
-  return allCountries.value.filter(country =>
-    country.label.toLowerCase().includes(query)
-  );
+  return allCountries.value.filter(c => c.label.toLowerCase().includes(query));
 });
 
-// Watch for changes in the `modelValue` prop and update `searchQuery`
 watch(
   () => props.modelValue,
   (newVal) => {
     const selected = allCountries.value.find((c) => c.value === newVal);
-    searchQuery.value = selected ? selected.label : '';
+    if (selected) {
+      selectedCountry.value = selected;
+      searchQuery.value = selected.label;
+    } else {
+      selectedCountry.value = null;
+      searchQuery.value = '';
+    }
   },
   { immediate: true }
 );
 
-// Handles input events, ensuring the dropdown opens only when not disabled
 const handleInput = () => {
   if (!props.disabled) {
     isOpen.value = true;
+    selectedCountry.value = null;
     emits('change', searchQuery.value);
   }
 };
 
-// Handles focus event, only opens dropdown when not disabled
 const handleFocus = () => {
-  if (!props.disabled) {
-    isOpen.value = true;
-  }
+  if (!props.disabled) isOpen.value = true;
 };
-
-// Handles blur event with a slight delay to allow click on suggestions
 
 function handleBlur() {
   setTimeout(() => {
-    isOpen.value = false
-
-    // Vérifie si l’entrée correspond à un pays valide
+    isOpen.value = false;
     const match = allCountries.value.find(
       (c) => c.label.toLowerCase() === searchQuery.value.toLowerCase()
-    )
-
+    );
     if (match) {
-      selectedCountry.value = match
-      searchQuery.value = match.label
-      emits('update:modelValue', match.value)
+      selectedCountry.value = match;
+      searchQuery.value = match.label;
+      emits('update:modelValue', match.value);
     } else {
-      selectedCountry.value = null
-      searchQuery.value = ''
-      emits('update:modelValue', '')
+      selectedCountry.value = null;
+      searchQuery.value = '';
+      emits('update:modelValue', '');
     }
-  }, 200)
+  }, 200);
 }
 
 const selectCountry = (country: { value: string; label: string }) => {
-  if (props.disabled) return
-  selectedCountry.value = country
-  searchQuery.value = country.label
-  emits('update:modelValue', country.value)
-  emits('select', country.value)
-  emits('change', country.value)
-  isOpen.value = false
-}
-
-
+  if (props.disabled) return;
+  selectedCountry.value = country;
+  searchQuery.value = country.label;
+  emits('update:modelValue', country.value);
+  emits('select', country.value);
+  emits('change', country.value);
+  isOpen.value = false;
+};
 </script>

@@ -31,7 +31,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '../../composables/useAuth'
-import { LayoutDashboard, Building2, Receipt, Shield } from 'lucide-vue-next'
+import { LayoutDashboard, Building2, Receipt, Shield, Package } from 'lucide-vue-next'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -42,6 +42,7 @@ const roleName = computed(() => authStore.user?.role?.roleName ?? 'Super Admin')
 const menuItems = [
   { label: 'Tableau de bord', path: '/',         icon: LayoutDashboard },
   { label: 'Parc Clients',    path: '/clients',  icon: Building2 },
+  { label: 'Produits',        path: '/products',  icon: Package },
   { label: 'Facturation',     path: '/billing',  icon: Receipt },
   { label: 'Sécurité',        path: '/security', icon: Shield },
 ]

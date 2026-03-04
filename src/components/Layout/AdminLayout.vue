@@ -23,6 +23,7 @@
         <RouterView />
       </main>
     </div>
+    <ToastContainer />
   </div>
 </template>
 
@@ -30,6 +31,7 @@
 import { ref } from 'vue'
 import Sidebar from './Sidebar.vue'
 import Navbar from './Navbar.vue'
+import ToastContainer from '../Toast/ToastContainer.vue'
 
 // track visibility for mobile
 const isSidebarOpen = ref(false)

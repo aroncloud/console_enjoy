@@ -6,6 +6,7 @@ import BaseTable, { type Column } from '../../components/Table/BaseTable.vue'
 import PaginationTable from '../../components/Pagination/PaginationTable.vue'
 import { Plus, BedDouble, Utensils, RefreshCcw, Smartphone, ExternalLink } from 'lucide-vue-next'
 import { hotelService } from '../../servicesAPI/clientService'
+import { useToastStore } from '../../composables/toast'
 
 // ── Types 
 interface Hotel {
@@ -29,8 +30,8 @@ interface Hotel {
 // ── State 
 const hotels    = ref<Hotel[]>([])
 const loading   = ref(false)
-const error     = ref<string | null>(null)
 const showForm  = ref(false)
+const toastStore = useToastStore()
 
 // ── Colonnes table 
 const columns: Column[] = [
@@ -44,29 +45,53 @@ const columns: Column[] = [
 ]
 
 // ── Chargement 
-onMounted(async () => {
+onMounted(() => {
+   fetchHotels()
+})
+
+const fetchHotels = async () => {
   loading.value = true
   try {
     const response = await hotelService.getAll()
     hotels.value = response.data?.data || response.data || []
-    console.log('Hôtels chargés :', hotels.value)
   } catch (e: any) {
-    error.value = e.message
+    console.error('Erreur lors du chargement des hôtels :', e)
+    toastStore.show({
+      message: 'Erreur lors du chargement des hôtels',
+      type: 'error',
+    })
   } finally {
     loading.value = false
   }
-})
+}
 
 // ── Formulaire 
 const openForm  = () => { showForm.value = true }
 const closeForm = () => { showForm.value = false }
-const handleSubmit = (data: Record<string, unknown>) => {
-  console.log('Nouvel établissement :', data)
-  closeForm()
+
+const handleSubmit = async (data: any) => {
+  try {
+    loading.value = true
+    console.log('Données soumises :', data)
+    await hotelService.create(data)
+    toastStore.show({
+      message: 'Hôtel ajouté avec succès !',
+      type: 'success',
+    })
+  
+    closeForm()
+    await fetchHotels()
+  } catch (e: any) {
+    toastStore.show({
+      message: 'Erreur lors de l\'ajout de l\'hôtel',
+      type: 'error',
+    })
+  } finally {
+    loading.value = false 
+  }
 }
 
 // ── Filtres 
-// Le backend renvoie status: 'active' | 'inactive' | 'suspended' etc.
 const activeFilter = ref('all')
 const currentPage  = ref(1)
 const pageSize     = ref(5)
@@ -130,6 +155,7 @@ const getProducts = (row: Hotel) => {
     @submit="handleSubmit"
     @cancel="closeForm"
     @back="closeForm"
+    :loading="loading"
   />
 
   <!-- ── Vue Liste ── -->
@@ -151,10 +177,7 @@ const getProducts = (row: Hotel) => {
       />
     </div>
 
-    <!-- Erreur -->
-    <div v-if="error" class="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
-      {{ error }}
-    </div>
+  
 
     <!-- Filtres -->
     <div class="flex gap-3 mb-6 overflow-x-auto pb-2">

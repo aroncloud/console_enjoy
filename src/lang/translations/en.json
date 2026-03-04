@@ -197,5 +197,6 @@
 		"ye": "Yemen",
 		"zm": "Zambia",
 		"zw": "Zimbabwe"
-	}
+	},
+	"phoneNumberPlaceholder" : "Enter phone number"
 }

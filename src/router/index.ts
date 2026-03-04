@@ -4,9 +4,11 @@ import Dashboard from '../views/Dashboard.vue'
 import Login from '../views/auth/Login.vue'
 import Clients from '../views/clients/Clients.vue'
 import ClientDetail from '../views/clients/ClientDetail.vue'
+import HotelSubscriptions from '../views/clients/HotelSubscriptions.vue'
 import Support from '../views/support/Support.vue'
 import Billing from '../views/billing/Billing.vue'
 import Security from '../views/security/Security.vue'
+import Product from '../views/products/Product.vue'
 import { useAuthStore } from '../composables/useAuth'
 
 const router = createRouter({
@@ -22,12 +24,32 @@ const router = createRouter({
       path: '/',
       component: AdminLayout,
       children: [
-        { path: '',            name: 'dashboard',     component: Dashboard },
-        { path: 'clients',     name: 'clients',       component: Clients },
-        { path: 'clients/:id', name: 'client-detail', component: ClientDetail },
-        { path: 'support',     name: 'support',       component: Support },
-        { path: 'billing',     name: 'billing',       component: Billing },
-        { path: 'security',    name: 'security',      component: Security },
+        { path: '',        name: 'dashboard', component: Dashboard },
+        { path: 'clients', name: 'clients',   component: Clients },
+
+    
+        {
+          path: 'clients/:id',
+          
+          children: [
+            {
+              path: '',
+              name: 'client-detail',
+              component: ClientDetail,
+            },
+            {
+              path: 'subscriptions',
+              name: 'client-subscriptions',
+              component: HotelSubscriptions,
+            },
+          ],
+        },
+     
+
+        { path: 'support',  name: 'support',  component: Support },
+        { path: 'billing',  name: 'billing',  component: Billing },
+        { path: 'security', name: 'security', component: Security },
+        { path: 'products', name: 'products', component: Product },
       ],
     },
     {

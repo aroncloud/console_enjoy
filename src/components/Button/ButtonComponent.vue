@@ -7,7 +7,7 @@
     :class="[
       // Base
       'inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-all duration-200 active:scale-[0.98]',
-      'focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900',
+      'focus:outline-none focus:ring-1 focus:ring-offset-1 dark:focus:ring-offset-slate-900',
       
       // Dynamic classes
       sizeClasses,

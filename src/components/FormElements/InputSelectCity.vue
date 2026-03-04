@@ -125,7 +125,7 @@ onMounted(() => {
         :key="index"
         type="button"
         @mousedown.prevent="selectCity(city)"
-        class="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        class="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-100 hover:bg-purple-100 hover:text-purple-800 rounded-sm dark:hover:bg-purple-900 transition-colors"
       >
         <span class="font-medium">{{ city.name }}</span>
         <span v-if="city.subcountry" class="text-xs text-gray-500 dark:text-gray-400"> — {{ city.subcountry }}</span>

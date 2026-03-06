@@ -8,7 +8,6 @@ import { Plus, BedDouble, Utensils, RefreshCcw, Smartphone, ExternalLink } from 
 import { hotelService } from '../../servicesAPI/clientService'
 import { useToastStore } from '../../composables/toast'
 
-// ── Types 
 interface Hotel {
   id: number
   hotelName: string
@@ -27,13 +26,12 @@ interface Hotel {
   currentWorkingDate: string | null
 }
 
-// ── State 
-const hotels    = ref<Hotel[]>([])
-const loading   = ref(false)
-const showForm  = ref(false)
+const hotels     = ref<Hotel[]>([])
+const loading    = ref(false)
+const showForm   = ref(false)
+const editHotelId = ref<number | null>(null)  
 const toastStore = useToastStore()
 
-// ── Colonnes table 
 const columns: Column[] = [
   { key: 'hotel',    label: 'Hôtel' },
   { key: 'location', label: 'Localisation' },
@@ -44,54 +42,50 @@ const columns: Column[] = [
   { key: 'actions',  label: 'Actions', tdClass: 'text-right' },
 ]
 
-// ── Chargement 
-onMounted(() => {
-   fetchHotels()
-})
+onMounted(() => { fetchHotels() })
 
 const fetchHotels = async () => {
   loading.value = true
   try {
     const response = await hotelService.getAll()
+    console.log('Hotels API response:', response)
     hotels.value = response.data?.data || response.data || []
   } catch (e: any) {
-    console.error('Erreur lors du chargement des hôtels :', e)
-    toastStore.show({
-      message: 'Erreur lors du chargement des hôtels',
-      type: 'error',
-    })
+    toastStore.show({ message: 'Erreur lors du chargement des hôtels', type: 'error' })
   } finally {
     loading.value = false
   }
 }
 
-// ── Formulaire 
-const openForm  = () => { showForm.value = true }
-const closeForm = () => { showForm.value = false }
+// ── Ouvrir formulaire ────
+const openCreate = () => {
+  editHotelId.value = null  
+  showForm.value = true
+}
 
+
+
+const closeForm = () => {
+  showForm.value = false
+  editHotelId.value = null
+}
+
+// ── Submit 
 const handleSubmit = async (data: any) => {
+  loading.value = true
   try {
-    loading.value = true
-    console.log('Données soumises :', data)
     await hotelService.create(data)
-    toastStore.show({
-      message: 'Hôtel ajouté avec succès !',
-      type: 'success',
-    })
-  
+    toastStore.show({ message: 'Hôtel ajouté avec succès !', type: 'success' })
     closeForm()
     await fetchHotels()
   } catch (e: any) {
-    toastStore.show({
-      message: 'Erreur lors de l\'ajout de l\'hôtel',
-      type: 'error',
-    })
+    toastStore.show({ message: "Erreur lors de l'ajout", type: 'error' })
   } finally {
-    loading.value = false 
+    loading.value = false
   }
 }
 
-// ── Filtres 
+// ── Filtres & pagination ────────────
 const activeFilter = ref('all')
 const currentPage  = ref(1)
 const pageSize     = ref(5)
@@ -106,80 +100,55 @@ const pagedHotels = computed(() => {
   return filteredHotels.value.slice(start, start + pageSize.value)
 })
 
-// Compteurs basés sur les vrais statuts backend
 const countActive    = computed(() => hotels.value.filter(h => h.status === 'active').length)
 const countInactive  = computed(() => hotels.value.filter(h => h.status === 'inactive').length)
 const countSuspended = computed(() => hotels.value.filter(h => h.status === 'suspended').length)
 
-const setFilter = (key: string) => {
-  activeFilter.value = key
-  currentPage.value = 1
-}
+const setFilter = (key: string) => { activeFilter.value = key; currentPage.value = 1 }
 
-// ── Styles statut 
-const getStatusStyles = (status: string) => {
-  switch (status) {
-    case 'active':    return 'bg-green-100 text-green-700'
-    case 'inactive':  return 'bg-gray-100 text-gray-600'
-    case 'suspended': return 'bg-red-100 text-red-700'
-    case 'demo':      return 'bg-orange-100 text-orange-700'
-    default:          return 'bg-gray-100 text-gray-500'
-  }
-}
+const getStatusStyles = (status: string) => ({
+  active:    'bg-green-100 text-green-700',
+  inactive:  'bg-gray-100 text-gray-600',
+  suspended: 'bg-red-100 text-red-700',
+  demo:      'bg-orange-100 text-orange-700',
+}[status] ?? 'bg-gray-100 text-gray-500')
 
-const getStatusLabel = (status: string) => {
-  switch (status) {
-    case 'active':    return 'Actif'
-    case 'inactive':  return 'Inactif'
-    case 'suspended': return 'Suspendu'
-    case 'demo':      return 'Démo'
-    default:          return status
-  }
-}
+const getStatusLabel = (status: string) => ({
+  active:    'Actif',
+  inactive:  'Inactif',
+  suspended: 'Suspendu',
+  demo:      'Démo',
+}[status] ?? status)
 
-// ── Étoiles 
 const renderStars = (grade: number) => '★'.repeat(grade) + '☆'.repeat(5 - grade)
 
-// ── Produits 
-const getProducts = (row: Hotel) => {
-  if ((row as any).products) return (row as any).products
-  return ['pms']
-}
+const getProducts = (row: any) => 
+  (row.subscriptions || []).map((sub: any) => sub.module?.slug).filter(Boolean)
 </script>
 
 <template>
 
-  <!-- ── Vue Formulaire ── -->
+  <!-- ── Vue Formulaire (création OU édition selon editHotelId) ── -->
   <AddHotelForm
     v-if="showForm"
+    :hotel-id="editHotelId"
+    :loading="loading"
     @submit="handleSubmit"
     @cancel="closeForm"
     @back="closeForm"
-    :loading="loading"
   />
 
   <!-- ── Vue Liste ── -->
   <div v-else class="p-4 md:p-8 bg-gray-50 min-h-screen font-sans">
 
-    <!-- Header -->
     <div class="flex flex-col md:flex-row justify-between md:items-start mb-8 gap-4">
       <div>
         <h1 class="text-2xl font-bold text-gray-900">Gestion du Parc Client</h1>
-        <p class="text-gray-500 text-sm mt-1">
-          Gérez les abonnements et les accès des établissements hôteliers.
-        </p>
+        <p class="text-gray-500 text-sm mt-1">Gérez les abonnements et les accès des établissements hôteliers.</p>
       </div>
-      <ButtonComponent
-        label="Ajouter un Hôtel"
-        variant="primary"
-        :iconLeft="Plus"
-        @click="openForm"
-      />
+      <ButtonComponent label="Ajouter un Hôtel" variant="primary" :iconLeft="Plus" @click="openCreate" />
     </div>
 
-  
-
-    <!-- Filtres -->
     <div class="flex gap-3 mb-6 overflow-x-auto pb-2">
       <button
         v-for="filter in [
@@ -196,19 +165,11 @@ const getProducts = (row: Hotel) => {
             ? 'bg-purple-600 text-white'
             : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
         ]"
-      >
-        {{ filter.label }}
-      </button>
+      >{{ filter.label }}</button>
     </div>
 
-    <!-- Table -->
-    <BaseTable
-      :columns="columns"
-      :data="pagedHotels"
-      :loading="loading"
-    >
+    <BaseTable :columns="columns" :data="pagedHotels" :loading="loading">
 
-      <!-- Hôtel -->
       <template #cell-hotel="{ row }">
         <div class="flex items-center gap-3">
           <div class="w-9 h-9 rounded-lg bg-purple-100 flex items-center justify-center shrink-0">
@@ -221,7 +182,6 @@ const getProducts = (row: Hotel) => {
         </div>
       </template>
 
-      <!-- Localisation -->
       <template #cell-location="{ row }">
         <div class="flex flex-col">
           <span class="text-sm text-gray-800">{{ row.city }}</span>
@@ -229,37 +189,15 @@ const getProducts = (row: Hotel) => {
         </div>
       </template>
 
-      <!-- Produits actifs (mock en attendant le back) -->
       <template #cell-products="{ row }">
         <div class="flex items-center gap-2.5 text-gray-300">
-          <!-- PMS / Hébergement -->
-          <BedDouble
-            :size="17"
-            :class="getProducts(row).includes('pms') ? 'text-purple-500' : 'text-gray-200'"
-            title="PMS"
-          />
-          <!-- Restauration -->
-          <Utensils
-            :size="17"
-            :class="getProducts(row).includes('pos') ? 'text-orange-400' : 'text-gray-200'"
-            title="Point de vente"
-          />
-          <!-- Channel Manager -->
-          <RefreshCcw
-            :size="17"
-            :class="row.channelEnable ? 'text-green-500' : 'text-gray-200'"
-            title="Channel Manager"
-          />
-          <!-- App mobile -->
-          <Smartphone
-            :size="17"
-            :class="getProducts(row).includes('app') ? 'text-blue-400' : 'text-gray-200'"
-            title="App mobile"
-          />
+          <BedDouble  :size="17" :class="getProducts(row).includes('pms') ? 'text-purple-500' : 'text-gray-200'" title="PMS" />
+          <Utensils   :size="17" :class="getProducts(row).includes('pos') ? 'text-orange-400' : 'text-gray-200'" title="Point de vente" />
+          <RefreshCcw :size="17" :class="getProducts(row).includes('channel-manager')? 'text-green-500' : 'text-gray-200'" title="Channel Manager" />
+          <Smartphone :size="17" :class="getProducts(row).includes('mobile-app') ? 'text-blue-400'   : 'text-gray-200'" title="App mobile" />
         </div>
       </template>
 
-      <!-- Statut -->
       <template #cell-status="{ row }">
         <span :class="['px-2.5 py-1 rounded-full text-[11px] font-bold inline-flex items-center gap-1.5', getStatusStyles(row.status)]">
           <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
@@ -267,7 +205,6 @@ const getProducts = (row: Hotel) => {
         </span>
       </template>
 
-      <!-- Infos -->
       <template #cell-infos="{ row }">
         <div class="flex flex-col gap-0.5">
           <span class="text-xs text-amber-500 tracking-wide">{{ renderStars(row.grade ?? 0) }}</span>
@@ -275,7 +212,6 @@ const getProducts = (row: Hotel) => {
         </div>
       </template>
 
-      <!-- Contact -->
       <template #cell-contact="{ row }">
         <div class="flex flex-col">
           <span class="text-xs text-gray-700 truncate max-w-[140px]">{{ row.email }}</span>
@@ -283,7 +219,6 @@ const getProducts = (row: Hotel) => {
         </div>
       </template>
 
-      <!-- Actions -->
       <template #cell-actions="{ row }">
         <router-link
           :to="`/clients/${row.id}`"
@@ -294,17 +229,6 @@ const getProducts = (row: Hotel) => {
         </router-link>
       </template>
 
-      <!-- Pagination dans le footer de la table -->
-      <template #footer>
-        <PaginationTable
-          :currentPage="currentPage"
-          :pageSize="pageSize"
-          :totalItems="filteredHotels.length"
-          @update:currentPage="currentPage = $event"
-        />
-      </template>
-
     </BaseTable>
-
   </div>
 </template>

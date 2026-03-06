@@ -5,16 +5,14 @@
     <div class="w-full lg:w-1/2 flex flex-col bg-white px-12 py-8 h-full overflow-hidden">
 
       <!-- Logo -->
-      <div class="flex items-center gap-2.5 shrink-0">
+      <!-- <div class="flex items-center gap-2.5 shrink-0">
         <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-purple-100">
-          <!-- <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2L4 7v5c0 5.25 3.4 10.15 8 11.35C16.6 22.15 20 17.25 20 12V7l-8-5z"/>
-          </svg> -->
+          
           <img src="/src/assets/LogoEnjoy.png" alt="Logo EnjoyConsole" class="w-6 h-6"/>
         </div>
         <span class="text-lg font-bold text-gray-900 tracking-tight">EnjoyConsole</span>
-      </div>
-
+      </div> -->
+ 
       <!-- Form area -->
       <div class="flex-1 flex flex-col justify-center max-w-sm w-full mx-auto">
 
@@ -141,7 +139,7 @@
             :disabled="isLoading"
             class="w-full py-2.5 bg-purple-600 hover:bg-purple-700 active:bg-purple-800
                    disabled:opacity-60 disabled:cursor-not-allowed
-                   text-white text-sm font-semibold rounded-xl transition-colors
+                   text-white text-sm font-semibold rounded-xl transition-colors cursor-pointer
                    flex items-center justify-center gap-2 shadow-sm shadow-purple-200"
           >
             <svg v-if="isLoading" class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
@@ -316,7 +314,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../composables/useAuth'
 import { auth, resendEmailVerification, requestPasswordReset } from '../../servicesAPI/auth'
-
+import api from '../../servicesAPI/api'
 const router = useRouter()
 const authStore = useAuthStore()
 
@@ -410,21 +408,29 @@ const handleSubmit = async () => {
   loginAttempts.value++
   if (!email.value.trim() || !password.value.trim()) { error.value = 'Email et mot de passe requis.'; return }
   isLoading.value = true
-  try {
+   try {
     const res = await auth({ email: email.value.trim().toLowerCase(), password: password.value, keepLoggedIn: keepLoggedIn.value })
     const { user, access_token } = res.data.data
     const token = access_token.token
+
+    // ── Nouveau : injecte le token dans axios pour toutes les futures requêtes
+    localStorage.setItem('token', token)
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+
     authStore.login(user, token)
     authStore.setRoleId(user.roleId)
     authStore.setUserId(user.id ?? user.UserId)
+
     if (keepLoggedIn.value) {
       const entry: RememberedAccount = { id: user.id, name: user.name || user.fullName || user.username || user.email, email: user.email || email.value }
       const existing = rememberedAccounts.value.filter((a) => a.email !== entry.email)
       rememberedAccounts.value = [entry, ...existing].slice(0, 5)
       setCookie('rememberedAccounts', JSON.stringify(rememberedAccounts.value), { days: 30, secure: location.protocol === 'https:', sameSite: 'Lax' })
     }
+
     loginAttempts.value = 0
     router.push({ path: '/' })
+
   } catch (err: any) {
     if (err.response?.status === 403) {
       const data = err.response.data

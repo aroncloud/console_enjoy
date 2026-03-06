@@ -104,7 +104,7 @@
               <tr
                 v-for="(row, rowIndex) in paginatedData"
                 :key="row.id ?? rowIndex"
-                class="hover:bg-gray-50 transition-colors"
+                class="hover:bg-slate-50 transition-colors"
                 :class="onRowClick ? 'cursor-pointer' : ''"
                 @click="onRowClick?.(row)"
               >
@@ -197,10 +197,9 @@
 
       <!-- Pagination externe -->
       <Pagination
-        :current-page="currentPage"
-        :page-size="pageSize"
-        :total-items="filteredData.length"
-        @update:current-page="currentPage = $event"
+         v-if="meta && meta.total > meta.perPage"
+        :meta="meta"
+        @page-change="(page) => emit('page-change', page)"
       />
     </div>
 
@@ -229,6 +228,14 @@ export interface Props {
   showSearch?: boolean
   showFilters?: boolean
   loading?: boolean
+  meta?: {
+    total: number;
+    perPage: number;
+    currentPage: number;
+    lastPage: number;
+    previousPageUrl?: string | null;
+    nextPageUrl?: string | null;
+  }
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -237,7 +244,12 @@ const props = withDefaults(defineProps<Props>(), {
   showSearch: false,
   showFilters: false,
   loading: false,
+
 })
+
+const emit = defineEmits<{
+  (e: 'page-change', page: number): void
+}>()
 
 // ── Sort 
 const sortKey = ref<string | null>(null)

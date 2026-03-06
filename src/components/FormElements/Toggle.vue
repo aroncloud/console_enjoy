@@ -19,7 +19,7 @@
 
         <div
           :class="[
-            'relative inline-flex h-6 w-11 items-center rounded-full border transition-colors duration-200 ease-in-out',
+            'relative inline-flex h-5 w-11 items-center rounded-full border transition-colors duration-200 ease-in-out',
             disabled
               ? (modelValue
                   ? 'bg-purple-500/40 border-purple-400 cursor-not-allowed'

@@ -164,7 +164,7 @@
 
     <!-- Audit log -->
     <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-      <div class="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+      <div class="px-5 py-4 border-b rounded-md border-slate-200 dark:border-slate-800 flex items-center justify-between">
         <h3 class="font-bold text-sm">Journal d'audit</h3>
         <button class="p-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-500 hover:text-purple-500 transition-colors">
           <Download :size="14" />

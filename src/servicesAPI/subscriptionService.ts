@@ -14,12 +14,12 @@ export interface Subscription {
 }
 
 export interface CreateSubscriptionPayload {
-  hotelId: number
-  moduleId: number
-  billingCycle: 'monthly' | 'yearly'
-  startsAt: string
-  endsAt: string
-  limitCount: number
+  hotel_idd: number
+  module_id: number
+  billing_cycle: 'monthly' | 'yearly'
+  starts_at: string
+  ends_at: string
+  limit_count: number
   price: number
 }
 
@@ -30,7 +30,7 @@ export const subscriptionService = {
   getById: (id: number) =>
     api.get<Subscription>(`/console/${id}`).then(r => r.data),
 
- create: (hotel_id : number,payload: CreateSubscriptionPayload) =>
+ create: (hotel_id : number,payload: any) =>
     api.post<Subscription>(`/console/hotels/${hotel_id}/subscriptions`, payload).then(r => r.data),
 
  update: (id: number, payload: Partial<Subscription>) =>

@@ -4,7 +4,7 @@ import { useAuthStore } from '../composables/useAuth'
 // ── Connexion
 export function auth(credentials: { email: string; password: string; keepLoggedIn?: boolean }) {
   return api
-    .post('/authLoginConsole', credentials, { withCredentials: true })
+    .post('/authLoginConsole', credentials)
     .then((resp:any) => {
       const authStore = useAuthStore()
 

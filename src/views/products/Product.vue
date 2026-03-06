@@ -31,14 +31,8 @@ const toastStore   = useToastStore()
 
 // ── Pagination ───
 const page  = ref(1)
-const limit = ref(10)
-const meta  = ref({
-  total:       0,
-  perPage:     10,
-  currentPage: 1,
-  lastPage:    1,
-  firstPage:   1,
-})
+const limit = ref(20)
+const meta = ref<any>(null)
 
 // ── Columns ───
 const columns: Column[] = [
@@ -70,11 +64,11 @@ const formErrors = reactive({
 })
 
 // ── Fetch 
-const fetchProducts = async () => {
+const fetchProducts = async (page=1) => {
   loading.value = true
   try {
     const res = await productService.getAll({
-      page:     page.value,
+      page:     page,
       limit:    limit.value,
       search:   searchQuery.value || undefined,
       isActive: filterActive.value === 'active'   ? true
@@ -83,6 +77,7 @@ const fetchProducts = async () => {
     })
     products.value = res.data
     meta.value     = res.meta
+    console.log('Fetched products:', res.data, 'Meta:', res.meta)
   } catch (e) {
     console.error(e)
     toastStore.show({ message: 'Erreur lors du chargement des produits', type: 'error' })
@@ -91,16 +86,20 @@ const fetchProducts = async () => {
   }
 }
 
-onMounted(() => fetchProducts())
+onMounted(() => fetchProducts(1))
+
+const handlePageChange = (newPage: number) => {
+  fetchProducts(newPage);
+};
 
 // Relancer le fetch + reset page 1 quand search ou filtre change
 watch([searchQuery, filterActive], () => {
   page.value = 1
-  fetchProducts()
+  fetchProducts(1)
 })
 
 // Relancer quand la page change
-watch(page, () => fetchProducts())
+watch(page, () => fetchProducts(1))
 
 // ── Computed KPIs 
 const countActive = computed(() => products.value.filter(m => m.isActive).length)
@@ -187,7 +186,7 @@ const handleSubmit = async () => {
 
     showForm.value = false
     resetForm()
-    await fetchProducts()
+    await fetchProducts(1)
   } catch (e) {
     console.error(e)
     toastStore.show({ message: 'Erreur lors de la sauvegarde', type: 'error' })
@@ -212,7 +211,7 @@ const confirmDelete = async () => {
     deletingProduct.value = null
     // Si on supprime le dernier élément d'une page > 1, reculer d'une page
     if (products.value.length === 1 && page.value > 1) page.value--
-    else await fetchProducts()
+    else await fetchProducts(1)
   } catch (e) {
     console.error(e)
     toastStore.show({ message: 'Erreur lors de la suppression', type: 'error' })
@@ -249,14 +248,14 @@ const toggleActive = async (prod: any) => {
     </div>
 
     <!-- ── KPIs ── -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div class="bg-white rounded-xl border border-slate-200 p-5">
         <div class="flex items-center justify-between mb-2">
           <div class="p-2 bg-slate-100 rounded-lg"><Package :size="18" class="text-slate-600" /></div>
           <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-full">Total</span>
         </div>
         <p class="text-xs text-slate-500 font-medium">Produits</p>
-        <p class="text-2xl font-black mt-1 text-slate-900">{{ meta.total }}</p>
+        <p class="text-2xl font-black mt-1 text-slate-900">{{ meta?.total ?? 0 }}</p>
       </div>
       <div class="bg-white rounded-xl border border-slate-200 p-5">
         <div class="flex items-center justify-between mb-2">
@@ -266,14 +265,14 @@ const toggleActive = async (prod: any) => {
         <p class="text-xs text-slate-500 font-medium">Produits actifs</p>
         <p class="text-2xl font-black mt-1 text-slate-900">{{ countActive }}</p>
       </div>
-      <div class="bg-white rounded-xl border border-slate-200 p-5">
+      <!-- <div class="bg-white rounded-xl border border-slate-200 p-5">
         <div class="flex items-center justify-between mb-2">
           <div class="p-2 bg-purple-100 rounded-lg"><Package :size="18" class="text-purple-600" /></div>
           <span class="text-[10px] font-bold text-purple-600 bg-purple-100 px-2 py-1 rounded-full">mensuel</span>
         </div>
         <p class="text-xs text-slate-500 font-medium">Revenu catalogue / mois</p>
         <p class="text-2xl font-black mt-1 text-slate-900">{{ formatCurrency(totalRevenuePotentiel) }}</p>
-      </div>
+      </div> -->
     </div>
 
     <!-- ── Filtres + Recherche ── -->
@@ -287,7 +286,7 @@ const toggleActive = async (prod: any) => {
           v-for="[key, label] in [['all', 'Tous'], ['active', 'Actifs'], ['inactive', 'Inactifs']]"
           :key="key"
           @click="filterActive = key as any"
-          class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all"
+          class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer"
           :class="filterActive === key ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
         >
           {{ label }}
@@ -297,7 +296,7 @@ const toggleActive = async (prod: any) => {
 
     <!-- ── Table ── -->
     <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-      <BaseTable :columns="columns" :data="products" :loading="loading" :show-search="false">
+      <BaseTable :columns="columns" :data="products" :loading="loading" :show-search="false" :meta="meta" @page-change="handlePageChange">
 
         <template #cell-name="{ row }">
           <div class="flex items-center gap-3">
@@ -336,30 +335,6 @@ const toggleActive = async (prod: any) => {
         </template>
 
       </BaseTable>
-
-      <!-- ── Pagination ── -->
-      <div v-if="meta.lastPage > 1" class="flex items-center justify-between px-5 py-3 border-t border-slate-100">
-        <p class="text-xs text-slate-500">
-          Page <span class="font-bold">{{ meta.currentPage }}</span> sur <span class="font-bold">{{ meta.lastPage }}</span>
-          · <span class="font-bold">{{ meta.total }}</span> résultats
-        </p>
-        <div class="flex gap-1">
-          <button
-            :disabled="page === 1 || loading"
-            @click="page--"
-            class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
-            ← Précédent
-          </button>
-          <button
-            :disabled="page === meta.lastPage || loading"
-            @click="page++"
-            class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
-            Suivant →
-          </button>
-        </div>
-      </div>
     </div>
 
     <!-- ── Modal formulaire ── -->
@@ -374,8 +349,8 @@ const toggleActive = async (prod: any) => {
       </template>
 
       <div class="space-y-4">
-        <Input v-model="form.slug"         lb="Slug"              placeholder="ex: channel-manager"           :errorMsg="formErrors.slug"         :disabled="saving" customClass="w-full" isRequired />
-        <Input v-model="form.name"         lb="Nom"               placeholder="ex: Property Management System" :errorMsg="formErrors.name"         :disabled="saving" customClass="w-full" isRequired />
+        <Input v-model="form.slug"  lb="Slug"    placeholder="ex: channel-manager"           :errorMsg="formErrors.slug"         :disabled="saving" customClass="w-full" isRequired />
+        <Input v-model="form.name"  lb="Nom"   placeholder="ex: Property Management System" :errorMsg="formErrors.name"         :disabled="saving" customClass="w-full" isRequired />
         <Input v-model.number="form.priceMonthly" lb="Prix mensuel (XAF)" type="number" placeholder="ex: 49000" :errorMsg="formErrors.priceMonthly" :disabled="saving" customClass="w-full" isRequired />
 
         <div>

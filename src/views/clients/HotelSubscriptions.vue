@@ -2,24 +2,22 @@
   <div class="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans">
 
     <!-- ── Page header ── -->
-    <div class=" dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
-      <div class=" px-6">
+    <div class="dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+      <div class="px-6">
 
-        <!-- Back button -->
         <div class="pt-5 pb-4">
           <button
             @click="router.back()"
             class="flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-800 dark:hover:text-white transition-colors cursor-pointer"
           >
-            <ArrowLeft  />
+            <ArrowLeft />
             Retour
           </button>
         </div>
 
-        <!-- Title (only on step 1) -->
         <div v-if="currentStep === 1" class="pb-5">
-          <h2 class="text-xl font-black text-slate-900 dark:text-white">Choisissez vos modules</h2>
-          <p class="text-sm text-slate-500 mt-1">Sélectionnez les modules adaptés à votre établissement</p>
+          <h2 class="text-xl font-black text-slate-900 dark:text-white">Choisissez vos produits</h2>
+          <p class="text-sm text-slate-500 mt-1">Sélectionnez les produits adaptés à votre établissement</p>
         </div>
         <div v-else-if="currentStep === 2" class="pb-5">
           <h2 class="text-xl font-black text-slate-900 dark:text-white">Paiement</h2>
@@ -53,18 +51,16 @@
             />
           </div>
         </div>
-
       </div>
     </div>
 
     <!-- ── Page content ── -->
     <div class="max-w-6xl mx-auto px-6 py-8">
 
-      <!-- ── Step 1: Plan ── -->
+      <!-- ── Step 1 ── -->
       <div v-if="currentStep === 1">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-          <!-- Left: Modules -->
           <div class="lg:col-span-2 space-y-4">
 
             <!-- Dependency warning -->
@@ -85,73 +81,90 @@
             <div v-if="modulesLoading" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div v-for="i in 6" :key="i" class="h-40 bg-gray-200 rounded-xl animate-pulse"></div>
             </div>
-            <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div v-else class="grid grid-cols-1 sm:grid-cols-2 items-start gap-4">
               <div
                 v-for="mod in modules"
                 :key="mod.id"
-                class="relative bg-white dark:bg-slate-900 rounded-2xl border-2 transition-all duration-200 overflow-hidden"
+                class="relative bg-white dark:bg-slate-900 rounded-2xl border transition-all duration-200 overflow-hidden"
                 :class="[
                   isSelected(mod.id)
-                    ? 'border-purple-500 shadow-lg shadow-purple-100 dark:shadow-purple-900/20'
+                    ? 'border-purple-300 shadow-lg shadow-purple-100 dark:shadow-purple-900/20'
                     : isLocked(mod.id)
                       ? 'border-slate-200 dark:border-slate-700 opacity-60 cursor-not-allowed'
                       : 'border-slate-200 dark:border-slate-700 hover:border-purple-300 hover:shadow-md cursor-pointer'
                 ]"
                 @click="toggleModule(mod)"
               >
-                <!-- Selected indicator -->
-                <div
-                  v-if="isSelected(mod.id)"
-                  class="absolute top-3 right-3 w-5 h-5 rounded-full flex items-center justify-center"
-                  :style="{ background: mod.color }"
-                >
+                <div v-if="isSelected(mod.id)" class="absolute top-3 right-3 w-5 h-5 rounded-full flex items-center justify-center" :style="{ background: mod.color }">
                   <Check :size="11" class="text-white" />
                 </div>
-
-                <!-- Lock indicator -->
-                <div
-                  v-if="isLocked(mod.id)"
-                  class="absolute top-3 right-3 w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center"
-                >
+                <div v-if="isLocked(mod.id)" class="absolute top-3 right-3 w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
                   <Lock :size="10" class="text-slate-400" />
                 </div>
 
                 <div class="p-5">
                   <!-- Icon + name -->
                   <div class="flex items-start gap-3 mb-4">
-                    <div
-                      class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
-                      :style="{ background: mod.color + '15', color: mod.color }"
-                    >
+                    <div class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" :style="{ background: mod.color + '15', color: mod.color }">
                       <component :is="mod.icon" :size="20" />
                     </div>
                     <div class="flex-1 min-w-0">
                       <p class="font-black text-slate-900 dark:text-white text-sm">{{ mod.fullName }}</p>
-                      <p class="text-[11px] text-slate-400 mt-0.5 leading-relaxed">{{ mod.description }}</p>
+                      <p class="text-[11px] text-gray-500 mt-0.5 leading-relaxed">{{ formatCurrency(mod.priceMonthly) }}</p>
                     </div>
                   </div>
 
-                  <!-- Limit input (if selected and has limit) -->
-                  <div v-if="isSelected(mod.id) && mod.limitLabel" class="mb-4">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">{{ mod.limitLabel }}</p>
-                    <input
-                      type="number"
-                      min="1"
-                      v-model="getSel(mod.id).limitCount"
-                      @click.stop
-                      class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    />
+                  <!-- Module-specific inputs -->
+                  <div v-if="isSelected(mod.id)" @click.stop>
+                    <div v-if="mod.slug === 'pms'" class="mb-4 p-3 rounded-xl border border-slate-100 bg-slate-50/50 space-y-2 min-h-24">
+                      <div class="flex justify-between items-center">
+                        <p class="text-xs font-medium text-slate-500 flex items-center gap-1.5">
+                          <BedDouble :size="12" class="text-slate-400" />
+                          Chambres autorisées
+                        </p>
+                        <span class="text-xs font-bold" :style="{ color: mod.color }">{{ getSel(mod.id).rooms }}</span>
+                      </div>
+                      <input type="range" min="1" max="250" v-model.number="getSel(mod.id).rooms" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer" :style="`accent-color: ${mod.color}`" />
+                      <div class="flex justify-between text-[9px] text-slate-300 font-medium"><span>1</span><span>250</span></div>
+                    </div>
+
+                    <div v-else-if="mod.slug === 'pos'" class="mb-4 p-3 rounded-xl border border-slate-100 bg-slate-50/50 space-y-2 min-h-24">
+                      <p class="text-xs font-medium text-slate-500 flex items-center gap-1.5"><Utensils :size="12" class="text-slate-400" />Terminaux</p>
+                      <div class="flex items-center gap-3">
+                        <Input v-model.number="getSel(mod.id).units" type="number" :min="1" customClass="w-full" />
+                        <span class="text-[10px] font-bold text-slate-400 whitespace-nowrap">TERMINAUX</span>
+                      </div>
+                    </div>
+
+                    <div v-else-if="mod.slug === 'channel-manager'" class="mb-4 p-3 rounded-xl border border-slate-100 bg-slate-50/50 space-y-2 min-h-24">
+                      <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">OTAs connectés</p>
+                      <div v-for="ota in getSel(mod.id).otas" :key="ota.name" class="flex  items-center gap-2 p-2 rounded-lg bg-white border border-slate-100" :class="!ota.checked ? 'opacity-50' : ''">
+                        <input type="checkbox" v-model="ota.checked" class="w-3.5 h-3.5 rounded accent-purple-600 cursor-pointer" />
+                        <span class="text-xs font-medium text-slate-700 dark:text-slate-300">{{ ota.name }}</span>
+                      </div>
+                    </div>
+
+                    <div v-else-if="mod.slug === 'mobile-app'" class="mb-4 p-3 rounded-xl border border-slate-100 bg-slate-50/50 space-y-3 min-h-24">
+                      <div class="space-y-1">
+                        <p class="text-xs font-medium text-slate-500">Quota staff</p>
+                        <Input v-model.number="getSel(mod.id).staffQuota" type="number" :min="1" customClass="w-full" />
+                      </div>
+                      <div class="flex items-center justify-between p-2.5 rounded-lg border border-yellow-100 bg-yellow-50/50">
+                        <div class="flex items-center gap-2"><span class="text-sm">👤</span><span class="text-xs font-semibold text-slate-700">Guest App</span></div>
+                        <input type="checkbox" v-model="getSel(mod.id).guestApp" class="w-3.5 h-3.5 rounded accent-purple-600 cursor-pointer" />
+                      </div>
+                    </div>
                   </div>
 
-                  <!-- Billing cycle (if selected) -->
+                  <!-- ── Billing cycle ── -->
                   <div v-if="isSelected(mod.id)" class="mb-4" @click.stop>
                     <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Facturation</p>
                     <div class="grid grid-cols-2 gap-2">
                       <button
-                        v-for="[val, label] in [['monthly', 'Mensuel'], ['yearly', 'Annuel −17%']]"
+                        v-for="[val, label] in [['monthly', 'Mensuel'], ['yearly', 'Annuel']]"
                         :key="val"
                         @click="setSel(mod.id, 'billingCycle', val)"
-                        class="py-1.5 px-2 rounded-lg text-[11px] font-bold border-2 transition-all"
+                        class="py-1.5 px-2 rounded-lg text-[11px] font-bold border-1 transition-all"
                         :class="getSel(mod.id).billingCycle === val
                           ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'
                           : 'border-slate-200 dark:border-slate-700 text-slate-500 hover:border-slate-300'"
@@ -159,34 +172,95 @@
                     </div>
                   </div>
 
-                  <!-- Price + dependency badge -->
-                  <div class="flex items-end justify-between">
+                  <!-- ── Période : UNIQUEMENT si mensuel ── -->
+                  <Transition name="slide-down">
+                    <div v-if="isSelected(mod.id) && getSel(mod.id).billingCycle === 'monthly'" class="mb-4" @click.stop>
+                      <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                        <CalendarRange :size="11" />
+                        Période de souscription
+                      </p>
+                     <InputDoubleDate
+                      :modelValue="{ start: getSel(mod.id).startMonth, end: getSel(mod.id).endMonth }"
+                      @update:modelValue="val => { 
+                        setSel(mod.id, 'startMonth', val.start); 
+                        setSel(mod.id, 'endMonth', val.end); 
+                      }"
+                    />
+                    
+                    </div>
+                  </Transition>
+
+                  <!-- ── Prix catalogue + Prix appliqué modifiable ── -->
+                  <div v-if="isSelected(mod.id)" class="mb-4" @click.stop>
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                      <Tag :size="11" />
+                      Prix de souscription
+                    </p>
+                     <Input
+                        type="number"
+                         v-model.number="getSel(mod.id).customPrice"
+                         :min="0"
+                              
+                      />
+                    <!-- <div class="p-3 rounded-xl border border-slate-100 bg-slate-50/50">
+                      <div class="flex items-center gap-2">
+
+                     
+                        <div class="flex-1">
+                          <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Catalogue</p>
+                          <div class="flex items-center h-9 px-3 rounded-lg border border-slate-200 bg-slate-100 dark:bg-slate-700/50 dark:border-slate-600">
+                            <span class="text-xs font-bold text-slate-400 line-through">{{ mod.priceMonthly.toLocaleString('fr-FR') }}</span>
+                            <span class="text-[9px] text-slate-400 ml-1">/mois</span>
+                          </div>
+                        </div>
+
+                        <ArrowRight :size="13" class="text-slate-300 shrink-0 mt-4" />
+
+                      
+                        <div class="flex-1">
+                          <p class="text-[9px] font-bold text-purple-500 uppercase tracking-wider mb-1">Prix appliqué</p>
+                          <div class="relative">
+                            <input
+                              type="number"
+                              v-model.number="getSel(mod.id).customPrice"
+                              :min="0"
+                              class="w-full h-9 rounded-lg border-2 border-purple-300 dark:border-purple-700/60 bg-white dark:bg-slate-800 px-3 pr-10 text-xs font-black text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-400/30 focus:border-purple-500 transition-all"
+                            />
+                            <span class="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-bold text-slate-400 pointer-events-none">XAF</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div v-if="getSel(mod.id).customPrice > 0 && getSel(mod.id).customPrice < mod.priceMonthly" class="mt-2 flex items-center gap-1.5 text-[10px] font-bold text-emerald-600">
+                        <TrendingDown :size="11" />
+                        Remise de {{ Math.round((1 - getSel(mod.id).customPrice / mod.priceMonthly) * 100) }}% par rapport au catalogue
+                      </div>
+                      <div v-else-if="getSel(mod.id).customPrice > mod.priceMonthly" class="mt-2 flex items-center gap-1.5 text-[10px] font-bold text-amber-500">
+                        <TrendingUp :size="11" />
+                        Majoration de {{ Math.round((getSel(mod.id).customPrice / mod.priceMonthly - 1) * 100) }}% par rapport au catalogue
+                      </div>
+                    </div> -->
+                  </div>
+
+              
+                  <!-- <div class="flex items-end justify-between">
                     <div>
-                      <span class="text-lg font-black text-slate-900 dark:text-white">
-                        {{ formatCurrency(getPrice(mod)) }}
-                      </span>
-                      <span class="text-xs text-slate-400">
-                        /{{ isSelected(mod.id) && getSel(mod.id).billingCycle === 'yearly' ? 'an' : 'mois' }}
-                      </span>
+                      <span class="text-lg font-black text-slate-900 dark:text-white">{{ formatCurrency(getPrice(mod)) }}</span>
+                      <span class="text-xs text-slate-400">/{{ isSelected(mod.id) && getSel(mod.id).billingCycle === 'yearly' ? 'an' : 'mois' }}</span>
                     </div>
                     <div v-if="mod.requires" class="flex items-center gap-1 text-[10px] text-slate-400">
                       <Link2 :size="10" />
                       Requiert {{ modules.find(m => m.id === mod.requires)?.name }}
                     </div>
-                  </div>
+                  </div> -->
                 </div>
 
-                <!-- Bottom color bar when selected -->
-                <div
-                  v-if="isSelected(mod.id)"
-                  class="h-1 w-full"
-                  :style="{ background: mod.color }"
-                />
+                <div v-if="isSelected(mod.id)" class="h-1 w-full" :style="{ background: mod.color }" />
               </div>
             </div>
           </div>
 
-          <!-- Right: Summary -->
+          <!-- Summary sidebar -->
           <div class="space-y-4">
             <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden sticky top-6">
               <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
@@ -195,43 +269,35 @@
               <div class="p-5">
                 <div v-if="selectedModules.length === 0" class="text-center py-6">
                   <Package :size="28" class="text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-                  <p class="text-xs text-slate-400">Aucun module sélectionné</p>
+                  <p class="text-xs text-slate-400">Aucun produit sélectionné</p>
                 </div>
                 <div v-else class="space-y-3">
-                  <div v-for="mod in selectedModules" :key="mod.id" class="flex items-center justify-between gap-2">
-                    <div class="flex items-center gap-2 min-w-0">
-                      <div
-                        class="w-6 h-6 rounded-lg flex items-center justify-center shrink-0"
-                        :style="{ background: mod.color + '15', color: mod.color }"
-                      >
+                  <div v-for="mod in selectedModules" :key="mod.id" class="flex items-start justify-between gap-2">
+                    <div class="flex items-start gap-2 min-w-0">
+                      <div class="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 mt-0.5" :style="{ background: mod.color + '15', color: mod.color }">
                         <component :is="mod.icon" :size="13" />
                       </div>
                       <div class="min-w-0">
                         <p class="text-xs font-bold text-slate-700 dark:text-slate-300 truncate">{{ mod.name }}</p>
                         <p class="text-[10px] text-slate-400">{{ getSel(mod.id).billingCycle === 'yearly' ? 'Annuel' : 'Mensuel' }}</p>
+                       
                       </div>
                     </div>
-                    <span class="text-xs font-bold text-slate-800 dark:text-white shrink-0">{{ getPrice(mod).toLocaleString('fr-FR') }}</span>
+                    <span class="text-xs font-bold text-slate-800 dark:text-white shrink-0">{{ formatCurrency(getPrice(mod)) }}</span>
                   </div>
 
-                  <div class="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-1">
-                    <div class="flex justify-between items-center">
-                      <span class="text-xs text-slate-500">Sous-total</span>
-                      <!-- <span class="text-xs font-bold text-slate-700 dark:text-slate-200">{{ totalMonthlyEquivalent.toLocaleString('fr-FR') }} XAF</span> -->
-                    </div>
-                    <!-- <div class="flex justify-between items-center">
-                      <span class="text-xs text-slate-500">TVA (19.25%)</span>
-                      <span class="text-xs font-bold text-slate-700 dark:text-slate-200">{{ Math.round(totalMonthlyEquivalent * 0.1925).toLocaleString('fr-FR') }} XAF</span>
-                    </div> -->
-                  </div>
-                  <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                  <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
                     <span class="text-sm font-black text-slate-900 dark:text-white">Total / mois</span>
-                    <span class="text-lg font-black text-purple-600">
-                      {{ Math.round(totalMonthlyEquivalent * 1.1925).toLocaleString('fr-FR') }}
-                      <span class="text-xs font-normal text-slate-400">XAF</span>
-                    </span>
+                    <span class="text-lg font-black text-purple-600">{{ formatCurrency(totalMonthlyEquivalent) }}</span>
                   </div>
                 </div>
+
+                <Transition name="slide-down">
+                  <div v-if="hasMissingPeriod" class="mt-3 flex items-start gap-2 p-3 rounded-xl bg-amber-50 border border-amber-200">
+                    <AlertTriangle :size="13" class="text-amber-500 mt-0.5 shrink-0" />
+                    <p class="text-[11px] text-amber-700 font-medium">Veuillez définir la période pour tous les modules en facturation mensuelle.</p>
+                  </div>
+                </Transition>
 
                 <button
                   @click="goToStep2"
@@ -240,82 +306,49 @@
                   :class="selectedModules.length > 0
                     ? 'bg-purple-600 hover:bg-purple-700 shadow-lg shadow-purple-200 dark:shadow-purple-900/30'
                     : 'bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed'"
-                >
-                  Continuer →
-                </button>
-
-                <div class="mt-4 space-y-2">
-                  <div class="flex items-center gap-2 text-[11px] text-slate-400">
-                    <ShieldCheck :size="12" class="text-emerald-500 shrink-0" />
-                    <span>Paiement 100% sécurisé</span>
-                  </div>
-                  <div class="flex items-center gap-2 text-[11px] text-slate-400">
-                    <RotateCcw :size="12" class="text-blue-500 shrink-0" />
-                    <span>Résiliable à tout moment</span>
-                  </div>
-                </div>
+                >Continuer →</button>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ── Step 2: Paiement ── -->
+      <!-- ── Step 2 ── -->
       <div v-if="currentStep === 2">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-          <!-- Left: Plan recap -->
           <div class="space-y-4">
             <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden sticky top-6">
               <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                 <h3 class="font-black text-sm text-slate-900 dark:text-white">Plan sélectionné</h3>
-                <button @click="currentStep = 1" class="text-xs text-purple-600 font-bold hover:underline">Modifier</button>
+                <button :disabled="loading" @click="currentStep = 1" class="text-xs text-purple-600 font-bold hover:underline cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">Modifier</button>
               </div>
               <div class="p-5 space-y-3">
-                <div
-                  v-for="mod in selectedModules"
-                  :key="mod.id"
-                  class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800"
-                >
-                  <div
-                    class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                    :style="{ background: mod.color + '15', color: mod.color }"
-                  >
+                <div v-for="mod in selectedModules" :key="mod.id" class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800">
+                  <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" :style="{ background: mod.color + '15', color: mod.color }">
                     <component :is="mod.icon" :size="16" />
                   </div>
                   <div class="flex-1 min-w-0">
                     <p class="text-xs font-bold text-slate-800 dark:text-white truncate">{{ mod.name }}</p>
                     <p class="text-[10px] text-slate-400">{{ getSel(mod.id).billingCycle === 'yearly' ? 'Facturation annuelle' : 'Facturation mensuelle' }}</p>
+                    <p v-if="getSel(mod.id).billingCycle === 'monthly' && getSel(mod.id).startMonth && getSel(mod.id).endMonth" class="text-[10px] text-purple-500 font-semibold mt-0.5 flex items-center gap-1">
+                      <CalendarRange :size="9" />{{ formatMonthShort(getSel(mod.id).startMonth) }} → {{ formatMonthShort(getSel(mod.id).endMonth) }}
+                    </p>
                   </div>
-                  <span class="text-xs font-black text-slate-900 dark:text-white shrink-0">{{ getPrice(mod).toLocaleString('fr-FR') }}</span>
+                  <span class="text-xs font-black text-slate-900 dark:text-white shrink-0">{{ formatCurrency(getPrice(mod)) }}</span>
                 </div>
 
                 <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                  <span class="text-xs font-bold text-slate-500">Total TTC / mois</span>
-                  <span class="text-sm font-black text-purple-600">
-                    {{ Math.round(totalMonthlyEquivalent * 1.1925).toLocaleString('fr-FR') }} XAF
-                  </span>
-                </div>
-              </div>
-
-              <div class="px-5 pb-5 grid grid-cols-2 gap-2">
-                <div class="bg-slate-50 dark:bg-slate-800 rounded-xl p-2.5 flex items-center gap-2">
-                  <ShieldCheck :size="13" class="text-emerald-500 shrink-0" />
-                  <span class="text-[10px] font-semibold text-slate-500">SSL Sécurisé</span>
-                </div>
-                <div class="bg-slate-50 dark:bg-slate-800 rounded-xl p-2.5 flex items-center gap-2">
-                  <RotateCcw :size="13" class="text-blue-500 shrink-0" />
-                  <span class="text-[10px] font-semibold text-slate-500">Garantie 30j</span>
+                  <span class="text-xs font-bold text-slate-500">Total / mois</span>
+                  <span class="text-sm font-black text-purple-600">{{ formatCurrency(totalMonthlyEquivalent) }}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Right: Payment + Order summary -->
           <div class="lg:col-span-2 space-y-6">
 
-            <!-- Payment method -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <!-- <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
               <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center">
                   <CreditCard :size="15" class="text-purple-600" />
@@ -327,8 +360,8 @@
               </div>
               <div class="p-6 space-y-5">
 
-                <!-- Method tabs -->
-                <div class="grid grid-cols-3 gap-3">
+             
+                <div class="grid grid-cols-2 gap-3">
                   <button
                     v-for="method in paymentMethods"
                     :key="method.val"
@@ -350,51 +383,33 @@
                   </button>
                 </div>
 
-                <!-- Card fields -->
+              
                 <div v-if="payment.method === 'card'" class="space-y-4">
                   <div>
                     <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Titulaire de la carte</label>
-                    <input
-                      v-model="payment.cardName"
-                      placeholder="Jean Dupont"
-                      class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    />
+                    <Input v-model="payment.cardName" placeholder="Jean Dupont" customClass="w-full" />
                   </div>
                   <div>
                     <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Numéro de carte</label>
-                    <input
-                      v-model="payment.cardNumber"
-                      placeholder="0000 0000 0000 0000"
-                      maxlength="19"
-                      class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono"
-                    />
+                    <Input v-model="payment.cardNumber" placeholder="0000 0000 0000 0000" maxlength="19" customClass="w-full font-mono" />
                   </div>
                   <div class="grid grid-cols-2 gap-4">
                     <div>
                       <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Date d'expiration</label>
-                      <input
-                        v-model="payment.expiry"
-                        placeholder="MM / AA"
-                        class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono"
-                      />
+                      <Input v-model="payment.expiry" placeholder="MM / AA" customClass="w-full font-mono" />
                     </div>
                     <div>
                       <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1.5">CVV</label>
-                      <input
-                        v-model="payment.cvv"
-                        placeholder="•••"
-                        maxlength="3"
-                        class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono"
-                      />
+                      <Input v-model="payment.cvv" placeholder="•••" maxlength="3" customClass="w-full font-mono" />
                     </div>
                   </div>
                 </div>
 
-                <!-- Mobile Money fields -->
+            
                 <div v-if="payment.method === 'mobile'" class="space-y-4">
                   <div>
                     <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Opérateur</label>
-                    <div class="grid grid-cols-3 gap-2">
+                    <div class="grid grid-cols-2 gap-2">
                       <button
                         v-for="op in mobileOperators"
                         :key="op.name"
@@ -404,30 +419,18 @@
                           ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
                           : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'"
                       >
-                        <component
-                          :is="op.icon"
-                          :size="16"
-                          :class="payment.mobileOperator === op.name ? 'text-purple-600' : 'text-slate-400'"
-                        />
-                        <span
-                          class="text-[10px] font-bold text-center leading-tight"
-                          :class="payment.mobileOperator === op.name ? 'text-purple-700 dark:text-purple-400' : 'text-slate-500'"
-                        >{{ op.name }}</span>
+                        <component :is="op.icon" :size="16" :class="payment.mobileOperator === op.name ? 'text-purple-600' : 'text-slate-400'" />
+                        <span class="text-[10px] font-bold text-center leading-tight" :class="payment.mobileOperator === op.name ? 'text-purple-700 dark:text-purple-400' : 'text-slate-500'">{{ op.name }}</span>
                       </button>
                     </div>
                   </div>
                   <div>
                     <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Numéro de téléphone</label>
-                    <input
-                      v-model="payment.mobilePhone"
-                      placeholder="+237 6XX XXX XXX"
-                      class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    />
+                    <Input v-model="payment.mobilePhone" placeholder="+237 6XX XXX XXX" customClass="w-full" />
                   </div>
                 </div>
 
-                <!-- Transfer info -->
-                <div v-if="payment.method === 'transfer'" class="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 space-y-3">
+              <div v-if="payment.method === 'transfer'" class="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 space-y-3">
                   <p class="text-xs font-bold text-blue-800 dark:text-blue-400 flex items-center gap-1.5">
                     <Info :size="13" />
                     Informations de virement bancaire
@@ -450,11 +453,9 @@
                     <AlertTriangle :size="11" />
                     Mentionnez impérativement la référence lors du virement.
                   </p>
-                </div>
+                </div> 
               </div>
-            </div>
-
-            <!-- Order summary + CTA -->
+            </div> -->          
             <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
               <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center">
@@ -463,41 +464,60 @@
                 <h3 class="font-black text-sm text-slate-900 dark:text-white">Récapitulatif de commande</h3>
               </div>
               <div class="p-6 space-y-3">
-                <div v-for="mod in selectedModules" :key="mod.id" class="flex justify-between items-center">
-                  <div class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
-                    <component :is="mod.icon" :size="14" class="text-slate-400 shrink-0" />
-                    {{ mod.fullName }}
+                <div v-for="mod in selectedModules" :key="mod.id" class="flex justify-between items-start gap-4">
+                  <div class="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-300 min-w-0">
+                    <component :is="mod.icon" :size="14" class="text-slate-400 shrink-0 mt-0.5" />
+                    <div class="min-w-0">
+                      <span class="font-medium">{{ mod.fullName }}</span>
+                      <div class="flex items-center gap-1 mt-0.5 flex-wrap">
+                        <span v-if="mod.slug === 'pms'" class="text-[10px] text-slate-400">({{ getSel(mod.id).rooms }} ch.)</span>
+                        <span v-else-if="mod.slug === 'pos'" class="text-[10px] text-slate-400">({{ getSel(mod.id).units }} term.)</span>
+                        <span v-else-if="mod.slug === 'mobile-app'" class="text-[10px] text-slate-400">({{ getSel(mod.id).staffQuota }} staff)</span>
+                        <span v-else-if="mod.slug === 'channel-manager'" class="text-[10px] text-slate-400">({{ getSel(mod.id).otas.filter(o => o.checked).length }} OTA)</span>
+                      </div>
+                      <div v-if="getSel(mod.id).billingCycle === 'monthly' && getSel(mod.id).startMonth && getSel(mod.id).endMonth" class="flex items-center gap-1 mt-1">
+                        <div class="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold" :style="{ background: mod.color + '15', color: mod.color }">
+                          <CalendarRange :size="8" />
+                          {{ formatDateFull(getSel(mod.id).startMonth) }} → {{ formatDateFull(getSel(mod.id).endMonth) }}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <span class="font-semibold text-slate-800 dark:text-white text-sm">{{ getPrice(mod).toLocaleString('fr-FR') }} XAF</span>
+                  <div class="text-right shrink-0">
+                    <span class="font-semibold text-slate-800 dark:text-white text-sm block">{{ formatCurrency(getPrice(mod))}}</span>
+                   
+                  </div>
                 </div>
-                <div class="flex justify-between items-center text-sm text-slate-400">
-                  <span>TVA (19.25%)</span>
-                  <span>{{ Math.round(totalMonthlyEquivalent * 0.1925).toLocaleString('fr-FR') }} XAF</span>
-                </div>
+
                 <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
                   <span class="font-black text-slate-900 dark:text-white">Montant total</span>
-                  <span class="text-2xl font-black text-purple-600">
-                    {{ Math.round(totalMonthlyEquivalent * 1.1925).toLocaleString('fr-FR') }}
-                    <span class="text-sm font-normal text-slate-400">XAF</span>
-                  </span>
+                  <span class="text-2xl font-black text-purple-600">{{ formatCurrency(totalMonthlyEquivalent) }}</span>
                 </div>
                 <p class="text-[10px] text-slate-400 text-right flex items-center justify-end gap-1">
-                  <RefreshCw :size="10" />
-                  Récurrent mensuel à partir d'aujourd'hui
+                  <RefreshCw :size="10" />Récurrent mensuel à partir d'aujourd'hui
                 </p>
-
                 <button
                   @click="goToStep3"
-                  class="mt-2 w-full py-3.5 rounded-xl text-sm font-black text-white bg-purple-600 hover:bg-purple-700 shadow-lg shadow-purple-200 dark:shadow-purple-900/30 transition-all flex items-center justify-center gap-2"
+                  :disabled="loading"
+                  class="mt-2 w-full py-3.5 rounded-xl text-sm font-black text-white bg-purple-600 hover:bg-purple-700 shadow-lg shadow-purple-200 dark:shadow-purple-900/30 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  <ShieldCheck :size="16" />
-                  Finaliser la souscription →
+                  <svg
+                    v-if="loading"
+                    class="animate-spin h-4 w-4 text-current"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  <span v-if="loading">Chargement...</span>
+                  <template v-else>
+                    <ShieldCheck :size="16" />
+                    Finaliser la souscription →
+                  </template>
                 </button>
                 <p class="text-[10px] text-slate-400 text-center mt-1">
-                  En continuant, vous acceptez nos
-                  <span class="underline cursor-pointer">Conditions d'utilisation</span>
-                  et notre
-                  <span class="underline cursor-pointer">Politique de confidentialité</span>.
+                  En continuant, vous acceptez nos <span class="underline cursor-pointer">Conditions d'utilisation</span> et notre <span class="underline cursor-pointer">Politique de confidentialité</span>.
                 </p>
               </div>
             </div>
@@ -512,49 +532,39 @@
             <CheckCircle2 :size="40" class="text-emerald-500" />
           </div>
           <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-2">Souscription confirmée !</h2>
-          <p class="text-sm text-slate-500 mb-8">Vos modules sont maintenant actifs. Vous pouvez commencer à les utiliser immédiatement.</p>
+          <p class="text-sm text-slate-500 mb-8">Vos produits sont maintenant actifs. Vous pouvez commencer à les utiliser immédiatement.</p>
 
           <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 mb-6 text-left space-y-3">
-            <h3 class="font-black text-sm text-slate-900 dark:text-white mb-3">Modules activés</h3>
+            <h3 class="font-black text-sm text-slate-900 dark:text-white mb-3">Produits activés</h3>
             <div v-for="mod in selectedModules" :key="mod.id" class="flex items-center gap-3">
-              <div
-                class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                :style="{ background: mod.color + '15', color: mod.color }"
-              >
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" :style="{ background: mod.color + '15', color: mod.color }">
                 <component :is="mod.icon" :size="15" />
               </div>
               <div class="flex-1">
                 <p class="text-xs font-bold text-slate-800 dark:text-white">{{ mod.fullName }}</p>
-                <p class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1">
-                  <Check :size="9" /> Actif
+                <p class="text-[10px] text-slate-400">
+                  <span v-if="getSel(mod.id).billingCycle === 'monthly'">{{ formatDateFull(getSel(mod.id).startMonth) }} → {{ formatDateFull(getSel(mod.id).endMonth) }}</span>
+                  <span v-else>Facturation annuelle</span>
                 </p>
+                <p class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1"><Check :size="9" /> Actif</p>
               </div>
               <span class="text-xs font-black text-slate-700 dark:text-slate-300">{{ getPrice(mod).toLocaleString('fr-FR') }} XAF</span>
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-3">
-            <button
-              @click="router.back()"
-              class="py-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center justify-center gap-2"
-            >
-              <LayoutDashboard :size="15" />
-              Tableau de bord
+            <button @click="router.back()" class="py-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center justify-center gap-2">
+              <LayoutDashboard :size="15" />Tableau de bord
             </button>
-            <button
-              @click="resetAndRestart"
-              class="py-3 rounded-xl bg-purple-600 text-sm font-bold text-white hover:bg-purple-700 transition-colors flex items-center justify-center gap-2"
-            >
-              <Plus :size="15" />
-              Ajouter des modules
+            <button @click="resetAndRestart" class="py-3 rounded-xl bg-purple-600 text-sm font-bold text-white hover:bg-purple-700 transition-colors flex items-center justify-center gap-2">
+              <Plus :size="15" />Ajouter des produits
             </button>
           </div>
         </div>
       </div>
 
     </div>
-    </div>
- 
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -562,120 +572,102 @@ import { ref, computed, reactive, onMounted, type Component } from 'vue'
 import { useRouter } from 'vue-router'
 import { productService, type Product } from '../../servicesAPI/productService'
 import { formatCurrency } from '../../components/Utilities/function'
+import Input from '../../components/FormElements/Input.vue'
+import InputDoubleDate from '../../components/FormElements/InputDoubleDate.vue'
+import { subscriptionService } from '../../servicesAPI/subscriptionService'
+import { useToastStore } from '../../composables/toast'
 import {
   ArrowLeft, ShieldCheck, Check, Lock, Link2,
-  Package, RotateCcw, CreditCard, Info,
-  CheckCircle2, AlertTriangle, BedDouble, Utensils,
+  Package, CheckCircle2, AlertTriangle, BedDouble, Utensils,
   ArrowLeftRight, Smartphone, BarChart2, Users,
   Receipt, RefreshCw, LayoutDashboard, Plus,
-  Banknote, Wallet, Building2,
+  CalendarRange, Clock,
+  Tag, ArrowRight, TrendingDown, TrendingUp,
 } from 'lucide-vue-next'
 
 const router = useRouter()
+const toastStore = useToastStore()
+const loading = ref(false)
 
-// icon/color helpers (reuse dans dossier clients)
+// ── Icon / Color mapping ───
 const slugIconComponents: Record<string, Component> = {
-  'pms': BedDouble,
-  'pos': Utensils,
-  'channel-manager': ArrowLeftRight,
-  'mobile-app': Smartphone,
-  'analytics': BarChart2,
-  'crm': Users,
+  'pms': BedDouble, 'pos': Utensils, 'channel-manager': ArrowLeftRight,
+  'mobile-app': Smartphone, 'analytics': BarChart2, 'crm': Users,
 }
 const slugColors: Record<string, string> = {
-  'pms': '#7c3aed',
-  'pos': '#0891b2',
-  'channel-manager': '#059669',
-  'mobile-app': '#d97706',
-  'analytics': '#dc2626',
-  'crm': '#0f766e',
+  'pms': '#7c3aed', 'pos': '#0891b2', 'channel-manager': '#059669',
+  'mobile-app': '#d97706', 'analytics': '#dc2626', 'crm': '#0f766e',
 }
-const getIcon = (slug: string): Component => slugIconComponents[slug] ?? BedDouble
+const getIcon  = (slug: string): Component => slugIconComponents[slug] ?? Package
 const getColor = (slug: string) => slugColors[slug] ?? '#6b7280'
 
-// ── Types ─────────────────────────────────────────────────────────
-interface Module {
-  id: number
-  slug: string
-  name: string
-  fullName: string
-  description: string
-  priceMonthly: number
-  icon: any
-  color: string
-  limitLabel: string | null
-  requires?: number
-}
+// ── Types ────
+interface OTA { name: string; checked: boolean }
 
 interface Selection {
-  billingCycle: 'monthly' | 'yearly'
-  limitCount: number
+  billingCycle : 'monthly' | 'yearly'
+  rooms        : number
+  units        : number
+  staffQuota   : number
+  guestApp     : boolean
+  otas         : OTA[]
+  startMonth   : string
+  endMonth     : string
+  customPrice  : number
 }
 
-// ── Catalogue (chargée depuis l'API) ────────────────────────────────
-const modules = ref<Module[]>([])
-const modulesLoading = ref(false)
 
-// helper pour rafraîchir
+
+// ── Catalogue ─────
+const modules       = ref<any[]>([])
+const modulesLoading = ref(false)
+const hotelId = Number(router.currentRoute.value.params.id || 0)
+
 async function loadModules() {
   modulesLoading.value = true
   try {
     const res = await productService.getAll()
     const arr = Array.isArray(res.data) ? res.data : []
-    modules.value = arr.map((p: Product): Module => ({
-      id: Number(p.id),
-      slug: p.slug || '',
-      name: p.name,
-      fullName: p.name,
-      description: p.description || '',
-      priceMonthly: p.priceMonthly ?? 0,
-      icon: getIcon(p.slug || ''),
-      color: getColor(p.slug || ''),
-      limitLabel: p.slug,
+    modules.value = arr.map((p: Product): any => ({
+      id: Number(p.id), slug: p.slug || '', name: p.name, fullName: p.name,
+      description: p.description || '', priceMonthly: p.priceMonthly ?? 0,
+      icon: getIcon(p.slug || ''), color: getColor(p.slug || ''),
     }))
-  } catch (e) {
-    console.error(e)
-  } finally {
-    modulesLoading.value = false
-  }
+  } catch (e) { console.error(e) }
+  finally { modulesLoading.value = false }
+}
+onMounted(() => { loadModules() })
+
+
+const formatMonthShort = (ymd: string): string => {
+  if (!ymd) return ''
+  const [y, m, d] = ymd.split('-')
+  return `${d}/${m}/${y.slice(2)}`
 }
 
-onMounted(() => {
-  loadModules()
-})
 
-// ── Payment config ─────────────────────────────────────────────────
-const paymentMethods = [
-  { val: 'card',     label: 'Carte bancaire', icon: CreditCard },
-  { val: 'mobile',   label: 'Mobile Money',   icon: Wallet     },
-  { val: 'transfer', label: 'Virement',        icon: Building2  },
-] as const
+const formatDateFull = (ymd: string): string => {
+  if (!ymd) return ''
+  const [y, m, d] = ymd.split('-')
+  return `${d}/${m}/${y}`
+}
 
-const mobileOperators = [
-  { name: 'Orange Money', icon: Banknote },
-  { name: 'MTN MoMo',     icon: Banknote },
-  { name: 'Moov Money',   icon: Banknote },
+
+
+// ── OTA defaults ───────
+const DEFAULT_OTAS: OTA[] = [
+  { name: 'Booking.com', checked: true },
+  { name: 'Agoda',       checked: true },
+  { name: 'Expedia',     checked: false },
 ]
 
-// ── State ──────────────────────────────────────────────────────────
+// ── State ───────
 const currentStep        = ref(1)
 const steps              = ['Plan', 'Paiement', 'Confirmation']
 const showChannelWarning = ref(false)
-const transferRef        = 'HOS-' + Math.random().toString(36).substring(2, 8).toUpperCase()
+const selections         = reactive<Record<number, Selection>>({})
 
-const selections = reactive<Record<number, Selection>>({})
-
-const payment = reactive({
-  method:         'card' as 'card' | 'mobile' | 'transfer',
-  cardName:       '',
-  cardNumber:     '',
-  expiry:         '',
-  cvv:            '',
-  mobileOperator: 'Orange Money',
-  mobilePhone:    '',
-})
-
-// ── Computed ───────────────────────────────────────────────────────
+// ── Computed ─────
 const selectedModules = computed(() => modules.value.filter(m => selections[m.id] !== undefined))
 
 const isSelected = (id: number) => selections[id] !== undefined
@@ -683,32 +675,57 @@ const isLocked   = (id: number) => {
   const mod = modules.value.find(m => m.id === id)
   return mod?.requires !== undefined && !isSelected(mod.requires)
 }
-
 const getSel = (id: number) => selections[id] as Selection
 
-const getPrice = (mod: Module) => {
-  const sel = selections[mod.id]
+
+const getPrice = (mod: any): number => {
+  const sel  = selections[mod.id]
   if (!sel) return mod.priceMonthly
-  return sel.billingCycle === 'yearly' ? Math.round(mod.priceMonthly * 10) : mod.priceMonthly
+  const base = sel.customPrice > 0 ? sel.customPrice : mod.priceMonthly
+  return sel.billingCycle === 'yearly' ? Math.round(base * 10) : base
 }
 
 const totalMonthlyEquivalent = computed(() =>
   selectedModules.value.reduce((acc, mod) => {
     const sel = selections[mod.id]
-    const monthly = sel?.billingCycle === 'yearly'
-      ? Math.round(mod.priceMonthly * 10 / 12)
-      : mod.priceMonthly
-    return acc + monthly
+    const price = getPrice(mod)
+    return acc + (sel?.billingCycle === 'yearly' ? Math.round(price / 12) : price)
   }, 0)
 )
 
-// ── Actions ────────────────────────────────────────────────────────
+
+const hasMissingPeriod = computed(() =>
+  selectedModules.value.some(mod => {
+    const sel = getSel(mod.id)
+    return sel?.billingCycle === 'monthly' && (!sel?.startMonth || !sel?.endMonth)
+  })
+)
+
+// ── Actions ────────
 const setSel = (id: number, key: keyof Selection, val: any) => {
-  const s = getSel(id)
-  if (s) (s as any)[key] = val
+  const s = getSel(id); if (s) (s as any)[key] = val
 }
 
-const toggleModule = (mod: Module) => {
+const defaultSelection = (mod: any): Selection => {
+  const now   = new Date()
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const end   = new Date(now.getFullYear(), now.getMonth() + 1, 6) 
+
+  const fmt = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+
+  return {
+    billingCycle: 'monthly',
+    rooms: 10, units: 1, staffQuota: 5, guestApp: false,
+    otas: DEFAULT_OTAS.map(o => ({ ...o })),
+    startMonth : fmt(start),
+    endMonth   : fmt(end),
+    customPrice: Math.round(mod.priceMonthly),
+  }
+}
+
+
+const toggleModule = (mod: any) => {
   if (isLocked(mod.id)) {
     showChannelWarning.value = true
     setTimeout(() => { showChannelWarning.value = false }, 4000)
@@ -716,18 +733,48 @@ const toggleModule = (mod: Module) => {
   }
   if (isSelected(mod.id)) {
     delete selections[mod.id]
-    modules.value.forEach(m => {
-      if (m.requires === mod.id && isSelected(m.id)) delete selections[m.id]
-    })
+    modules.value.forEach(m => { if (m.requires === mod.id && isSelected(m.id)) delete selections[m.id] })
   } else {
-    selections[mod.id] = { billingCycle: 'monthly', limitCount: 1 }
+    selections[mod.id] = defaultSelection(mod)
   }
 }
 
 const goToStep2 = () => { if (selectedModules.value.length > 0) currentStep.value = 2 }
-const goToStep3 = () => {
-  currentStep.value = 3
-  // TODO: POST /subscriptions
+
+const buildSubscriptionPayload = (mod: any) => {
+  const sel = getSel(mod.id)
+  return {
+    module_id    : mod.id,
+    billing_cycle: sel.billingCycle,
+    price        : sel.customPrice,
+    starts_at: sel.billingCycle === 'monthly' && sel.startMonth ? sel.startMonth : null,  // ✅ plus de -01
+    ends_at  : sel.billingCycle === 'monthly' && sel.endMonth   ? sel.endMonth   : null,  // ✅ plus de -01
+    ...(mod.slug === 'pms'             && { rooms: sel.rooms }),
+    ...(mod.slug === 'pos'             && { units: sel.units }),
+    ...(mod.slug === 'mobile-app'      && { staff_quota: sel.staffQuota, guest_app: sel.guestApp }),
+    ...(mod.slug === 'channel-manager' && { otas: sel.otas.filter(o => o.checked).map(o => o.name) }),
+  }
+}
+
+const goToStep3 = async () => {
+  try {
+    loading.value = true
+    for (const mod of selectedModules.value) {
+      await subscriptionService.create(hotelId, buildSubscriptionPayload(mod))
+      toastStore.show({ type: 'success', title: 'Produit activé', message: `${mod.name} a été ajouté à votre abonnement.` })
+    }
+    currentStep.value = 3
+  } catch (error: any) {
+    const code = error.response?.data?.code
+    const codeMessages: Record<string, { title: string; message: string }> = {
+      DEPENDENCY_MISSING:    { title: 'Dépendance manquante', message: 'Le Channel Manager nécessite un abonnement PMS actif.' },
+      DUPLICATE_SUBSCRIPTION:{ title: 'Abonnement existant',  message: 'Un abonnement actif existe déjà pour ce module.' },
+    }
+    const toast = codeMessages[code] ?? { title: 'Erreur', message: error.response?.data?.message ?? 'Une erreur est survenue.' }
+    toastStore.show({ type: 'error', title: toast.title, message: toast.message })
+  }finally {
+    loading.value = false
+  }
 }
 
 const resetAndRestart = () => {
@@ -737,13 +784,6 @@ const resetAndRestart = () => {
 </script>
 
 <style scoped>
-.slide-down-enter-active,
-.slide-down-leave-active {
-  transition: all 0.3s ease;
-}
-.slide-down-enter-from,
-.slide-down-leave-to {
-  opacity: 0;
-  transform: translateY(-8px);
-}
+.slide-down-enter-active, .slide-down-leave-active { transition: all 0.3s ease; }
+.slide-down-enter-from, .slide-down-leave-to { opacity: 0; transform: translateY(-8px); }
 </style>

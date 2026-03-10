@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { Zap, Smartphone, RefreshCcw, Cloud, UserPlus } from 'lucide-vue-next'
+import { Smartphone, RefreshCcw, Cloud, UserPlus } from 'lucide-vue-next'
 
 interface Activation {
   id: number

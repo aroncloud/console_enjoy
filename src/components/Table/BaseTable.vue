@@ -158,8 +158,8 @@
             @click="onRowClick?.(row)"
           >
             <div class="px-3.5 py-3 bg-gray-50 border-b border-gray-200">
-              <slot :name="`cell-${columns[0]?.key}`" :row="row" :value="row[columns[0]?.key]">
-                <span class="font-semibold text-sm text-gray-900">{{ row[columns[0]?.key] }}</span>
+              <slot :name="`cell-${firstColumnKey}`" :row="row" :value="row[firstColumnKey]">
+                <span class="font-semibold text-sm text-gray-900">{{ row[firstColumnKey] }}</span>
               </slot>
             </div>
             <div class="px-3.5 py-3 flex flex-col gap-2.5">
@@ -209,7 +209,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import Pagination from '../../components/Pagination/PaginationTable.vue'
-import Select from '../FormElements/Select.vue'
 
 export interface Column {
   key: string
@@ -246,6 +245,8 @@ const props = withDefaults(defineProps<Props>(), {
   loading: false,
 
 })
+
+const firstColumnKey = computed(() => props.columns[0]?.key ?? '')
 
 const emit = defineEmits<{
   (e: 'page-change', page: number): void

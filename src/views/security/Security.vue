@@ -254,11 +254,12 @@ const tenantStatuses = ref([
 
 
 
-const toggleTenant = (t: { id: string; name: string; suspended: boolean }) => {
-  t.suspended = !t.suspended
+const toggleTenant = (t: Record<string, any>) => {
+  const tenant = t as { id: string; name: string; suspended: boolean }
+  tenant.suspended = !tenant.suspended
   auditLogs.value.unshift({
-    type:   t.suspended ? 'kill' : 'restore',
-    action: t.suspended ? `Accès suspendus — ${t.name}` : `Accès restaurés — ${t.name}`,
+    type:   tenant.suspended ? 'kill' : 'restore',
+    action: tenant.suspended ? `Accès suspendus — ${tenant.name}` : `Accès restaurés — ${tenant.name}`,
     meta:   'Action manuelle · par Admin',
     time:   "À l'instant",
   })

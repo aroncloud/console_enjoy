@@ -2,10 +2,9 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
-  ArrowLeft, Edit, Info, LogIn,
-  ListChecks, Banknote, OctagonAlert, Layers, Trash2,
+  ArrowLeft, Edit, Info,
+  ListChecks, Banknote, Layers, Trash2,
   BedDouble, Utensils, ArrowLeftRight, Smartphone, BarChart2, Users,
-  ToggleLeft, ToggleRight,
 } from 'lucide-vue-next'
 import { type Component } from 'vue'
 import { hotelService } from '../../servicesAPI/clientService'

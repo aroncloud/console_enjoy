@@ -89,7 +89,13 @@ const userEmail   = computed(() => authStore.user?.email ?? '')
 const roleName    = computed(() => authStore.user?.role?.roleName ?? 'Super Admin')
 
 const initials = computed(() =>
-  displayName.value.split(' ').map((w: any) => w[0].toUpperCase()).join('').slice(0, 2) || 'A'
+  displayName.value
+    .trim()
+    .split(/\s+/)
+    .filter((w: string) => w.length > 0)
+    .map((w: string) => (w[0]?.toUpperCase() ?? ''))
+    .join('')
+    .slice(0, 2) || 'A'
 )
 
 const toggleDropdown = () => { isOpen.value = !isOpen.value }

@@ -38,7 +38,7 @@
     <!-- Colonne Action -->
     <template #cell-action="{ row }">
       <button
-        @click.stop="handleAction(row)"
+        @click.stop="handleAction(row as License)"
         class="p-2 hover:bg-blue-50 rounded-lg transition-colors group"
       >
         <ChevronRight class="w-4 h-4 text-gray-400 group-hover:text-blue-500 transition-colors" />
@@ -49,10 +49,8 @@
     <!-- pagination footer -->
     <template #footer>
       <PaginationTable
-        :currentPage="currentPage"
-        :pageSize="pageSize"
-        :totalItems="licenses.length"
-        @update:currentPage="currentPage = $event"
+        :meta="paginationMeta"
+        @page-change="currentPage = $event"
       />
     </template>
   </BaseTable>
@@ -60,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { Building2, ChevronRight ,TriangleAlert  } from 'lucide-vue-next'
+import { Building2, ChevronRight } from 'lucide-vue-next'
 import BaseTable, { type Column } from '../Table/BaseTable.vue'
 import PaginationTable from '../Pagination/PaginationTable.vue'
 
@@ -102,6 +100,18 @@ const pageSize = ref(5)
 const pagedLicenses = computed(() => {
   const start = (currentPage.value - 1) * pageSize.value
   return licenses.slice(start, start + pageSize.value)
+})
+
+const paginationMeta = computed(() => {
+  const lastPage = Math.max(1, Math.ceil(licenses.length / pageSize.value))
+  return {
+    total: licenses.length,
+    perPage: pageSize.value,
+    currentPage: currentPage.value,
+    lastPage,
+    previousPageUrl: currentPage.value > 1 ? 'prev' : null,
+    nextPageUrl: currentPage.value < lastPage ? 'next' : null,
+  }
 })
 
 const getBadgeClass = (days: number): string => {

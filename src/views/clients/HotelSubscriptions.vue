@@ -584,15 +584,14 @@ import InputDoubleDate from '../../components/FormElements/InputDoubleDate.vue'
 import { subscriptionService } from '../../servicesAPI/subscriptionService'
 import { useToastStore } from '../../composables/toast'
 import {
-  ArrowLeft, ShieldCheck, Check, Lock, Link2,
+  ArrowLeft, ShieldCheck, Check, Lock,
   Package, CheckCircle2, AlertTriangle, BedDouble, Utensils,
   ArrowLeftRight, Smartphone, BarChart2, Users,
   Receipt, RefreshCw, LayoutDashboard, Plus,
-  CalendarRange, Clock,
-  Tag, ArrowRight, TrendingDown, TrendingUp,
+  CalendarRange,
+  Tag,
 } from 'lucide-vue-next'
 import { hotelService } from '../../servicesAPI/clientService'
-import { N } from 'vue-router/dist/index-DFCq6eJK.js'
 
 const router = useRouter()
 const toastStore = useToastStore()
@@ -667,6 +666,7 @@ onMounted(async () => {
 const formatMonthShort = (ymd: string): string => {
   if (!ymd) return ''
   const [y, m, d] = ymd.split('-')
+  if (!y || !m || !d) return ''
   return `${d}/${m}/${y.slice(2)}`
 }
 
@@ -674,6 +674,7 @@ const formatMonthShort = (ymd: string): string => {
 const formatDateFull = (ymd: string): string => {
   if (!ymd) return ''
   const [y, m, d] = ymd.split('-')
+  if (!y || !m || !d) return ''
   return `${d}/${m}/${y}`
 }
 

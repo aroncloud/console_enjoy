@@ -218,7 +218,7 @@
 import { ref, computed } from 'vue'
 import {
   Banknote, Clock, TriangleAlert, ChartLine, SquarePlus,
-  Search, SlidersHorizontal, Download, Mail, Megaphone,
+  Download, Mail, Megaphone,
   Gift, PlusCircle, CheckCircle
 } from 'lucide-vue-next'
 
@@ -226,7 +226,6 @@ import {
 import BaseTable      from '../../components/Table/BaseTable.vue'
 import BaseInput      from '../../components/FormElements/Input.vue'
 import BaseSelect     from '../../components/FormElements/Select.vue'
-import PaginationTable from '../../components/Pagination/PaginationTable.vue'
 
 // ── Colonnes table ────────────────────────────────────────────────────────────
 const columns = [

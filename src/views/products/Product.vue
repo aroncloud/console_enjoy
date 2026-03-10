@@ -2,7 +2,7 @@
 import { ref, computed, reactive, onMounted, watch } from 'vue'
 import {
   Plus, Edit, Trash2,
-  Package, Search, Check, Loader2,
+  Package, Search, Check,
   BedDouble, Utensils, ArrowLeftRight, Smartphone, BarChart2, Users
 } from 'lucide-vue-next'
 import { type Component } from 'vue'
@@ -103,11 +103,6 @@ watch(page, () => fetchProducts(1))
 
 // ── Computed KPIs 
 const countActive = computed(() => products.value.filter(m => m.isActive).length)
-const totalRevenuePotentiel = computed(() =>
-  products.value
-    .filter(m => m.isActive)
-    .reduce((acc, m) => acc + Number(m.priceMonthly ?? 0), 0)
-)
 
 // ── Helpers icônes / couleurs 
 const slugIconComponents: Record<string, Component> = {
@@ -220,17 +215,6 @@ const confirmDelete = async () => {
   }
 }
 
-// ── Toggle actif 
-const toggleActive = async (prod: any) => {
-  try {
-    await productService.update(Number(prod.id), { isActive: !prod.isActive })
-    const idx = products.value.findIndex(m => m.id === prod.id)
-    if (idx !== -1) products.value[idx]!.isActive = !prod.isActive
-  } catch (e) {
-    console.error(e)
-    toastStore.show({ message: 'Erreur lors de la mise à jour du statut', type: 'error' })
-  }
-}
 </script>
 
 <template>

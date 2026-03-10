@@ -86,7 +86,7 @@ const rangeConfig = computed((): Partial<BaseOptions & { utc: boolean }> => ({
   animate: false,
   disableMobile: false,
   utc: false,
-  onOpen: [(selectedDates, dateStr, instance) => {
+  onOpen: [(selectedDates, _dateStr, instance) => {
     if (selectedDates.length > 0) {
       instance.jumpToDate(selectedDates[0])
     } else {
@@ -94,14 +94,16 @@ const rangeConfig = computed((): Partial<BaseOptions & { utc: boolean }> => ({
     }
   }],
   // CORRECTION 2: S'assurer que la signature de la fonction et le type de retour correspondent
-  parseDate: (datestr: string, format: string): Date => {
+  parseDate: (datestr: string, _format: string): Date => {
     if (!datestr) return new Date() // Doit retourner une Date, pas null
 
     if (/^\d{4}-\d{2}-\d{2}$/.test(datestr)) {
       const parts = datestr.split('-')
-      const year = parseInt(parts[0], 10)
-      const month = parseInt(parts[1], 10) - 1
-      const day = parseInt(parts[2], 10)
+      const [y, m, d] = parts
+      if (!y || !m || !d) return new Date()
+      const year = parseInt(y, 10)
+      const month = parseInt(m, 10) - 1
+      const day = parseInt(d, 10)
       return new Date(year, month, day)
     }
 
@@ -120,7 +122,7 @@ const rangeConfig = computed((): Partial<BaseOptions & { utc: boolean }> => ({
 
 // Le callback 'onReady' de la config et celui de l'event @on-ready sont redondants.
 // On garde celui de l'event @on-ready pour plus de clarté.
-const onReady = (selectedDates: Date[], dateStr: string, instance: Instance) => {
+const onReady = (_selectedDates: Date[], _dateStr: string, instance: Instance) => {
   flatpickrInstance.value = instance
   instance.config.animate = false
 }
@@ -162,9 +164,11 @@ const parseDateFromString = (dateStr: string | null): Date | null => {
   try {
     const parts = dateStr.split('-')
     if (parts.length !== 3) return null
-    const year = parseInt(parts[0], 10)
-    const month = parseInt(parts[1], 10) - 1
-    const day = parseInt(parts[2], 10)
+    const [y, m, d] = parts
+    if (!y || !m || !d) return null
+    const year = parseInt(y, 10)
+    const month = parseInt(m, 10) - 1
+    const day = parseInt(d, 10)
     const date = new Date(year, month, day)
     return isNaN(date.getTime()) ? null : date
   } catch {

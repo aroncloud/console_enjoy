@@ -91,14 +91,14 @@ const flatpickrConfig = computed(() => {
 })
 
 // Méthode pour gérer le changement
-const handleChange = (selectedDates: Date[], dateStr: string) => {
+const handleChange = (_selectedDates: Date[], dateStr: string) => {
   console.log('Time changed:', dateStr) // Pour déboguer
   emits('clear-error')
   emits('update:modelValue', dateStr)
 }
 
 // Méthode pour gérer la fermeture du picker
-const handleClose = (selectedDates: Date[], dateStr: string) => {
+const handleClose = (_selectedDates: Date[], dateStr: string) => {
   console.log('Picker closed with:', dateStr) // Pour déboguer
   emits('update:modelValue', dateStr)
 }

@@ -90,8 +90,8 @@ import { TrendingUp, TrendingDown } from 'lucide-vue-next'
 const activePeriod = ref<'month' | 'quarter'>('quarter')
 
 const periods = [
-  { label: 'Mois', value: 'month' },
-  { label: 'Trimestre', value: 'quarter' },
+  { label: 'Mois', value: 'month' as const },
+  { label: 'Trimestre', value: 'quarter' as const },
 ]
 
 interface Bar {
@@ -146,7 +146,7 @@ const tooltip = ref<TooltipState>({
   trendUp: true,
 })
 
-const showTooltip = (bar: Bar, index: number, event: MouseEvent) => {
+const showTooltip = (bar: Bar, _index: number, event: MouseEvent) => {
   const target = event.currentTarget as HTMLElement
   const parent = target.parentElement!.getBoundingClientRect()
   const rect = target.getBoundingClientRect()

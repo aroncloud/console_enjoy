@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { routeProgressVisible } from '@/composables/routeProgress'
+import { routeProgressVisible } from '../../composables/routeProgress'
 
 const visible = computed(() => routeProgressVisible.value)
 </script>

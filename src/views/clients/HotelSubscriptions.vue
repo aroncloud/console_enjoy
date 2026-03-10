@@ -78,12 +78,12 @@
             </Transition>
 
             <!-- Module cards -->
-            <div v-if="modulesLoading" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div v-if="pageLoading" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div v-for="i in 6" :key="i" class="h-40 bg-gray-200 rounded-xl animate-pulse"></div>
             </div>
-            <div v-else class="grid grid-cols-1 sm:grid-cols-2 items-start gap-4">
+            <div v-else-if="availableModules.length > 0" class="grid grid-cols-1 sm:grid-cols-2 items-start gap-4">
               <div
-                v-for="mod in modules"
+                v-for="mod in availableModules"
                 :key="mod.id"
                 class="relative bg-white dark:bg-slate-900 rounded-2xl border transition-all duration-200 overflow-hidden"
                 :class="[
@@ -164,7 +164,7 @@
                         v-for="[val, label] in [['monthly', 'Mensuel'], ['yearly', 'Annuel']]"
                         :key="val"
                         @click="setSel(mod.id, 'billingCycle', val)"
-                        class="py-1.5 px-2 rounded-lg text-[11px] font-bold border-1 transition-all"
+                        class="py-1.5 px-2 rounded-lg text-[11px] font-bold border transition-all"
                         :class="getSel(mod.id).billingCycle === val
                           ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'
                           : 'border-slate-200 dark:border-slate-700 text-slate-500 hover:border-slate-300'"
@@ -258,6 +258,13 @@
                 <div v-if="isSelected(mod.id)" class="h-1 w-full" :style="{ background: mod.color }" />
               </div>
             </div>
+            <div v-else class="flex flex-col items-center justify-center py-16 text-slate-400">
+              <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center mb-3">
+                <Package :size="22" class="opacity-40" />
+              </div>
+              <p class="text-sm font-semibold">Tous les modules sont déjà actifs</p>
+              <p class="text-xs mt-1">Cet établissement a souscrit à tous les produits disponibles.</p>
+            </div>
           </div>
 
           <!-- Summary sidebar -->
@@ -287,7 +294,7 @@
                   </div>
 
                   <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                    <span class="text-sm font-black text-slate-900 dark:text-white">Total / mois</span>
+                    <span class="text-sm font-black text-slate-900 dark:text-white">Total</span>
                     <span class="text-lg font-black text-purple-600">{{ formatCurrency(totalMonthlyEquivalent) }}</span>
                   </div>
                 </div>
@@ -584,10 +591,16 @@ import {
   CalendarRange, Clock,
   Tag, ArrowRight, TrendingDown, TrendingUp,
 } from 'lucide-vue-next'
+import { hotelService } from '../../servicesAPI/clientService'
+import { N } from 'vue-router/dist/index-DFCq6eJK.js'
 
 const router = useRouter()
 const toastStore = useToastStore()
 const loading = ref(false)
+const pageLoading = ref(true) 
+const existingSubscriptions = ref<any[]>([])
+
+
 
 // ── Icon / Color mapping ───
 const slugIconComponents: Record<string, Component> = {
@@ -620,11 +633,10 @@ interface Selection {
 
 // ── Catalogue ─────
 const modules       = ref<any[]>([])
-const modulesLoading = ref(false)
 const hotelId = Number(router.currentRoute.value.params.id || 0)
 
-async function loadModules() {
-  modulesLoading.value = true
+const loadModules = async()=> {
+
   try {
     const res = await productService.getAll()
     const arr = Array.isArray(res.data) ? res.data : []
@@ -634,9 +646,22 @@ async function loadModules() {
       icon: getIcon(p.slug || ''), color: getColor(p.slug || ''),
     }))
   } catch (e) { console.error(e) }
-  finally { modulesLoading.value = false }
 }
-onMounted(() => { loadModules() })
+
+const activeModuleSlugs = computed(() =>
+  existingSubscriptions.value
+    .filter((sub: any) => sub.status === 'active')
+    .map((sub: any) => sub.module?.slug)
+)
+
+const availableModules = computed(() =>
+  modules.value.filter(m => !activeModuleSlugs.value.includes(m.slug))
+)
+onMounted(async () => {
+  pageLoading.value = true
+  await Promise.all([loadModules(), loadExistingSubscriptions()])
+  pageLoading.value = false
+})
 
 
 const formatMonthShort = (ymd: string): string => {
@@ -679,19 +704,18 @@ const getSel = (id: number) => selections[id] as Selection
 
 
 const getPrice = (mod: any): number => {
-  const sel  = selections[mod.id]
-  if (!sel) return mod.priceMonthly
-  const base = sel.customPrice > 0 ? sel.customPrice : mod.priceMonthly
-  return sel.billingCycle === 'yearly' ? Math.round(base * 10) : base
+  const sel = selections[mod.id]
+  if (!sel) return Number(mod.priceMonthly) 
+  const base = sel.customPrice > 0 ? Number(sel.customPrice) : Number(mod.priceMonthly)  
+  return sel.billingCycle === 'yearly' ? base * 12 : base
 }
 
 const totalMonthlyEquivalent = computed(() =>
   selectedModules.value.reduce((acc, mod) => {
-    const sel = selections[mod.id]
-    const price = getPrice(mod)
-    return acc + (sel?.billingCycle === 'yearly' ? Math.round(price / 12) : price)
+    return acc + getPrice(mod)  
   }, 0)
 )
+
 
 
 const hasMissingPeriod = computed(() =>
@@ -700,6 +724,14 @@ const hasMissingPeriod = computed(() =>
     return sel?.billingCycle === 'monthly' && (!sel?.startMonth || !sel?.endMonth)
   })
 )
+
+const loadExistingSubscriptions = async() =>{
+  try {
+    const res = await hotelService.getById(hotelId)
+    const hotel = res.data?.data ?? res.data
+    existingSubscriptions.value = hotel?.subscriptions || []
+  } catch (e) { console.error(e) }
+}
 
 // ── Actions ────────
 const setSel = (id: number, key: keyof Selection, val: any) => {
@@ -743,12 +775,29 @@ const goToStep2 = () => { if (selectedModules.value.length > 0) currentStep.valu
 
 const buildSubscriptionPayload = (mod: any) => {
   const sel = getSel(mod.id)
+  
+  const now = new Date()
+  const fmt = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+
+  // Pour yearly : date début = aujourd'hui, date fin = +1 an
+  const yearlyStart = fmt(now)
+  const yearlyEnd   = fmt(new Date(now.getFullYear() + 1, now.getMonth(), now.getDate()))
+
+  const limitCount = 
+    mod.slug === 'pms' ? sel.rooms : 
+    mod.slug == 'pos' ? sel.units : 
+    mod.slug == 'mobile-app' ? sel.staffQuota : 
+    mod.slug == 'channel-manager' ? sel.otas.filter((o: any) => o.checked).length : null 
+   
+
   return {
     module_id    : mod.id,
     billing_cycle: sel.billingCycle,
-    price        : sel.customPrice,
-    starts_at: sel.billingCycle === 'monthly' && sel.startMonth ? sel.startMonth : null,  // ✅ plus de -01
-    ends_at  : sel.billingCycle === 'monthly' && sel.endMonth   ? sel.endMonth   : null,  // ✅ plus de -01
+    price        : getPrice(mod),  
+    limit_count: limitCount,
+    starts_at: sel.billingCycle === 'yearly' ? yearlyStart : sel.startMonth,
+    ends_at  : sel.billingCycle === 'yearly' ? yearlyEnd   : sel.endMonth,
     ...(mod.slug === 'pms'             && { rooms: sel.rooms }),
     ...(mod.slug === 'pos'             && { units: sel.units }),
     ...(mod.slug === 'mobile-app'      && { staff_quota: sel.staffQuota, guest_app: sel.guestApp }),
@@ -760,6 +809,7 @@ const goToStep3 = async () => {
   try {
     loading.value = true
     for (const mod of selectedModules.value) {
+      console.log('buildSubscriptionPayload',buildSubscriptionPayload(mod))
       await subscriptionService.create(hotelId, buildSubscriptionPayload(mod))
       toastStore.show({ type: 'success', title: 'Produit activé', message: `${mod.name} a été ajouté à votre abonnement.` })
     }
@@ -769,6 +819,7 @@ const goToStep3 = async () => {
     const codeMessages: Record<string, { title: string; message: string }> = {
       DEPENDENCY_MISSING:    { title: 'Dépendance manquante', message: 'Le Channel Manager nécessite un abonnement PMS actif.' },
       DUPLICATE_SUBSCRIPTION:{ title: 'Abonnement existant',  message: 'Un abonnement actif existe déjà pour ce module.' },
+      INTERNAL_SERVER_ERROR : {title: 'Erreur',message : 'Une erreur est survenue.'}
     }
     const toast = codeMessages[code] ?? { title: 'Erreur', message: error.response?.data?.message ?? 'Une erreur est survenue.' }
     toastStore.show({ type: 'error', title: toast.title, message: toast.message })

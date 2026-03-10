@@ -79,6 +79,9 @@ const handleSubmit = async (data: any) => {
     closeForm()
     await fetchHotels()
   } catch (e: any) {
+    console.log('error',e)
+     console.error('Status:', e.response)
+  console.error('Data:', JSON.stringify(e.response?.data, null, 2))
     toastStore.show({ message: "Erreur lors de l'ajout", type: 'error' })
   } finally {
     loading.value = false

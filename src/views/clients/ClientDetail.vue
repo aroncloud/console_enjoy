@@ -100,6 +100,7 @@ const activeModules = computed(() =>
     startsAt     : sub.startsAt,
     endsAt       : sub.endsAt,
     paymentStatus: sub.paymentStatus,
+    limitCount : sub.limitCount
   }))
 )
 
@@ -184,19 +185,38 @@ const initials = computed(() =>
   hotelName.value.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()
 )
 
-const statusStyles = computed(() => ({
-  active:    'bg-emerald-100 text-emerald-700',
-  inactive:  'bg-gray-100 text-gray-500',
-  suspended: 'bg-red-100 text-red-700',
-}[hotelStatus.value] ?? 'bg-gray-100 text-gray-500'))
+const statusStyles = computed (()=> {
+  const map: Record<string,string> = {
+      active:    'bg-emerald-100 text-emerald-700',
+      inactive: 'bg-red-100 text-red-700',
+}
+  return map[hotelStatus.value] ?? 'bg-gray-100 text-gray-500'
+})
 
-const statusLabel = computed(() => ({
-  active:    'Actif',
-  inactive:  'Inactif',
-  suspended: 'Suspendu',
-}[hotelStatus.value] ?? hotelStatus.value))
+const statusLabel = computed(() => {
+  const map: Record<string, string> = {
+    active:    'Actif',
+    inactive: 'Inactif',
+  }
+  return map[hotelStatus.value] ?? hotelStatus.value
+})
 
+const getSubStatusConfig = (status: string) => {
+  const config: Record<string, { label: string; dot: string; text: string }> = {
+    active  : { label: 'Actif',      dot: 'bg-emerald-400', text: 'text-emerald-500' },
+    past_due: { label: 'En retard',  dot: 'bg-amber-400',   text: 'text-amber-500'   },
+    canceled: { label: 'Résilié',    dot: 'bg-red-400',     text: 'text-red-400'     },
+  }
+  return config[status] ?? { label: status, dot: 'bg-slate-300', text: 'text-slate-400' }
+}
 const renderStars = (n: number) => '★'.repeat(n) + '☆'.repeat(5 - n)
+
+const limitLabel = (slug: string): string => ({
+  'pms'            : 'ch.',
+  'pos'            : 'term.',
+  'mobile-app'     : 'staff',
+  'channel-manager': 'OTA',
+}[slug] ?? '')
 </script>
 
 <template>
@@ -405,18 +425,26 @@ const renderStars = (n: number) => '★'.repeat(n) + '☆'.repeat(5 - n)
 
                     <!-- Infos -->
                     <div class="flex-1 min-w-0">
-                      <p class="text-xs font-bold text-slate-800 truncate">{{ item.name }}</p>
+                      <div class="flex items-center gap-2">
+                        <p class="text-xs font-bold text-slate-800 truncate">{{ item.name }}</p>
+                        <span
+                          v-if="item.limitCount"
+                          class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 shrink-0"
+                        >
+                          {{ item.limitCount }} {{ limitLabel(item.slug) }}
+                        </span>
+                      </div>
                       <div class="flex items-center gap-2 mt-0.5 flex-wrap">
                         <!-- Statut pill -->
                         <span
                           class="flex items-center gap-1 text-[10px] font-semibold"
-                          :class="item.status === 'active' ? 'text-emerald-500' : 'text-slate-400'"
+                          :class="getSubStatusConfig(item.status).text"
                         >
                           <span
                             class="w-1.5 h-1.5 rounded-full shrink-0"
-                            :class="item.status === 'active' ? 'bg-emerald-400' : 'bg-slate-300'"
+                            :class="getSubStatusConfig(item.status).dot"
                           />
-                          {{ item.status === 'active' ? 'Actif' : 'Inactif' }}
+                          {{ getSubStatusConfig(item.status).label }}
                         </span>
                         <span class="text-slate-200">·</span>
                         <!-- Prix -->

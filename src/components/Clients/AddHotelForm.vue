@@ -65,7 +65,10 @@
               <Input lb="Enseigne / Chaîne" v-model="form.chain" placeholder="Ex: Luxury Collection" />
               <Input lb="Code Postal" v-model="form.postalCode" placeholder="Ex: 06000" />
               <InputCountries lb="Pays" v-model="form.country" />
-              <InputSelectCity lb="Ville" v-model="form.city" placeholder="Ville" :country="form.country" />
+              <div class="flex flex-col gap-1.5">
+              <InputSelectCity lb="Ville" v-model="form.city" placeholder="Ville" :country="form.country" :is-required="true" />
+               <p v-if="errors.city" class="text-sm font-light italic text-red-500">{{ errors.city }}</p>
+               </div>
               <Input lb="Email Professionnel" v-model="form.managerEmail" type="email" placeholder="j.dupont@hotel.com" />
               
 
@@ -77,10 +80,10 @@
                 </div>
               </div>
               <InputPhone :title="'Numéro de Téléphone'" v-model="form.phone" :isRequired="false" />
-              <Input lb="Nombre d'étages" v-model.number="form.totalFloors" type="number" placeholder="Ex: 5" />
+              <Input lb="Nombre d'étages" v-model.number="form.totalFloors" type="number" placeholder="Ex: 5" :is-required="true" />
 
               <div class="flex flex-col gap-1.5">
-                <label class="text-sm font-medium text-gray-700">Classement (étoiles)</label>
+                <label class="text-sm font-medium text-gray-700">Classement (étoiles)<span class="text-red-500">*</span> </label> 
                 <div class="flex items-center gap-2 h-11">
                   <button v-for="star in 5" :key="star" type="button" @click="form.starRating = star" class="transition-transform hover:scale-110">
                     <svg class="w-7 h-7 transition-colors" :class="star <= form.starRating ? 'text-amber-400' : 'text-gray-200'" fill="currentColor" viewBox="0 0 24 24">
@@ -89,10 +92,12 @@
                   </button>
                   <span class="text-sm text-gray-500 ml-1">{{ form.starRating > 0 ? `${form.starRating} étoile${form.starRating > 1 ? 's' : ''}` : 'Non classé' }}</span>
                 </div>
+                <p v-if="errors.starRating" class="text-sm font-light italic text-red-500">{{ errors.starRating }}</p>
               </div>
 
               <div class="col-span-2">
-                <Input lb="Adresse (Rue)" v-model="form.address" placeholder="Ex: 42 Avenue des Palmiers" />
+                <Input lb="Adresse (Rue)" v-model="form.address" placeholder="Ex: 42 Avenue des Palmiers" :is-required = "true" />
+                  <p v-if="errors.address" class="text-sm font-light italic text-red-500">{{ errors.address }}</p>
               </div>
             </div>
           </section>
@@ -127,7 +132,10 @@
                     <Input lb="Email" v-model="form.adminEmail" type="email" placeholder="admin@hotel.com" :is-required="true" />
                     <p v-if="errors.adminEmail" class="text-red-500 text-sm font-light italic">{{ errors.adminEmail }}</p>
                   </div>
-                  <InputPhone :title="'Numéro de Téléphone'" v-model="form.adminPhoneNumber" :isRequired="false" />
+                  <div class="flex flex-col gap-1.5">
+                  <InputPhone :title="'Numéro de Téléphone'" v-model="form.adminPhoneNumber" :isRequired="true" />
+                  <p v-if="errors.adminPhoneNumber" class="text-sm font-light italic text-red-500">{{ errors.adminPhoneNumber }}</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -282,6 +290,12 @@ const errors = reactive({
   adminFirstName: '',
   adminLastName:  '',
   adminEmail:     '',
+  address: '',
+  city:'',
+  starRating:'',
+  adminPhoneNumber:''
+
+
 })
 
 // ── Form ───────
@@ -289,7 +303,7 @@ const generateTenantId = () => `TEN-${Math.floor(1000 + Math.random() * 9000)}-F
 
 const form = reactive({
   hotelName: '', chain: '', address: '', postalCode: '', city: '', country: 'CM',
-  website: '', totalFloors: 0, starRating: 0,
+  website: '', totalFloors: 1, starRating: 0,
   managerName: '', managerEmail: '', phone: '',
   adminFirstName: '', adminLastName: '', adminEmail: '', adminPhoneNumber: '',
   tenantId: generateTenantId(), timezone: 'Africa/Douala', currency: 'XAF',
@@ -351,14 +365,18 @@ const validateTab = (tabKey: string): boolean => {
   let valid = true
   if (tabKey === 'general') {
     errors.hotelName = form.hotelName.trim() ? '' : "Le nom de l'hôtel est obligatoire"
-    if (errors.hotelName) valid = false
+    errors.address = form.address.trim() ? '' : 'L \' adresse est obligatoire'
+    errors.city = form.city.trim() ? '' : 'La ville est obligatoire'
+    errors.starRating = form.starRating ? '' : 'Les etoiles sont obligations'
+    if (errors.hotelName || errors.address || errors.city || errors.starRating ) valid = false
   }
   if (tabKey === 'contact') {
     errors.adminFirstName = form.adminFirstName.trim() ? '' : 'Le prénom est obligatoire'
     errors.adminLastName  = form.adminLastName.trim()  ? '' : 'Le nom est obligatoire'
+    errors.adminPhoneNumber = form.adminPhoneNumber ? '' : 'Le numéro de téléphone est obligatoire'
     errors.adminEmail     = form.adminEmail.trim() && /\S+@\S+\.\S+/.test(form.adminEmail)
       ? '' : 'Un email valide est requis'
-    if (errors.adminFirstName || errors.adminLastName || errors.adminEmail) valid = false
+    if (errors.adminFirstName || errors.adminLastName || errors.adminEmail || errors.adminPhoneNumber ) valid = false
   }
   return valid
 }

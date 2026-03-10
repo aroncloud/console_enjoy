@@ -34,8 +34,8 @@ export const subscriptionService = {
     api.post<Subscription>(`/console/hotels/${hotel_id}/subscriptions`, payload).then(r => r.data),
 
  update: (id: number, payload: Partial<Subscription>) =>
-    api.put<Subscription>(`/console/${id}`, payload).then(r => r.data),
+    api.put<Subscription>(`/console/subscriptions/${id}`, payload).then(r => r.data),
 
  delete: (id: number) =>
-    api.delete(`/console/${id}`).then(r => r.data),
+    api.delete(`/console/subscriptions/${id}`).then(r => r.data),
 }   

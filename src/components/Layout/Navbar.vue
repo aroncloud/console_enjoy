@@ -61,7 +61,10 @@
           </div>
 
           <div class="py-1">
-            <button class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+            <button
+              class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              @click="goProfile"
+            >
               <User class="w-4 h-4" />
               Mon profil
             </button>
@@ -121,6 +124,11 @@ const toggleDropdown = () => { isOpen.value = !isOpen.value }
 onClickOutside(dropdownRef, () => { isOpen.value = false })
 
 const toggleTheme = () => { theme.toggle() }
+
+const goProfile = () => {
+  isOpen.value = false
+  router.push({ name: 'profile' })
+}
 
 const handleLogout = () => {
   isOpen.value = false

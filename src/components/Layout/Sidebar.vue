@@ -31,7 +31,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '../../composables/useAuth'
-import { LayoutDashboard, Building2, Receipt, Shield, Package } from 'lucide-vue-next'
+import { LayoutDashboard, Building2, Receipt, Shield, Package, Users as UsersIcon } from 'lucide-vue-next'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -45,6 +45,7 @@ const menuItems = [
   { label: 'Produits',        path: '/products',  icon: Package },
   { label: 'Facturation',     path: '/billing',  icon: Receipt },
   { label: 'Sécurité',        path: '/security', icon: Shield },
+  { label: 'Utilisateurs',    path: '/users',    icon: UsersIcon },
 ]
 
 // Gestion manuelle de l'actif pour éviter le bug de "/" qui matche tout

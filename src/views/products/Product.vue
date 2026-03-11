@@ -231,7 +231,7 @@ const confirmDelete = async () => {
       </ButtonComponent>
     </div>
 
-    <!-- ── KPIs ── -->
+    <!-- ──  ── -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
         <div class="flex items-center justify-between mb-2">

@@ -1,138 +1,170 @@
 <template>
-  <div class="bg-white rounded-xl border border-gray-100 p-6 ">
+  <div class="bg-white rounded-xl border border-gray-100 p-5 ">
 
     <!-- Header -->
     <div class="flex items-center justify-between mb-8">
-      <h2 class="text-lg font-bold text-gray-800">Répartition du Chiffre d'Affaires</h2>
-      <div class="flex gap-2">
-        <button
-          v-for="period in periods"
-          :key="period.value"
-          @click="activePeriod = period.value"
-          class="px-3 py-1 text-xs font-semibold rounded transition-colors"
-          :class="activePeriod === period.value
-            ? 'bg-blue-600 text-white'
-            : 'bg-gray-100 text-gray-500'"
-        >
-          {{ period.label }}
-        </button>
-      </div>
+      <template v-if="loading">
+        <div class="h-5 w-56 bg-gray-200 rounded animate-pulse" />
+        <div class="flex gap-2">
+          <div class="h-7 w-16 bg-gray-200 rounded animate-pulse" />
+          <div class="h-7 w-16 bg-gray-200 rounded animate-pulse" />
+        </div>
+      </template>
+      <template v-else>
+        <h2 class="text-lg font-bold text-gray-800">Répartition du Chiffre d'Affaires</h2>
+        <div class="flex gap-2">
+          <button
+            v-for="period in periods"
+            :key="period.value"
+            @click="activePeriod = period.value"
+            class="px-3 py-1 text-xs font-semibold rounded transition-colors"
+            :class="activePeriod === period.value ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-500'"
+          >
+            {{ period.label }}
+          </button>
+        </div>
+      </template>
     </div>
 
-    <!-- Barres -->
-    <div class="h-64 flex items-end justify-between gap-2 px-4 relative">
-      <div
-        v-for="(bar, index) in activeBars"
-        :key="index"
-        class="w-full rounded-t relative group transition-all duration-500 cursor-pointer"
-        :class="bar.current ? 'bg-blue-600' : 'bg-blue-100 hover:bg-blue-200'"
-        :style="{ height: bar.height }"
-        @mouseenter="showTooltip(bar, index, $event)"
-        @mouseleave="hideTooltip"
-      >
-        <!-- Label "Actuel" -->
+    <!-- Skeleton Barres -->
+    <template v-if="loading">
+      <div class="h-52 flex items-end justify-between gap-2 px-4 animate-pulse">
         <div
-          v-if="bar.current"
-          class="absolute inset-x-0 -top-7 text-center text-xs font-bold text-blue-600"
-        >
-          Actuel
-        </div>
+          v-for="i in 12"
+          :key="i"
+          class="w-full bg-gray-200 rounded-t"
+          :style="{ height: `${15 + (i * 7) % 70}%` }"
+        />
       </div>
+      <div class="flex justify-between mt-4 px-4 animate-pulse">
+        <div v-for="i in 12" :key="i" class="h-2 w-6 bg-gray-200 rounded mx-auto" />
+      </div>
+    </template>
 
-      <!-- Tooltip -->
-      <Transition name="fade">
+    <!-- Barres réelles -->
+    <template v-else-if="activeBars.length>0">
+      <div class="h-52 flex items-end justify-between gap-2 px-4 relative">
         <div
-          v-if="tooltip.visible"
-          class="absolute z-50 bg-gray-900 text-white rounded-xl px-4 py-3 pointer-events-none min-w-[140px]"
-          :style="{ left: tooltip.x + 'px', top: tooltip.y + 'px', transform: 'translateX(-50%)' }"
+          v-for="(bar, index) in activeBars"
+          :key="index"
+          class="w-full rounded-t relative group transition-all duration-500 cursor-pointer"
+          :class="bar.current ? 'bg-blue-600' : 'bg-blue-100 hover:bg-blue-200'"
+          :style="{ height: bar.height }"
+          @mouseenter="showTooltip(bar, index, $event)"
+          @mouseleave="hideTooltip"
         >
-          <!-- Mois -->
-          <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
-            {{ tooltip.month }}
-          </p>
-          <!-- Valeur -->
-          <p class="text-base font-bold text-white">{{ tooltip.value }}</p>
-          <!-- Variation -->
-          <div class="flex items-center gap-1 mt-1">
-            <TrendingUp v-if="tooltip.trendUp" class="w-3 h-3 text-green-400" />
-            <TrendingDown v-else class="w-3 h-3 text-red-400" />
-            <span
-              class="text-xs font-semibold"
-              :class="tooltip.trendUp ? 'text-green-400' : 'text-red-400'"
-            >
-              {{ tooltip.trend }}
-            </span>
+          <div
+            v-if="bar.current"
+            class="absolute inset-x-0 -top-7 text-center text-xs font-bold text-blue-600"
+          >
+            Actuel
           </div>
-          <!-- Flèche -->
-          <div class="absolute left-1/2 -translate-x-1/2 -bottom-1.5 w-3 h-3 bg-gray-900 rotate-45 rounded-sm" />
         </div>
-      </Transition>
-    </div>
 
-    <!-- Labels mois -->
-    <div class="flex justify-between mt-4 px-4">
-      <span
-        v-for="(bar, index) in activeBars"
-        :key="index"
-        class="text-[10px] font-bold text-gray-400 uppercase tracking-widest w-full text-center"
-      >
-        {{ bar.month }}
-      </span>
-    </div>
+        <!-- Tooltip -->
+        <Transition name="fade">
+          <div
+            v-if="tooltip.visible"
+            class="absolute z-50 bg-gray-900 text-white rounded-xl px-4 py-3 pointer-events-none min-w-35"
+            :style="{ left: tooltip.x + 'px', top: tooltip.y + 'px', transform: 'translateX(-50%)' }"
+          >
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+              {{ tooltip.label }}
+            </p>
+            <p class="text-base font-bold text-white">{{ tooltip.value }}</p>
+            <div v-if="tooltip.trend" class="flex items-center gap-1 mt-1">
+              <TrendingUp v-if="tooltip.trendUp" class="w-3 h-3 text-green-400" />
+              <TrendingDown v-else class="w-3 h-3 text-red-400" />
+              <span
+                class="text-xs font-semibold"
+                :class="tooltip.trendUp ? 'text-green-400' : 'text-red-400'"
+              >
+                {{ tooltip.trend }}
+              </span>
+            </div>
+            <div class="absolute left-1/2 -translate-x-1/2 -bottom-1.5 w-3 h-3 bg-gray-900 rotate-45 rounded-sm" />
+          </div>
+        </Transition>
+      </div>
+
+      <!-- Labels -->
+      <div class="flex justify-between mt-4 px-4">
+        <span
+          v-for="(bar, index) in activeBars"
+          :key="index"
+          class="text-[10px] font-bold text-gray-400 uppercase tracking-widest w-full text-center"
+        >
+          {{ bar.label }}
+        </span>
+      </div>
+    </template>
+
+    <template v-else>
+      <div class="h-64 flex flex-col items-center justify-center gap-3 text-center">
+        <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
+          <BarChart2 class="w-6 h-6 text-gray-300" />
+        </div>
+        <p class="text-sm font-semibold text-gray-400">Aucune donnée disponible</p>
+        <p class="text-xs text-gray-300">Les revenus s'afficheront ici dès qu'il y aura des abonnements actifs.</p>
+      </div>
+    </template>
 
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { TrendingUp, TrendingDown } from 'lucide-vue-next'
+import { TrendingUp, TrendingDown,BarChart2 } from 'lucide-vue-next'
+import type { ChartPoint } from '../../servicesAPI/dashboardService'
+import { formatCurrency } from '../Utilities/function';
 
-const activePeriod = ref<'month' | 'quarter'>('quarter')
+const props = withDefaults(defineProps<{
+  data?: { week: ChartPoint[]; year: ChartPoint[] }
+  loading?: boolean
+}>(), {
+  data: () => ({ week: [], year: [] }),
+  loading: false,
+})
+
+const activePeriod = ref<'week' | 'year'>('year')
 
 const periods = [
-  { label: 'Mois', value: 'month' as const },
-  { label: 'Trimestre', value: 'quarter' as const },
+  { label: 'Semaine', value: 'week' as const },
+  { label: 'Année',   value: 'year' as const },
 ]
 
 interface Bar {
-  month: string
+  label: string
   height: string
   value: string
-  trend: string
+  trend: string | null
   trendUp: boolean
-  current?: boolean
+  current: boolean
 }
 
-const quarterBars: Bar[] = [
-  { month: 'Avril',   height: '66%', value: '38 000 F', trend: '+4.2%',  trendUp: true },
-  { month: 'Mai',     height: '75%', value: '45 000 F', trend: '+18.4%', trendUp: true },
-  { month: 'Juin',    height: '50%', value: '30 000 F', trend: '-33.3%', trendUp: false },
-  { month: 'Juillet', height: '80%', value: '52 000 F', trend: '+73.3%', trendUp: true },
-  { month: 'Août',    height: '95%', value: '45 200 F', trend: '+12.5%', trendUp: true, current: true },
-  { month: 'Sept',    height: '66%', value: '38 000 F', trend: '-15.9%', trendUp: false },
-]
-
-const monthBars: Bar[] = [
-  { month: 'Lun', height: '50%', value: '8 000 F',  trend: '+2.1%',  trendUp: true },
-  { month: 'Mar', height: '70%', value: '12 000 F', trend: '+50%',   trendUp: true },
-  { month: 'Mer', height: '40%', value: '6 000 F',  trend: '-50%',   trendUp: false },
-  { month: 'Jeu', height: '85%', value: '15 000 F', trend: '+150%',  trendUp: true },
-  { month: 'Ven', height: '95%', value: '18 000 F', trend: '+20%',   trendUp: true, current: true },
-  { month: 'Sam', height: '60%', value: '10 000 F', trend: '-44.4%', trendUp: false },
-]
+const toBar = (points: ChartPoint[]): Bar[] => {
+  const max = Math.max(...points.map((p) => p.value), 1)
+  return points.map((p) => ({
+    label: p.label,
+    height: `${Math.max(4, Math.round((p.value / max) * 100))}%`,
+    value: `${formatCurrency(p.value)}`,
+    trend: p.trend,
+    trendUp: p.trendUp,
+    current: p.current,
+  }))
+}
 
 const activeBars = computed<Bar[]>(() =>
-  activePeriod.value === 'quarter' ? quarterBars : monthBars
+  toBar(activePeriod.value === 'week' ? props.data.week : props.data.year)
 )
 
-// Tooltip state
 interface TooltipState {
   visible: boolean
   x: number
   y: number
-  month: string
+  label: string
   value: string
-  trend: string
+  trend: string | null
   trendUp: boolean
 }
 
@@ -140,9 +172,9 @@ const tooltip = ref<TooltipState>({
   visible: false,
   x: 0,
   y: 0,
-  month: '',
+  label: '',
   value: '',
-  trend: '',
+  trend: null,
   trendUp: true,
 })
 
@@ -155,7 +187,7 @@ const showTooltip = (bar: Bar, _index: number, event: MouseEvent) => {
     visible: true,
     x: rect.left - parent.left + rect.width / 2,
     y: rect.top - parent.top - 90,
-    month: bar.month,
+    label: bar.label,
     value: bar.value,
     trend: bar.trend,
     trendUp: bar.trendUp,

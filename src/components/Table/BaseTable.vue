@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white border border-gray-100 rounded-xl overflow-hidden flex flex-col">
+  <div class="bg-white border border-gray-100 rounded-xl overflow-hidden flex flex-col h-full">
 
     <!-- ── TOOLBAR  -->
     <div
@@ -40,7 +40,7 @@
     </div>
 
     <!-- ── TABLE CONTAINER -->
-    <div class="flex-1">
+    <div class="flex-1 min-h-0 overflow-auto">
 
       <!-- Desktop -->
       <div class="hidden md:block overflow-x-auto">

@@ -39,40 +39,41 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
       <!-- Quotas & Dépassements -->
-      <div class="lg:col-span-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800  overflow-hidden">
+      <div class="lg:col-span-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
         <div class="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-          <h3 class="font-bold text-xs uppercase tracking-wider text-slate-500">Quotas &amp; Dépassements</h3>
+          <h3 class="font-bold text-xs uppercase tracking-wider text-slate-500">Quotas & Dépassements</h3>
           <ChartLine :size="16" class="text-slate-400" />
         </div>
 
         <div class="p-5 space-y-3">
+          <div v-if="loadingQuotas" class="animate-pulse space-y-3 flex items-start">
+            <div v-for="i in 3" :key="i" class="h-20 bg-gray-100 rounded-lg" />
+          </div>
+
+          <div v-else-if="quotaItems.length === 0" class="text-center py-6 text-sm text-slate-400">
+            Aucun quota défini
+          </div>
+
           <div
+            v-else
             v-for="quota in quotaItems"
-            :key="quota.name"
-            class="flex flex-col gap-3 p-4 rounded-lg border"
-            :class="quota.overLimit
-              ? 'bg-orange-50 dark:bg-orange-900/10 border-orange-100 dark:border-orange-900/20'
-              : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800'"
+            :key="quota.id"
+            class="flex flex-col gap-3 p-4 rounded-lg border bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800"
           >
             <div class="flex justify-between items-start">
               <div>
-                <p class="font-bold text-sm text-gray-800 dark:text-white">{{ quota.name }}</p>
-                <p
-                  class="text-xs font-medium mt-0.5"
-                  :class="quota.overLimit ? 'text-orange-600' : 'text-slate-500'"
-                >
-                  {{ quota.detail }}
+                <p class="font-bold text-sm text-gray-800 dark:text-white">{{ quota.hotel }}</p>
+                <p class="text-xs font-medium mt-0.5 text-slate-500">
+                  {{ quota.module }} — limite : {{ quota.limitCount }}
                 </p>
               </div>
-              <button class="text-purple-500 hover:text-purple-700 transition-colors">
-                <SquarePlus :size="20" />
-              </button>
+              <span class="text-xs font-bold text-purple-500 bg-purple-50 px-2 py-1 rounded-full">
+                {{ formatCurrency(quota.price) }}
+              </span>
             </div>
             <button
-              class="w-full py-2 text-xs font-bold rounded-lg transition-all"
-              :class="quota.overLimit
-                ? 'bg-purple-500 text-white hover:bg-purple-600'
-                : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300'"
+              @click="openSurplusModal(quota)"
+              class="w-full py-2 text-xs font-bold rounded-lg transition-all bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-purple-500 hover:text-white"
             >
               Facturer surplus
             </button>
@@ -154,35 +155,48 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
       <!-- Offrir un mois gratuit -->
-      <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800  overflow-visible">
+    
+      <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-visible">
         <div class="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
           <div class="p-2 bg-purple-100 text-purple-500 rounded-lg">
             <Gift :size="18" />
           </div>
           <div>
             <h3 class="font-bold text-sm">Offrir un mois gratuit</h3>
-            <p class="text-xs text-slate-500">Geste commercial sur un module</p>
+            <p class="text-xs text-slate-500">Geste commercial sur un abonnement</p>
           </div>
         </div>
         <div class="p-5 space-y-4">
           <BaseSelect
-            lb="Module concerné"
-            v-model="selectedModule"
-            :options="moduleOptions"
-            placeholder="Choisir un module..."
+            lb="Hôtel"
+            v-model="selectedHotelId"
+            :options="hotelOptions"
+            placeholder="Choisir un hôtel..."
+            @update:modelValue="loadHotelSubscriptions"
+          />
+          <BaseSelect
+            lb="Abonnement"
+            v-model="selectedSubscriptionId"
+            :options="subscriptionOptions"
+            placeholder="Choisir un abonnement..."
+            :disabled="!selectedHotelId"
           />
           <button
-            class="w-full py-2.5 bg-purple-500 text-white font-bold rounded-lg text-sm hover:bg-purple-600 transition-all flex items-center justify-center gap-2"
-            @click="grant"
+            :disabled="!selectedSubscriptionId || loadingExtend"
+            @click="handleExtend"
+            class="w-full py-2.5 bg-purple-500 text-white font-bold rounded-lg text-sm hover:bg-purple-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <PlusCircle :size="16" />
-            Appliquer le geste commercial
+            {{ loadingExtend ? 'Application...' : 'Appliquer le geste commercial' }}
           </button>
+          <p v-if="extendSuccess" class="text-xs text-emerald-600 font-medium text-center">
+            ✓ +1 mois appliqué avec succès
+          </p>
         </div>
       </div>
 
-      <!-- Calculateur de quotas -->
-      <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+     <!-- Calculateur de quotas -->
+      <div id="calculateur"  class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
         <div class="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
           <div class="p-2 bg-orange-100 text-orange-500 rounded-lg">
             <ChartLine :size="18" />
@@ -193,39 +207,48 @@
           </div>
         </div>
         <div class="p-5 space-y-4">
-          <div class="grid grid-cols-2 gap-3">
-            <BaseInput
-              lb="Chambres"
-              type="number"
-              v-model="rooms"
-              placeholder="Ex: 60"
-              :min="0"
-            />
-            <BaseInput
-              lb="Terminaux POS"
-              type="number"
-              v-model="pos"
-              placeholder="Ex: 3"
-              :min="0"
-            />
-          </div>
+          <BaseSelect
+            lb="Abonnement concerné"
+            v-model="calcSubscriptionId"
+            :options="quotaItems.map(q => ({ label: `${q.hotel} — ${q.module}`, value: q.id }))"
+            placeholder="Choisir un abonnement..."
+          />
+          <BaseInput
+            lb="Quantité utilisée"
+            type="number"
+            v-model="usedQuantity"
+            placeholder="Ex: 70"
+            :min="0"
+          />
           <button
             class="w-full py-2.5 bg-purple-500 text-white font-bold rounded-lg text-sm hover:bg-purple-600 transition-all"
             @click="calc"
+            :disabled="!calcSubscriptionId"
           >
-            Calculer les dépassements
+            Calculer le dépassement
           </button>
+
           <Transition name="fade">
-            <div
-              v-if="result"
-              class="flex items-center gap-3 p-3 rounded-lg text-sm font-medium"
-              :class="hasOverage
-                ? 'bg-orange-50 text-orange-700 border border-orange-100 dark:bg-orange-900/10 dark:border-orange-900/20'
-                : 'bg-emerald-50 text-emerald-700 border border-emerald-100 dark:bg-emerald-900/10 dark:border-emerald-900/20'"
-            >
-              <TriangleAlert v-if="hasOverage" :size="16" />
-              <CheckCircle v-else :size="16" />
-              {{ result }}
+            <div v-if="result" class="space-y-3">
+              <div
+                class="flex items-center gap-3 p-3 rounded-lg text-sm font-medium"
+                :class="hasOverage
+                  ? 'bg-orange-50 text-orange-700 border border-orange-100'
+                  : 'bg-emerald-50 text-emerald-700 border border-emerald-100'"
+              >
+                <TriangleAlert v-if="hasOverage" :size="16" />
+                <CheckCircle v-else :size="16" />
+                {{ result }}
+              </div>
+
+              <button
+                v-if="hasOverage"
+                @click="handleFactureSurplus"
+                :disabled="loadingFacture"
+                class="w-full py-2 bg-orange-500 text-white font-bold rounded-lg text-xs hover:bg-orange-600 transition-all disabled:opacity-50"
+              >
+                {{ loadingFacture ? 'Génération...' : 'Générer la facture de surplus' }}
+              </button>
             </div>
           </Transition>
         </div>
@@ -238,7 +261,7 @@
 <script setup lang="ts">
 import { ref, computed,onMounted } from 'vue'
 import {
-  Banknote, Clock, TriangleAlert, ChartLine, SquarePlus,
+  Banknote, Clock, TriangleAlert, ChartLine,
   Mail, Megaphone,
   Gift, PlusCircle, CheckCircle
 } from 'lucide-vue-next'
@@ -271,41 +294,23 @@ const statsData = ref<any>(null)
 
 
 // ── Quotas ───────────
-const quotaItems = ref([
-  { name: 'Grand Hotel Paris', detail: '+10 chambres hors quota',    overLimit: true  },
-  { name: 'City Hub Lyon',     detail: '+2 terminaux POS',           overLimit: true  },
-  { name: 'Boutique Lodge',    detail: 'Utilisation API: +15k appels', overLimit: false },
-])
+
 
 // ── Geste commercial ───────
 const selectedModule = ref<string | number>('PMS')
-const moduleOptions = [
-  { label: 'PMS',                value: 'PMS'                },
-  { label: 'POS',                value: 'POS'                },
-  { label: 'Channel Manager',    value: 'Channel Manager'    },
-  { label: 'Application Mobile', value: 'Application Mobile' },
-]
 
-const grant = () => {
-  alert(`1 mois gratuit appliqué sur ${selectedModule.value}`)
+
+
+
+const openSurplusModal = (quota: any) => {
+  calcSubscriptionId.value = quota.id
+  usedQuantity.value = quota.limitCount // pré-rempli avec la limite
+  result.value = ''
+  hasOverage.value = false
+
+  // Scroll vers le calculateur
+  document.querySelector('#calculateur')?.scrollIntoView({ behavior: 'smooth' })
 }
-
-// ── Calculateur quotas ───────
-const rooms      = ref<number>(50)
-const pos        = ref<number>(2)
-const result     = ref('')
-const hasOverage = ref(false)
-
-const calc = () => {
-  const extra = Math.max(0, rooms.value - 60) * 2 + Math.max(0, pos.value - 3) * 10
-  hasOverage.value = extra > 0
-  result.value = extra
-    ? `Dépassement détecté : ${extra} € à facturer.`
-    : 'Aucun dépassement — quotas respectés.'
-}
-
-
-
 
 
 const fetchData = async ( currentPage=1) => {
@@ -345,7 +350,98 @@ const handleMarkAsPaid = async () => {
     console.error('Erreur paiement', e)
   }
 }
-onMounted(fetchData)
+
+import { subscriptionService } from '../../servicesAPI/subscriptionService'
+
+// ── Quotas ───────────────────
+const quotaItems = ref<any[]>([])
+const loadingQuotas = ref(false)
+
+const fetchQuotas = async () => {
+  loadingQuotas.value = true
+  try {
+    quotaItems.value = await invoiceService.getQuotas()
+  } finally {
+    loadingQuotas.value = false
+  }
+}
+
+// ── Geste commercial ──────────
+const selectedHotelId = ref<number | null>(null)
+const selectedSubscriptionId = ref<number | null>(null)
+const subscriptionOptions = ref<{ label: string; value: number }[]>([])
+const loadingExtend = ref(false)
+const extendSuccess = ref(false)
+
+const hotelOptions = computed(() =>
+  [...new Map(quotaItems.value.map(q => [q.hotelId, { label: q.hotel, value: q.hotelId }])).values()]
+)
+
+const loadHotelSubscriptions = () => {
+  selectedSubscriptionId.value = null
+  subscriptionOptions.value = quotaItems.value
+    .filter(q => q.hotelId === selectedHotelId.value)
+    .map(q => ({ label: q.module, value: q.id }))
+}
+
+const handleExtend = async () => {
+  if (!selectedSubscriptionId.value) return
+  loadingExtend.value = true
+  extendSuccess.value = false
+  try {
+    await subscriptionService.extend(selectedSubscriptionId.value)
+    extendSuccess.value = true
+    setTimeout(() => extendSuccess.value = false, 3000)
+  } finally {
+    loadingExtend.value = false
+  }
+}
+
+// ── Calculateur ───────────────────
+const calcSubscriptionId = ref<number | null>(null)
+const usedQuantity = ref<number>(0)
+const result = ref('')
+const hasOverage = ref(false)
+const surplusAmount = ref(0)
+const loadingFacture = ref(false)
+
+const calc = () => {
+  const sub = quotaItems.value.find(q => q.id === calcSubscriptionId.value)
+  if (!sub) return
+
+  const extra = Math.max(0, usedQuantity.value - sub.limitCount)
+  const pricePerUnit = sub.price / sub.limitCount
+  surplusAmount.value = Math.round(extra * pricePerUnit)
+  hasOverage.value = extra > 0
+  result.value = extra
+    ? `Dépassement de ${extra} unités — surplus à facturer : ${formatCurrency(surplusAmount.value)}`
+    : 'Aucun dépassement — quota respecté.'
+}
+
+const handleFactureSurplus = async () => {
+  const sub = quotaItems.value.find(q => q.id === calcSubscriptionId.value)
+  if (!sub) return
+  loadingFacture.value = true
+  try {
+    await invoiceService.factureSurplus(sub.hotelId, {
+      subscriptionId: sub.id,
+      quantity: usedQuantity.value - sub.limitCount,
+      amount: surplusAmount.value,
+      description: `Surplus de ${usedQuantity.value - sub.limitCount} ${sub.moduleName} (limite: ${sub.limitCount})`
+    })
+    result.value = '✓ Facture de surplus générée avec succès'
+    hasOverage.value = false
+    await fetchData()
+  } finally {
+    loadingFacture.value = false
+  }
+}
+
+onMounted(() => {
+  fetchData()
+  fetchQuotas()
+})
+
 
 
 

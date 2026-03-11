@@ -18,7 +18,7 @@
     </div>
 
     <!-- Licences + Activations -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch">
 
       <div class="lg:col-span-2 flex flex-col gap-3">
         <div class="flex items-center justify-between">
@@ -26,10 +26,10 @@
             <TriangleAlert class="w-5 h-5 text-red-500" />
             Alertes d'Expiration de Licence (30 jours)
           </h2>
-          <!-- <button class="text-sm text-blue-500 hover:underline">Voir tout</button> -->
         </div>
         <LicenseTable :data="dashboard?.licenseAlerts"
           :loading="loading"
+          class="flex-1 min-h-0"
           @page-change="handleAlertsPageChange" />
       </div>
 
@@ -40,7 +40,7 @@
             Activations Récentes
           </h2>
         </div>
-        <RecentActivations :data="dashboard?.recentActivations ?? []"  :loading="loading"/>
+        <RecentActivations :data="dashboard?.recentActivations ?? []" :loading="loading" class="flex-1 min-h-0"/>
       </div>
 
     </div>

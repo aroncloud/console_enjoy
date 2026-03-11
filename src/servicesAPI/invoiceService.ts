@@ -47,4 +47,11 @@ export const invoiceService = {
 
   markAsPaid: (id: number) =>
     api.patch(`/console/invoices/${id}/pay`).then((r) => r.data),
+
+
+  getQuotas: () =>
+    api.get<any[]>('/console/billing/quotas').then((r) => r.data),
+
+  factureSurplus: (hotelId: number, data: { subscriptionId: number; quantity: number; amount: number }) =>
+    api.post(`/console/hotels/${hotelId}/invoices`, data).then((r) => r.data),
 }

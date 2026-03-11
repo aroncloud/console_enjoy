@@ -38,4 +38,8 @@ export const subscriptionService = {
 
  delete: (id: number) =>
     api.delete(`/console/subscriptions/${id}`).then(r => r.data),
+
+ extend: (id: number) =>
+  api.patch(`/console/subscriptions/${id}/extend`).then((r) => r.data),
+
 }   

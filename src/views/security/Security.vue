@@ -10,7 +10,7 @@
           </div>
           <span class="text-[10px] font-bold text-emerald-600 bg-emerald-100 px-2 py-1 rounded-full">Opérationnel</span>
         </div>
-        <p class="text-slate-500 text-xs font-medium">Statut système</p>
+        <p class="text-slate-500 dark:text-slate-400 text-xs font-medium">Statut système</p>
         <h3 class="text-2xl font-black mt-1">Nominal</h3>
       </div>
 
@@ -21,7 +21,7 @@
           </div>
           <span class="text-[10px] font-bold text-blue-500 bg-blue-100 px-2 py-1 rounded-full">En ligne</span>
         </div>
-        <p class="text-slate-500 text-xs font-medium">Tenants actifs</p>
+        <p class="text-slate-500 dark:text-slate-400 text-xs font-medium">Tenants actifs</p>
         <h3 class="text-2xl font-black mt-1">{{ tenantStatuses.filter(t => !t.suspended).length }} / {{ tenantStatuses.length }}</h3>
       </div>
 
@@ -32,7 +32,7 @@
           </div>
           <span class="text-[10px] font-bold text-red-500 bg-red-100 px-2 py-1 rounded-full">Suspendus</span>
         </div>
-        <p class="text-slate-500 text-xs font-medium">Accès révoqués</p>
+        <p class="text-slate-500 dark:text-slate-400 text-xs font-medium">Accès révoqués</p>
         <h3 class="text-2xl font-black mt-1">{{ tenantStatuses.filter(t => t.suspended).length }}</h3>
       </div>
     </div>
@@ -43,7 +43,7 @@
       <!-- Kill-Switch -->
       <div class="lg:col-span-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
         <div class="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-          <h3 class="font-bold text-xs uppercase tracking-wider text-slate-500">Kill-Switch API</h3>
+          <h3 class="font-bold text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">Kill-Switch API</h3>
           <Power :size="16" class="text-red-400" />
         </div>
 
@@ -92,7 +92,7 @@
           <Transition name="fade">
             <div v-if="confirmMode" class="rounded-lg border border-red-200 dark:border-red-900/40 bg-red-50 dark:bg-red-900/10 p-4 space-y-3">
               <p class="text-sm font-semibold text-red-700 dark:text-red-400">Confirmer la suspension de <span class="font-black">{{ tenant }}</span> ?</p>
-              <p class="text-xs text-slate-500">Cette action est réversible depuis le panel ci-dessous.</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Cette action est réversible depuis le panel ci-dessous.</p>
               <div class="flex gap-2">
                 <button
                   class="flex-1 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
@@ -111,7 +111,7 @@
             </div>
           </Transition>
 
-          <p class="text-xs text-slate-400 flex items-start gap-1.5">
+          <p class="text-xs text-slate-400 dark:text-slate-400 flex items-start gap-1.5">
             <Info :size="12" class="mt-0.5 shrink-0" />
             Usage : non-paiement prolongé ou incident de sécurité.
           </p>

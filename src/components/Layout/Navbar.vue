@@ -24,11 +24,17 @@
 
       <button
         type="button"
-        class="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition cursor-pointer"
         @click="toggleTheme"
+        class="relative inline-flex h-9 w-16 items-center rounded-full border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 px-1 transition-colors cursor-pointer"
+        aria-label="Basculer le thème"
       >
-        <Sun v-if="isDark" class="w-5 h-5 text-slate-300" />
-        <Moon v-else class="w-5 h-5 text-gray-500 dark:text-slate-300" />
+        <span
+          class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white dark:bg-slate-900 shadow transition-transform"
+          :class="isDark ? 'translate-x-7' : 'translate-x-0'"
+        >
+          <Moon v-if="isDark" class="w-4 h-4 text-slate-300" />
+          <Sun v-else class="w-4 h-4 text-amber-500" />
+        </span>
       </button>
 
       <div class="relative" ref="dropdownRef">
@@ -77,9 +83,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, inject, type Ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { onClickOutside, useDark } from '@vueuse/core'
+import { onClickOutside } from '@vueuse/core'
 import { Search, Bell, LogOut, User, Menu, Sun, Moon } from 'lucide-vue-next'
 import { useAuthStore } from '../../composables/useAuth'
 
@@ -92,13 +98,8 @@ const search = ref('')
 const isOpen = ref(false)
 const dropdownRef = ref<HTMLElement | null>(null)
 
-const isDark = useDark({
-  selector: 'html',
-  attribute: 'class',
-  valueDark: 'dark',
-  valueLight: '',
-  storageKey: 'enjoy-theme',
-})
+const isDark = inject<Ref<boolean>>('enjoy-isDark')
+if (!isDark) throw new Error('Theme provider is missing')
 
 // Champs exacts selon la réponse backend
 const displayName = computed(() => authStore.user?.fullName ?? authStore.user?.username ?? 'Administrateur')

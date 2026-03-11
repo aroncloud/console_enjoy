@@ -1,13 +1,13 @@
 <template>
-  <div class="min-h-screen bg-gray-50 px-6 py-8">
+  <div class="min-h-screen bg-gray-50 dark:bg-slate-950 px-6 py-8">
     <div class="">
 
       <!-- Loading skeleton (mode édition) -->
       <div v-if="loadingHotel" class="space-y-6">
-        <div class="h-8 w-1/3 bg-gray-200 rounded animate-pulse" />
-        <div class="h-4 w-1/4 bg-gray-200 rounded animate-pulse" />
-        <div class="bg-white rounded-xl border border-gray-200 p-8 space-y-5">
-          <div v-for="i in 6" :key="i" class="h-10 bg-gray-100 rounded-lg animate-pulse" />
+        <div class="h-8 w-1/3 bg-gray-200 dark:bg-slate-700 rounded animate-pulse" />
+        <div class="h-4 w-1/4 bg-gray-200 dark:bg-slate-700 rounded animate-pulse" />
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-8 space-y-5">
+          <div v-for="i in 6" :key="i" class="h-10 bg-gray-100 dark:bg-slate-800 rounded-lg animate-pulse" />
         </div>
       </div>
 
@@ -15,10 +15,10 @@
         <!-- Header -->
         <div class="flex items-start justify-between mb-6">
           <div>
-            <h1 class="text-2xl font-bold text-gray-900">
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
               {{ isEditMode ? 'Modifier l\'établissement' : 'Ajouter un nouvel établissement' }}
             </h1>
-            <p class="text-gray-500 text-sm mt-1">
+            <p class="text-gray-500 dark:text-slate-400 text-sm mt-1">
               {{ isEditMode
                 ? `Mettez à jour les informations de ${form.hotelName}`
                 : 'Configurez les détails du nouveau client pour son activation.' }}
@@ -34,7 +34,7 @@
         </div>
 
         <!-- Tab navigation -->
-        <div class="flex border-b border-gray-200 mb-6 gap-6">
+        <div class="flex border-b border-gray-200 dark:border-slate-800 mb-6 gap-6">
           <button
             v-for="tab in tabs"
             :key="tab.key"
@@ -44,8 +44,8 @@
               'pb-3 text-sm font-medium border-b-2 transition-colors',
               activeTab === tab.key
                 ? 'border-purple-600 text-purple-600'
-                : 'border-transparent text-gray-500',
-              loading ? 'cursor-not-allowed opacity-50' : 'hover:text-gray-700 cursor-pointer'
+                : 'border-transparent text-gray-500 dark:text-slate-400',
+              loading ? 'cursor-not-allowed opacity-50' : 'hover:text-gray-700 dark:hover:text-slate-200 cursor-pointer'
             ]"
           >
             {{ tab.label }}
@@ -53,7 +53,7 @@
         </div>
 
         <!-- Form card -->
-        <div class="bg-white rounded-xl border border-gray-200 p-8 space-y-8" :class="loading ? 'pointer-events-none opacity-60' : ''">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-8 space-y-8" :class="loading ? 'pointer-events-none opacity-60' : ''">
 
           <!-- ── Informations Générales ── -->
           <section v-show="activeTab === 'general'">
@@ -73,10 +73,10 @@
               
 
               <div class="flex flex-col gap-1.5">
-                <label class="text-sm font-medium text-gray-700">Site Web</label>
+                <label class="text-sm font-medium text-gray-700 dark:text-slate-300">Site Web</label>
                 <div class="flex">
-                  <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-200 bg-gray-50 text-gray-500 text-sm">https://</span>
-                  <input v-model="form.website" type="text" placeholder="www.hotel.com" class="dark:bg-dark-900 h-11 w-full rounded-r-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-purple-500 focus:outline-hidden focus:ring-3 focus:ring-purple-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-purple-800" />
+                  <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 text-gray-500 dark:text-slate-300 text-sm">https://</span>
+                  <input v-model="form.website" type="text" placeholder="www.hotel.com" class="h-11 w-full rounded-r-lg border border-gray-300 dark:border-slate-700 bg-transparent dark:bg-slate-800 px-4 py-2.5 text-sm text-gray-800 dark:text-slate-200 placeholder:text-gray-400 dark:placeholder:text-slate-400 focus:border-purple-500 focus:outline-hidden focus:ring-3 focus:ring-purple-500/10 dark:focus:border-purple-800" />
                 </div>
               </div>
               <InputPhone :title="'Numéro de Téléphone'" v-model="form.phone" :isRequired="false" />
@@ -115,8 +115,8 @@
               </div> -->
 
               <div class=" ">
-                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Administrateur Système</h3>
-                <p class="text-xs text-gray-400 mb-4">
+                <h3 class="text-sm font-semibold text-gray-500 dark:text-slate-300 uppercase tracking-wider mb-4">Administrateur Système</h3>
+                <p class="text-xs text-gray-400 dark:text-slate-400 mb-4">
                   {{ isEditMode ? 'Modifier les accès administrateur de cet établissement.' : 'Cet utilisateur recevra les accès pour gérer l\'établissement.' }}
                 </p>
                 <div class="grid md:grid-cols-2 grid-cols-1 gap-5">
@@ -145,17 +145,17 @@
           <section v-show="activeTab === 'config'">
             <div class="space-y-6">
               <div>
-                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Identifiants & Localisation</h3>
+                <h3 class="text-sm font-semibold text-gray-500 dark:text-slate-300 uppercase tracking-wider mb-4">Identifiants & Localisation</h3>
                 <div class="grid  md:grid-cols-3 grid-cols-1 gap-5">
                   <div class="flex flex-col gap-1.5">
-                    <label class="text-sm font-medium text-gray-700">Tenant ID</label>
+                    <label class="text-sm font-medium text-gray-700 dark:text-slate-300">Tenant ID</label>
                     <div class="flex gap-2">
-                      <input v-model="form.tenantId" readonly class="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 text-gray-600 focus:outline-none" />
+                      <input v-model="form.tenantId" readonly class="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-700 rounded-lg bg-gray-50 dark:bg-slate-800 text-gray-600 dark:text-slate-200 focus:outline-none" />
                       <!-- Régénération uniquement en mode création -->
                       <button
                         v-if="!isEditMode"
                         @click="regenerateTenantId"
-                        class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-500 transition-colors"
+                        class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-500 dark:text-slate-300 transition-colors"
                         title="Régénérer"
                       >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -163,15 +163,15 @@
                         </svg>
                       </button>
                     </div>
-                    <p class="text-xs text-gray-400">Identifiant unique auto-généré.</p>
+                    <p class="text-xs text-gray-400 dark:text-slate-400">Identifiant unique auto-généré.</p>
                   </div>
                   <Select lb="Fuseau Horaire" v-model="form.timezone" :options="timezoneOptions" />
                   <Select lb="Devise par défaut" v-model="form.currency" :options="currencyOptions" />
                 </div>
               </div>
 
-              <div class="border-t border-gray-100 pt-6">
-                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Horaires</h3>
+              <div class="border-t border-gray-100 dark:border-slate-800 pt-6">
+                <h3 class="text-sm font-semibold text-gray-500 dark:text-slate-300 uppercase tracking-wider mb-4">Horaires</h3>
                 <div class="grid grid-cols-1 md:grid-cols-4  gap-5">
                   <div class="flex flex-col gap-1.5">
                     <InputTime title="Heure de Check-in" v-model="form.checkInTime" />
@@ -184,16 +184,16 @@
                 </div>
               </div>
 
-              <div class="border-t border-gray-100 pt-6">
-                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Politiques</h3>
+              <div class="border-t border-gray-100 dark:border-slate-800 pt-6">
+                <h3 class="text-sm font-semibold text-gray-500 dark:text-slate-300 uppercase tracking-wider mb-4">Politiques</h3>
                 <div class="grid grid-cols-1 gap-5">
                   <div class="flex flex-col gap-1.5">
-                    <label class="text-sm font-medium text-gray-700">Politique d'annulation</label>
-                    <textarea v-model="form.cancellationPolicy" rows="3" placeholder="Ex: Annulation gratuite jusqu'à 48h avant l'arrivée..." class="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-purple-500 focus:outline-none focus:ring-3 focus:ring-purple-500/10 resize-none" />
+                    <label class="text-sm font-medium text-gray-700 dark:text-slate-300">Politique d'annulation</label>
+                    <textarea v-model="form.cancellationPolicy" rows="3" placeholder="Ex: Annulation gratuite jusqu'à 48h avant l'arrivée..." class="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-transparent dark:bg-slate-800 px-4 py-2.5 text-sm text-gray-800 dark:text-slate-200 placeholder:text-gray-400 dark:placeholder:text-slate-400 focus:border-purple-500 focus:outline-none focus:ring-3 focus:ring-purple-500/10 resize-none" />
                   </div>
                   <div class="flex flex-col gap-1.5">
-                    <label class="text-sm font-medium text-gray-700">Politique de l'établissement</label>
-                    <textarea v-model="form.policies" rows="3" placeholder="Ex: Non-fumeur. Animaux non admis. Accès PMR disponible..." class="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-purple-500 focus:outline-none focus:ring-3 focus:ring-purple-500/10 resize-none" />
+                    <label class="text-sm font-medium text-gray-700 dark:text-slate-300">Politique de l'établissement</label>
+                    <textarea v-model="form.policies" rows="3" placeholder="Ex: Non-fumeur. Animaux non admis. Accès PMR disponible..." class="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-transparent dark:bg-slate-800 px-4 py-2.5 text-sm text-gray-800 dark:text-slate-200 placeholder:text-gray-400 dark:placeholder:text-slate-400 focus:border-purple-500 focus:outline-none focus:ring-3 focus:ring-purple-500/10 resize-none" />
                   </div>
                 </div>
               </div>

@@ -1,10 +1,9 @@
 <template>
-  <div class="h-screen flex font-sans overflow-hidden">
+  <div class="h-screen flex font-sans overflow-hidden bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">
 
     <!--  LEFT PANEL -->
-    <div class="w-full lg:w-1/2 flex flex-col bg-white px-12 py-8 h-full overflow-hidden">
+    <div class="w-full lg:w-1/2 flex flex-col bg-white dark:bg-slate-950 px-12 py-8 h-full overflow-hidden">
 
-      <!-- Logo -->
       <!-- <div class="flex items-center gap-2.5 shrink-0">
         <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-purple-100">
           
@@ -12,28 +11,45 @@
         </div>
         <span class="text-lg font-bold text-gray-900 tracking-tight">EnjoyConsole</span>
       </div> -->
+
+      <div class="flex items-center justify-end shrink-0">
+        <button
+          type="button"
+          @click="toggleTheme"
+          class="relative inline-flex h-9 w-16 items-center rounded-full border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 px-1 transition-colors cursor-pointer"
+          aria-label="Basculer le thème"
+        >
+          <span
+            class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white dark:bg-slate-900 shadow transition-transform"
+            :class="isDark ? 'translate-x-7' : 'translate-x-0'"
+          >
+            <Moon v-if="isDark" class="w-4 h-4 text-slate-300" />
+            <Sun v-else class="w-4 h-4 text-amber-500" />
+          </span>
+        </button>
+      </div>
  
       <!-- Form area -->
       <div class="flex-1 flex flex-col justify-center max-w-sm w-full mx-auto">
 
         <!-- ── ACCOUNT PICKER ── -->
         <div v-if="accountPickerMode && !selectedAccount && !resetMode && !emailVerificationRequired">
-          <h1 class="text-3xl font-bold text-gray-900 mb-1.5">Bon retour</h1>
-          <p class="text-gray-500 text-sm mb-6">Sélectionnez un compte pour accéder à votre console.</p>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-1.5">Bon retour</h1>
+          <p class="text-gray-500 dark:text-slate-400 text-sm mb-6">Sélectionnez un compte pour accéder à votre console.</p>
           <div class="space-y-2.5 mb-4">
             <button
               v-for="acc in rememberedAccounts"
               :key="acc.id ?? acc.email"
               type="button"
               @click="selectAccount(acc)"
-              class="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-200 hover:border-purple-400 hover:bg-purple-50 transition-all text-left"
+              class="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-slate-900 transition-all text-left"
             >
               <div class="h-9 w-9 rounded-full bg-purple-600 text-white flex items-center justify-center uppercase text-sm font-bold shrink-0">
                 {{ (acc.name || acc.email).slice(0, 1) }}
               </div>
               <div>
-                <div class="text-sm font-semibold text-gray-800">{{ acc.name || acc.email }}</div>
-                <div class="text-xs text-gray-500">{{ acc.email }}</div>
+                <div class="text-sm font-semibold text-gray-800 dark:text-white">{{ acc.name || acc.email }}</div>
+                <div class="text-xs text-gray-500 dark:text-slate-400">{{ acc.email }}</div>
               </div>
             </button>
           </div>
@@ -44,8 +60,8 @@
 
         <!-- ── LOGIN FORM ── -->
         <div v-else-if="!resetMode && !emailVerificationRequired">
-          <h1 class="text-3xl font-bold text-gray-900 mb-1.5">Accès Console</h1>
-          <p class="text-gray-500 text-sm mb-6">Connectez-vous pour administrer votre réseau Enjoy PMS.</p>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-1.5">Accès Console</h1>
+          <p class="text-gray-500 dark:text-slate-400 text-sm mb-6">Connectez-vous pour administrer votre réseau Enjoy PMS.</p>
 
           <!-- Error -->
           <div v-if="error" class="flex items-start gap-2.5 px-4 py-3 bg-red-50 border border-red-200 rounded-xl mb-4">
@@ -57,20 +73,20 @@
           </div>
 
           <!-- Selected account chip -->
-          <div v-if="selectedAccount" class="flex items-center gap-3 p-3 rounded-xl border border-gray-200 bg-gray-50 mb-4">
+          <div v-if="selectedAccount" class="flex items-center gap-3 p-3 rounded-xl border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-900 mb-4">
             <div class="h-8 w-8 rounded-full bg-purple-600 text-white flex items-center justify-center uppercase text-sm font-bold shrink-0">
               {{ (selectedAccount.name || selectedAccount.email).slice(0, 1) }}
             </div>
             <div class="flex-1 min-w-0">
-              <div class="text-sm font-semibold text-gray-800 truncate">{{ selectedAccount.name || selectedAccount.email }}</div>
-              <div class="text-xs text-gray-500 truncate">{{ selectedAccount.email }}</div>
+              <div class="text-sm font-semibold text-gray-800 dark:text-white truncate">{{ selectedAccount.name || selectedAccount.email }}</div>
+              <div class="text-xs text-gray-500 dark:text-slate-400 truncate">{{ selectedAccount.email }}</div>
             </div>
             <button type="button" @click="useAnotherAccount" class="text-xs text-purple-600 hover:text-purple-800 shrink-0 font-medium">Changer</button>
           </div>
 
           <!-- Email -->
           <div v-if="!selectedAccount" class="mb-3.5">
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">Adresse email</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Adresse email</label>
             <input
               v-model="email"
               type="email"
@@ -78,7 +94,7 @@
               autocomplete="username"
               required
               :disabled="isLoading"
-              class="w-full px-4 py-2.5 text-sm text-gray-800 bg-white border border-gray-200 rounded-xl outline-none placeholder-gray-400
+              class="w-full px-4 py-2.5 text-sm text-gray-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl outline-none placeholder-gray-400 dark:placeholder:text-slate-400
                      disabled:opacity-50 disabled:cursor-not-allowed transition-all
                      focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
             />
@@ -87,7 +103,7 @@
           <!-- Password -->
           <div class="mb-4">
             <div class="flex items-center justify-between mb-1.5">
-              <label class="block text-sm font-medium text-gray-700">Mot de passe</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-slate-300">Mot de passe</label>
               <button type="button" :disabled="isLoading" @click="toggleResetMode"
                 class="text-sm text-purple-600 hover:text-purple-800 font-medium transition-colors disabled:opacity-50">
                 Mot de passe oublié ?
@@ -101,12 +117,12 @@
                 autocomplete="current-password"
                 required
                 :disabled="isLoading"
-                class="w-full px-4 pr-11 py-2.5 text-sm text-gray-800 bg-white border border-gray-200 rounded-xl outline-none placeholder-gray-400
+                class="w-full px-4 pr-11 py-2.5 text-sm text-gray-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl outline-none placeholder-gray-400 dark:placeholder:text-slate-400
                        disabled:opacity-50 disabled:cursor-not-allowed transition-all
                        focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
               />
               <button type="button" @click="showPassword = !showPassword"
-                class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
+                class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-400 hover:text-gray-600 dark:hover:text-slate-200 transition-colors">
                 <svg v-if="!showPassword" class="w-5 h-5" viewBox="0 0 20 20" fill="none">
                   <path d="M2 10s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6Z" stroke="currentColor" stroke-width="1.5"/>
                   <circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/>
@@ -123,13 +139,13 @@
             <div class="relative">
               <input v-model="keepLoggedIn" type="checkbox" class="sr-only" />
               <div class="h-4 w-4 rounded border flex items-center justify-center transition-colors"
-                :class="keepLoggedIn ? 'bg-purple-600 border-purple-600' : 'bg-white border-gray-300'">
+                :class="keepLoggedIn ? 'bg-purple-600 border-purple-600' : 'bg-white dark:bg-slate-900 border-gray-300 dark:border-slate-700'">
                 <svg v-if="keepLoggedIn" class="w-2.5 h-2.5 text-white" viewBox="0 0 10 10" fill="none">
                   <path d="M1.5 5L4 7.5 8.5 2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
               </div>
             </div>
-            <span class="text-sm text-gray-600">Se souvenir de moi</span>
+            <span class="text-sm text-gray-600 dark:text-slate-300">Se souvenir de moi</span>
           </label>
 
           <!-- Submit -->
@@ -148,7 +164,7 @@
             {{ isLoading ? 'Connexion…' : 'Se connecter' }}
           </button>
 
-          <p class="mt-4 text-center text-xs text-gray-400">Accès réservé à l'équipe Enjoy PMS.</p>
+          <p class="mt-4 text-center text-xs text-gray-400 dark:text-slate-500">Accès réservé à l'équipe Enjoy PMS.</p>
         </div>
 
         <!-- ── RESET PASSWORD ── -->
@@ -159,16 +175,16 @@
             </svg>
             Retour
           </button>
-          <h1 class="text-3xl font-bold text-gray-900 mb-1.5">Réinitialiser</h1>
-          <p class="text-gray-500 text-sm mb-6">Saisissez votre email. Vous recevrez un lien si un compte existe.</p>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-1.5">Réinitialiser</h1>
+          <p class="text-gray-500 dark:text-slate-400 text-sm mb-6">Saisissez votre email. Vous recevrez un lien si un compte existe.</p>
           <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">Adresse email</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Adresse email</label>
             <input
               v-model="resetEmail"
               type="email"
               placeholder="admin@enjoy-pms.com"
               :disabled="isVerifyingReset || resetSent"
-              class="w-full px-4 py-2.5 text-sm text-gray-800 bg-white border border-gray-200 rounded-xl outline-none placeholder-gray-400
+              class="w-full px-4 py-2.5 text-sm text-gray-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl outline-none placeholder-gray-400 dark:placeholder:text-slate-400
                      disabled:opacity-50 disabled:cursor-not-allowed transition-all
                      focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
             />
@@ -197,7 +213,7 @@
               </svg>
               {{ isVerifyingReset ? 'Envoi…' : 'Envoyer le lien' }}
             </button>
-            <button type="button" @click="backToLogin" class="flex-1 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">
+            <button type="button" @click="backToLogin" class="flex-1 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-200 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-xl transition-colors">
               {{ resetSent ? 'Retour à la connexion' : 'Annuler' }}
             </button>
           </div>
@@ -211,9 +227,9 @@
             </svg>
             Retour
           </button>
-          <h1 class="text-3xl font-bold text-gray-900 mb-1.5">Vérifiez votre email</h1>
-          <p class="text-gray-500 text-sm mb-1">Un email de vérification a été envoyé à</p>
-          <p class="text-base font-semibold text-gray-800 mb-6">{{ verificationEmail }}</p>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-1.5">Vérifiez votre email</h1>
+          <p class="text-gray-500 dark:text-slate-400 text-sm mb-1">Un email de vérification a été envoyé à</p>
+          <p class="text-base font-semibold text-gray-800 dark:text-white mb-6">{{ verificationEmail }}</p>
           <div class="space-y-2.5">
             <button type="button" @click="resendVerificationEmail" :disabled="isResendingVerification"
               class="w-full py-2.5 text-sm font-semibold text-white bg-purple-600 hover:bg-purple-700
@@ -223,7 +239,7 @@
               </svg>
               {{ isResendingVerification ? 'Envoi…' : "Renvoyer l'email" }}
             </button>
-            <button type="button" @click="backToLogin" class="w-full py-2.5 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">
+            <button type="button" @click="backToLogin" class="w-full py-2.5 text-sm font-medium text-gray-700 dark:text-slate-200 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-xl transition-colors">
               Retour à la connexion
             </button>
           </div>
@@ -236,7 +252,7 @@
               Email renvoyé avec succès.
             </p>
           </div>
-          <p class="text-xs text-gray-400 mt-3">Vous ne trouvez pas l'email ? Vérifiez vos spams.</p>
+          <p class="text-xs text-gray-400 dark:text-slate-500 mt-3">Vous ne trouvez pas l'email ? Vérifiez vos spams.</p>
         </div>
 
       </div>
@@ -252,7 +268,7 @@
     </div>
 
     <!--  RIGHT PANEL -->
-    <div class="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-purple-50 h-full">
+    <div class="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-purple-50 dark:bg-slate-900 h-full">
 
       <!-- Top accent bar -->
       <div class="absolute top-0 left-0 right-0 h-1 bg-purple-600"></div>
@@ -310,13 +326,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, inject, type Ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { Sun, Moon } from 'lucide-vue-next'
 import { useAuthStore } from '../../composables/useAuth'
 import { auth, resendEmailVerification, requestPasswordReset } from '../../servicesAPI/auth'
 import api from '../../servicesAPI/api'
 const router = useRouter()
 const authStore = useAuthStore()
+
+const isDark = inject<Ref<boolean>>('enjoy-isDark')
+if (!isDark) throw new Error('Theme provider is missing')
+
+const toggleTheme = () => { isDark.value = !isDark.value }
 
 const email = ref('')
 const password = ref('')

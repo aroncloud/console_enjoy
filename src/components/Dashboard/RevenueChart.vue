@@ -1,24 +1,24 @@
 <template>
-  <div class="bg-white rounded-xl border border-gray-100 p-5 ">
+  <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800 p-5">
 
     <!-- Header -->
     <div class="flex items-center justify-between mb-8">
       <template v-if="loading">
-        <div class="h-5 w-56 bg-gray-200 rounded animate-pulse" />
+        <div class="h-5 w-56 bg-gray-200 dark:bg-slate-700 rounded animate-pulse" />
         <div class="flex gap-2">
-          <div class="h-7 w-16 bg-gray-200 rounded animate-pulse" />
-          <div class="h-7 w-16 bg-gray-200 rounded animate-pulse" />
+          <div class="h-7 w-16 bg-gray-200 dark:bg-slate-700 rounded animate-pulse" />
+          <div class="h-7 w-16 bg-gray-200 dark:bg-slate-700 rounded animate-pulse" />
         </div>
       </template>
       <template v-else>
-        <h2 class="text-lg font-bold text-gray-800">Répartition du Chiffre d'Affaires</h2>
+        <h2 class="text-lg font-bold text-gray-800 dark:text-white">Répartition du Chiffre d'Affaires</h2>
         <div class="flex gap-2">
           <button
             v-for="period in periods"
             :key="period.value"
             @click="activePeriod = period.value"
             class="px-3 py-1 text-xs font-semibold rounded transition-colors"
-            :class="activePeriod === period.value ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-500'"
+            :class="activePeriod === period.value ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-300'"
           >
             {{ period.label }}
           </button>
@@ -32,12 +32,12 @@
         <div
           v-for="i in 12"
           :key="i"
-          class="w-full bg-gray-200 rounded-t"
+          class="w-full bg-gray-200 dark:bg-slate-700 rounded-t"
           :style="{ height: `${15 + (i * 7) % 70}%` }"
         />
       </div>
       <div class="flex justify-between mt-4 px-4 animate-pulse">
-        <div v-for="i in 12" :key="i" class="h-2 w-6 bg-gray-200 rounded mx-auto" />
+        <div v-for="i in 12" :key="i" class="h-2 w-6 bg-gray-200 dark:bg-slate-700 rounded mx-auto" />
       </div>
     </template>
 
@@ -48,14 +48,14 @@
           v-for="(bar, index) in activeBars"
           :key="index"
           class="w-full rounded-t relative group transition-all duration-500 cursor-pointer"
-          :class="bar.current ? 'bg-blue-600' : 'bg-blue-100 hover:bg-blue-200'"
+          :class="bar.current ? 'bg-blue-600' : 'bg-blue-100 dark:bg-blue-900/40 hover:bg-blue-200 dark:hover:bg-blue-900/60'"
           :style="{ height: bar.height }"
           @mouseenter="showTooltip(bar, index, $event)"
           @mouseleave="hideTooltip"
         >
           <div
             v-if="bar.current"
-            class="absolute inset-x-0 -top-7 text-center text-xs font-bold text-blue-600"
+            class="absolute inset-x-0 -top-7 text-center text-xs font-bold text-blue-600 dark:text-blue-400"
           >
             Actuel
           </div>
@@ -92,7 +92,7 @@
         <span
           v-for="(bar, index) in activeBars"
           :key="index"
-          class="text-[10px] font-bold text-gray-400 uppercase tracking-widest w-full text-center"
+          class="text-[10px] font-bold text-gray-400 dark:text-slate-400 uppercase tracking-widest w-full text-center"
         >
           {{ bar.label }}
         </span>
@@ -101,11 +101,11 @@
 
     <template v-else>
       <div class="h-64 flex flex-col items-center justify-center gap-3 text-center">
-        <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
-          <BarChart2 class="w-6 h-6 text-gray-300" />
+        <div class="w-12 h-12 bg-gray-100 dark:bg-slate-800 rounded-xl flex items-center justify-center">
+          <BarChart2 class="w-6 h-6 text-gray-300 dark:text-slate-600" />
         </div>
-        <p class="text-sm font-semibold text-gray-400">Aucune donnée disponible</p>
-        <p class="text-xs text-gray-300">Les revenus s'afficheront ici dès qu'il y aura des abonnements actifs.</p>
+        <p class="text-sm font-semibold text-gray-400 dark:text-slate-400">Aucune donnée disponible</p>
+        <p class="text-xs text-gray-300 dark:text-slate-500">Les revenus s'afficheront ici dès qu'il y aura des abonnements actifs.</p>
       </div>
     </template>
 

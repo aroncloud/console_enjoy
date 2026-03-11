@@ -104,11 +104,11 @@
           </template>
 
           <template #cell-description="{value}" >
-            <span class="text-sm text-gray-500 font-light">{{ value }}</span>
+            <span class="text-sm text-gray-500 dark:text-slate-400 font-light">{{ value }}</span>
           </template>
 
            <template #cell-hotel="{value}" >
-            <span class="text-sm text-gray-900 font-semibold capitalize">{{ value }}</span>
+            <span class="text-sm text-gray-900 dark:text-white font-semibold capitalize">{{ value }}</span>
           </template>
 
           <template #cell-actions="{ row }">
@@ -337,10 +337,11 @@ const pendingAmount = computed(() => statsData.value?.pendingAmount ?? 0)
 const pendingCount  = computed(() => statsData.value?.pendingCount  ?? 0)
 const overdueAmount = computed(() => statsData.value?.overdueAmount ?? 0)
 
-const handleMarkAsPaid = async () => {
+const handleMarkAsPaid = async (row: any) => {
   try {
-    // await invoiceService.markAsPaid(row.id)
-    // await fetchData()
+    if (!row?.id) return
+    await invoiceService.markAsPaid(row.id)
+    await fetchData(metaData.value?.currentPage ?? 1)
   } catch (e) {
     console.error('Erreur paiement', e)
   }

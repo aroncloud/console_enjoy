@@ -352,7 +352,7 @@ const confirmDelete = async () => {
             :disabled="saving"
             placeholder="Décrivez brièvement ce produit..."
             class="w-full rounded-lg border px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-purple-500 focus:outline-hidden focus:ring-3 focus:ring-purple-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-purple-800 transition-colors"
-            :class="saving ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200' : 'bg-transparent border-gray-300'"
+            :class="saving ? 'bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-400 cursor-not-allowed border-gray-200 dark:border-slate-700' : 'bg-transparent dark:bg-slate-900 border-gray-300 dark:border-slate-700'"
           />
         </div>
 

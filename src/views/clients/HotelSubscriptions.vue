@@ -17,11 +17,11 @@
 
         <div v-if="currentStep === 1" class="pb-5">
           <h2 class="text-xl font-black text-slate-900 dark:text-white">Choisissez vos produits</h2>
-          <p class="text-sm text-slate-500 mt-1">Sélectionnez les produits adaptés à votre établissement</p>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Sélectionnez les produits adaptés à votre établissement</p>
         </div>
         <div v-else-if="currentStep === 2" class="pb-5">
           <h2 class="text-xl font-black text-slate-900 dark:text-white">Paiement</h2>
-          <p class="text-sm text-slate-500 mt-1">Finalisez votre souscription en choisissant un mode de paiement</p>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Finalisez votre souscription en choisissant un mode de paiement</p>
         </div>
 
         <!-- Steps -->
@@ -79,7 +79,7 @@
 
             <!-- Module cards -->
             <div v-if="pageLoading" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div v-for="i in 6" :key="i" class="h-40 bg-gray-200 rounded-xl animate-pulse"></div>
+              <div v-for="i in 6" :key="i" class="h-40 bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse"></div>
             </div>
             <div v-else-if="availableModules.length > 0" class="grid grid-cols-1 sm:grid-cols-2 items-start gap-4">
               <div
@@ -110,13 +110,13 @@
                     </div>
                     <div class="flex-1 min-w-0">
                       <p class="font-black text-slate-900 dark:text-white text-sm">{{ mod.fullName }}</p>
-                      <p class="text-[11px] text-gray-500 mt-0.5 leading-relaxed">{{ formatCurrency(mod.priceMonthly) }}</p>
+                      <p class="text-[11px] text-gray-500 dark:text-slate-400 mt-0.5 leading-relaxed">{{ formatCurrency(mod.priceMonthly) }}</p>
                     </div>
                   </div>
 
                   <!-- Module-specific inputs -->
                   <div v-if="isSelected(mod.id)" @click.stop>
-                    <div v-if="mod.slug === 'pms'" class="mb-4 p-3 rounded-xl border border-slate-100 bg-slate-50/50 space-y-2 min-h-24">
+                    <div v-if="mod.slug === 'pms'" class="mb-4 p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 space-y-2 min-h-24">
                       <div class="flex justify-between items-center">
                         <p class="text-xs font-medium text-slate-500 flex items-center gap-1.5">
                           <BedDouble :size="12" class="text-slate-400" />
@@ -124,11 +124,11 @@
                         </p>
                         <span class="text-xs font-bold" :style="{ color: mod.color }">{{ getSel(mod.id).rooms }}</span>
                       </div>
-                      <input type="range" min="1" max="250" v-model.number="getSel(mod.id).rooms" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer" :style="`accent-color: ${mod.color}`" />
-                      <div class="flex justify-between text-[9px] text-slate-300 font-medium"><span>1</span><span>250</span></div>
+                      <input type="range" min="1" max="250" v-model.number="getSel(mod.id).rooms" class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer" :style="`accent-color: ${mod.color}`" />
+                      <div class="flex justify-between text-[9px] text-slate-300 dark:text-slate-500 font-medium"><span>1</span><span>250</span></div>
                     </div>
 
-                    <div v-else-if="mod.slug === 'pos'" class="mb-4 p-3 rounded-xl border border-slate-100 bg-slate-50/50 space-y-2 min-h-24">
+                    <div v-else-if="mod.slug === 'pos'" class="mb-4 p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 space-y-2 min-h-24">
                       <p class="text-xs font-medium text-slate-500 flex items-center gap-1.5"><Utensils :size="12" class="text-slate-400" />Terminaux</p>
                       <div class="flex items-center gap-3">
                         <Input v-model.number="getSel(mod.id).units" type="number" :min="1" customClass="w-full" />
@@ -136,15 +136,15 @@
                       </div>
                     </div>
 
-                    <div v-else-if="mod.slug === 'channel-manager'" class="mb-4 p-3 rounded-xl border border-slate-100 bg-slate-50/50 space-y-2 min-h-24">
+                    <div v-else-if="mod.slug === 'channel-manager'" class="mb-4 p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 space-y-2 min-h-24">
                       <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">OTAs connectés</p>
-                      <div v-for="ota in getSel(mod.id).otas" :key="ota.name" class="flex  items-center gap-2 p-2 rounded-lg bg-white border border-slate-100" :class="!ota.checked ? 'opacity-50' : ''">
+                      <div v-for="ota in getSel(mod.id).otas" :key="ota.name" class="flex items-center gap-2 p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700" :class="!ota.checked ? 'opacity-50' : ''">
                         <input type="checkbox" v-model="ota.checked" class="w-3.5 h-3.5 rounded accent-purple-600 cursor-pointer" />
                         <span class="text-xs font-medium text-slate-700 dark:text-slate-300">{{ ota.name }}</span>
                       </div>
                     </div>
 
-                    <div v-else-if="mod.slug === 'mobile-app'" class="mb-4 p-3 rounded-xl border border-slate-100 bg-slate-50/50 space-y-3 min-h-24">
+                    <div v-else-if="mod.slug === 'mobile-app'" class="mb-4 p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 space-y-3 min-h-24">
                       <div class="space-y-1">
                         <p class="text-xs font-medium text-slate-500">Quota staff</p>
                         <Input v-model.number="getSel(mod.id).staffQuota" type="number" :min="1" customClass="w-full" />
@@ -158,7 +158,7 @@
 
                   <!-- ── Billing cycle ── -->
                   <div v-if="isSelected(mod.id)" class="mb-4" @click.stop>
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Facturation</p>
+                  <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Facturation</p>
                     <div class="grid grid-cols-2 gap-2">
                       <button
                         v-for="[val, label] in [['monthly', 'Mensuel'], ['yearly', 'Annuel']]"
@@ -167,7 +167,7 @@
                         class="py-1.5 px-2 rounded-lg text-[11px] font-bold border transition-all"
                         :class="getSel(mod.id).billingCycle === val
                           ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'
-                          : 'border-slate-200 dark:border-slate-700 text-slate-500 hover:border-slate-300'"
+                          : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'"
                       >{{ label }}</button>
                     </div>
                   </div>
@@ -175,7 +175,7 @@
                   <!-- ── Période : UNIQUEMENT si mensuel ── -->
                   <Transition name="slide-down">
                     <div v-if="isSelected(mod.id) && getSel(mod.id).billingCycle === 'monthly'" class="mb-4" @click.stop>
-                      <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                      <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                         <CalendarRange :size="11" />
                         Période de souscription
                       </p>
@@ -192,7 +192,7 @@
 
                   <!-- ── Prix catalogue + Prix appliqué modifiable ── -->
                   <div v-if="isSelected(mod.id)" class="mb-4" @click.stop>
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                    <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                       <Tag :size="11" />
                       Prix de souscription
                     </p>

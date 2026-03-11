@@ -12,10 +12,10 @@
       <!-- Colonne Hôtel -->
       <template #cell-hotel="{ row }">
         <div class="flex items-center gap-3">
-          <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
-            <Building2 class="w-4 h-4 text-gray-400" />
+          <div class="w-8 h-8 bg-gray-100 dark:bg-slate-800 rounded-lg flex items-center justify-center">
+            <Building2 class="w-4 h-4 text-gray-400 dark:text-slate-400" />
           </div>
-          <span class="font-medium text-gray-700">{{ row.hotel }}</span>
+          <span class="font-medium text-gray-700 dark:text-slate-200">{{ row.hotel }}</span>
         </div>
       </template>
 
@@ -30,20 +30,20 @@
               <component :is="getIconComponent(value.slug)" :size="16" :style="{ color: getColor(value.slug) }" />
             </div>
             <div class="min-w-0">
-              <p class="font-bold text-sm text-slate-900 truncate">{{ value.module }}</p>
+              <p class="font-bold text-sm text-slate-900 dark:text-white truncate">{{ value.module }}</p>
             </div>
           </div>
       </template>
 
       <!-- Colonne Date d'échéance -->
       <template #cell-dueDate="{ value }">
-        <span class="text-gray-500 text-sm">{{ formatDate(value) }}</span>
+        <span class="text-gray-500 dark:text-slate-300 text-sm">{{ formatDate(value) }}</span>
       </template>
 
       <!-- Colonne Jours restants -->
       <template #cell-daysLeft="{ value }">
         <div class="flex items-center gap-2">
-          <div class="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+          <div class="w-16 h-1.5 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden">
             <div
               class="h-full rounded-full transition-all"
               :class="getProgressColor(value)"
@@ -66,7 +66,7 @@
           :to="`/clients/${row.hotelId}`"
           class="inline-flex items-center gap-1 text-purple-600 hover:text-purple-800 text-sm font-semibold transition-colors"
         >
-          <ChevronRight class="w-4 h-4 text-gray-400 group-hover:text-blue-500 transition-colors" />
+          <ChevronRight class="w-4 h-4 text-gray-400 dark:text-slate-400 group-hover:text-blue-500 transition-colors" />
         </router-link>
       </template>
 

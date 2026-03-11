@@ -83,11 +83,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, inject, type Ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { onClickOutside } from '@vueuse/core'
 import { Search, Bell, LogOut, User, Menu, Sun, Moon } from 'lucide-vue-next'
 import { useAuthStore } from '../../composables/useAuth'
+import { useThemeStore } from '../../composables/theme'
 
 defineEmits(['toggle-sidebar'])
 
@@ -98,8 +99,8 @@ const search = ref('')
 const isOpen = ref(false)
 const dropdownRef = ref<HTMLElement | null>(null)
 
-const isDark = inject<Ref<boolean>>('enjoy-isDark')
-if (!isDark) throw new Error('Theme provider is missing')
+const theme = useThemeStore()
+const isDark = computed(() => theme.isDark)
 
 // Champs exacts selon la réponse backend
 const displayName = computed(() => authStore.user?.fullName ?? authStore.user?.username ?? 'Administrateur')
@@ -119,7 +120,7 @@ const initials = computed(() =>
 const toggleDropdown = () => { isOpen.value = !isOpen.value }
 onClickOutside(dropdownRef, () => { isOpen.value = false })
 
-const toggleTheme = () => { isDark.value = !isDark.value }
+const toggleTheme = () => { theme.toggle() }
 
 const handleLogout = () => {
   isOpen.value = false

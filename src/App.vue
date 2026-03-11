@@ -2,16 +2,12 @@
   <RouterView />
 </template>
 <script setup lang="ts">
-import { provide } from 'vue'
-import { useDark } from '@vueuse/core'
+import { watchEffect } from 'vue'
+import { useThemeStore } from './composables/theme'
 
-const isDark = useDark({
-  selector: 'html',
-  attribute: 'class',
-  valueDark: 'dark',
-  valueLight: '',
-  storageKey: 'enjoy-theme',
+const theme = useThemeStore()
+
+watchEffect(() => {
+  document.documentElement.classList.toggle('dark', theme.isDark)
 })
-
-provide('enjoy-isDark', isDark)
 </script>

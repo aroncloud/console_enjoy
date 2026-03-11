@@ -326,19 +326,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, inject, type Ref } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { Sun, Moon } from 'lucide-vue-next'
 import { useAuthStore } from '../../composables/useAuth'
+import { useThemeStore } from '../../composables/theme'
 import { auth, resendEmailVerification, requestPasswordReset } from '../../servicesAPI/auth'
 import api from '../../servicesAPI/api'
 const router = useRouter()
 const authStore = useAuthStore()
 
-const isDark = inject<Ref<boolean>>('enjoy-isDark')
-if (!isDark) throw new Error('Theme provider is missing')
+const theme = useThemeStore()
+const isDark = computed(() => theme.isDark)
 
-const toggleTheme = () => { isDark.value = !isDark.value }
+const toggleTheme = () => { theme.toggle() }
 
 const email = ref('')
 const password = ref('')

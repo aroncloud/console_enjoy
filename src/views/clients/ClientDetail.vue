@@ -234,40 +234,40 @@ const limitLabel = (slug: string): string => ({
   <template v-else>
 
     <!-- Loading skeleton -->
-    <div v-if="loading" class="min-h-screen bg-slate-50 p-8 space-y-6">
+    <div v-if="loading" class="min-h-screen bg-slate-50 dark:bg-slate-950 p-8 space-y-6">
       <div class="space-y-3">
-        <div class="h-6 w-3/4 bg-gray-200 rounded animate-pulse"></div>
-        <div class="h-4 w-1/4 bg-gray-200 rounded animate-pulse"></div>
+        <div class="h-6 w-3/4 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div>
+        <div class="h-4 w-1/4 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div>
       </div>
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
         <div class="space-y-6">
-          <div class="h-40 bg-gray-200 rounded-xl animate-pulse"></div>
-          <div class="h-48 bg-gray-200 rounded-xl animate-pulse"></div>
+          <div class="h-40 bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse"></div>
+          <div class="h-48 bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse"></div>
         </div>
         <div class="lg:col-span-2 space-y-6">
-          <div class="h-60 bg-gray-200 rounded-xl animate-pulse"></div>
+          <div class="h-60 bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse"></div>
         </div>
       </div>
     </div>
 
     <!-- Erreur -->
-    <div v-else-if="error" class="flex flex-col items-center justify-center min-h-screen bg-slate-50 gap-4">
+    <div v-else-if="error" class="flex flex-col items-center justify-center min-h-screen bg-slate-50 dark:bg-slate-950 gap-4">
       <button @click="router.push('/clients')" class="text-sm text-purple-600 hover:underline">
         ← Retour au parc client
       </button>
     </div>
 
     <!-- Contenu -->
-    <div v-else class="flex flex-1 flex-col bg-slate-50">
+    <div v-else class="flex flex-1 flex-col bg-slate-50 dark:bg-slate-950">
       <div class="p-4 md:p-8 space-y-6 md:space-y-8 w-full">
 
         <!-- ── Header ── -->
-        <section class="bg-white rounded-xl border border-slate-200  overflow-hidden">
+        <section class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
           <div class="p-4 md:p-5 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
             <div class="flex items-center gap-3 flex-wrap">
-              <ArrowLeft @click="router.back()" class="cursor-pointer shrink-0 text-gray-500 hover:text-gray-800 transition-colors" />
-              <h2 class="text-lg md:text-xl font-bold text-slate-900">{{ hotelName }}</h2>
-              <span class="font-mono text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded">{{ hotelCode }}</span>
+              <ArrowLeft @click="router.back()" class="cursor-pointer shrink-0 text-gray-500 dark:text-slate-400 hover:text-gray-800 dark:hover:text-white transition-colors" />
+              <h2 class="text-lg md:text-xl font-bold text-slate-900 dark:text-white">{{ hotelName }}</h2>
+              <span class="font-mono text-xs text-gray-400 dark:text-slate-400 bg-gray-100 dark:bg-slate-800 px-2 py-0.5 rounded">{{ hotelCode }}</span>
               <span :class="['inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold', statusStyles]">
                 {{ statusLabel }}
               </span>
@@ -283,22 +283,22 @@ const limitLabel = (slug: string): string => ({
           <div class="lg:col-span-1 space-y-6">
 
             <!-- Infos générales -->
-            <div class="bg-white rounded-xl border border-slate-200  overflow-hidden">
+            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
               <div class="p-4 md:p-5 border-b border-slate-100 flex justify-between items-center">
-                <h3 class="font-bold text-slate-900 flex items-center gap-2 text-sm">
+                <h3 class="font-bold text-slate-900 dark:text-white flex items-center gap-2 text-sm">
                   <Info class="w-5 h-5 text-yellow-600" /> Informations Générales
                 </h3>
                 <div class="flex items-center gap-2">
                   <button
                     @click="showEditForm = true"
-                    class="text-yellow-600 hover:bg-yellow-50 p-1.5 rounded-lg transition-colors cursor-pointer"
+                    class="text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 p-1.5 rounded-lg transition-colors cursor-pointer"
                     title="Modifier"
                   >
                     <Edit class="w-4 h-4" />
                   </button>
                   <button
                     @click="showDeleteModal = true"
-                    class="text-red-500 hover:bg-red-50 p-1.5 rounded-lg transition-colors cursor-pointer"
+                    class="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 p-1.5 rounded-lg transition-colors cursor-pointer"
                     title="Supprimer"
                   >
                     <Trash2 class="w-4 h-4" />
@@ -311,39 +311,39 @@ const limitLabel = (slug: string): string => ({
                     {{ initials }}
                   </div>
                   <div>
-                    <p class="text-sm font-bold text-slate-900">{{ hotelName }}</p>
+                    <p class="text-sm font-bold text-slate-900 dark:text-white">{{ hotelName }}</p>
                     <p class="text-xs text-amber-500">{{ renderStars(hotelGrade) }}</p>
                   </div>
                 </div>
                 <div class="space-y-1">
                   <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Adresse</p>
-                  <p class="text-sm text-slate-700">{{ hotelAddress }}</p>
+                  <p class="text-sm text-slate-700 dark:text-slate-200">{{ hotelAddress }}</p>
                 </div>
                 <div class="space-y-1">
                   <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Email</p>
-                  <p class="text-sm text-slate-700">{{ hotelEmail }}</p>
+                  <p class="text-sm text-slate-700 dark:text-slate-200">{{ hotelEmail }}</p>
                 </div>
                 <div class="space-y-1">
                   <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Téléphone</p>
-                  <p class="text-sm text-slate-700">{{ hotelPhone }}</p>
+                  <p class="text-sm text-slate-700 dark:text-slate-200">{{ hotelPhone }}</p>
                 </div>
-                <div class="grid grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+                <div class="grid grid-cols-2 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
                   <div class="space-y-1">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Devise</p>
-                    <p class="text-sm font-semibold text-slate-900">{{ currency }}</p>
+                    <p class="text-sm font-semibold text-slate-900 dark:text-white">{{ currency }}</p>
                   </div>
                   <div class="space-y-1">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Fuseau</p>
-                    <p class="text-xs text-slate-600">{{ timezone }}</p>
+                    <p class="text-xs text-slate-600 dark:text-slate-300">{{ timezone }}</p>
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- Technique & Facturation -->
-            <div class="bg-white rounded-xl border border-slate-200  overflow-hidden">
-              <div class="p-4 md:p-5 border-b border-slate-100 bg-slate-50">
-                <h3 class="font-bold text-slate-900 flex items-center gap-2 text-sm">
+            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+              <div class="p-4 md:p-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800">
+                <h3 class="font-bold text-slate-900 dark:text-white flex items-center gap-2 text-sm">
                   <Banknote class="w-5 h-5 text-yellow-600" /> Technique & Facturation
                 </h3>
               </div>
@@ -351,24 +351,24 @@ const limitLabel = (slug: string): string => ({
                 <div class="flex items-center justify-between">
                   <div class="space-y-1">
                     <p class="text-[10px] font-bold text-slate-400 uppercase">Date de travail</p>
-                    <p class="text-lg font-bold text-slate-900">{{ workingDate }}</p>
+                    <p class="text-lg font-bold text-slate-900 dark:text-white">{{ workingDate }}</p>
                   </div>
                   <button class="bg-yellow-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-yellow-700 transition-colors cursor-pointer">
                     Mettre à jour
                   </button>
                 </div>
-                <div class="pt-4 border-t border-slate-100 space-y-4">
+                <div class="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-4">
                   <div class="flex justify-between items-end">
                     <div class="space-y-1">
                       <p class="text-[10px] font-bold text-slate-400 uppercase">Mensualité</p>
-                      <p class="text-2xl font-black text-slate-900">—<span class="text-sm font-normal text-slate-500"> /mois</span></p>
+                      <p class="text-2xl font-black text-slate-900 dark:text-white">—<span class="text-sm font-normal text-slate-500 dark:text-slate-400"> /mois</span></p>
                     </div>
                     <div class="text-right">
                       <p class="text-[10px] font-bold text-slate-400 uppercase">Prochaine facture</p>
-                      <p class="text-sm font-bold text-slate-700">—</p>
+                      <p class="text-sm font-bold text-slate-700 dark:text-slate-200">—</p>
                     </div>
                   </div>
-                  <button class="w-full py-2.5 border border-yellow-600 text-yellow-600 font-bold rounded-lg text-sm hover:bg-yellow-50 transition-all cursor-pointer">
+                  <button class="w-full py-2.5 border border-yellow-600 text-yellow-600 font-bold rounded-lg text-sm hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-all cursor-pointer">
                     Générer Gratuité
                   </button>
                 </div>
@@ -379,16 +379,16 @@ const limitLabel = (slug: string): string => ({
 
           <!-- ── Colonne droite ── -->
           <div class="lg:col-span-2">
-            <div class="bg-white rounded-xl border border-slate-200  overflow-hidden">
+            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
 
               <!-- Header produits -->
-              <div class="p-4 md:p-5 border-b border-slate-100 flex items-center justify-between">
+              <div class="p-4 md:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                 <div class="flex items-center gap-3">
                   <div class="h-9 w-9 bg-purple-50 rounded-lg flex items-center justify-center shrink-0">
                     <Layers class="text-purple-600 w-4 h-4" />
                   </div>
                   <div>
-                    <h3 class="font-bold text-sm text-slate-900">Produits actifs</h3>
+                    <h3 class="font-bold text-sm text-slate-900 dark:text-white">Produits actifs</h3>
                     <p class="text-xs text-slate-400">
                       {{ activeModules.length }} souscription{{ activeModules.length > 1 ? 's' : '' }} en cours
                     </p>
@@ -396,7 +396,7 @@ const limitLabel = (slug: string): string => ({
                 </div>
                 <RouterLink
                   :to="`/clients/${route.params.id}/subscriptions`"
-                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-purple-200 text-purple-600 text-xs font-bold hover:bg-purple-50 transition-colors"
+                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-purple-200 dark:border-purple-800/40 text-purple-600 dark:text-purple-300 text-xs font-bold hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
                 >
                   <ListChecks class="w-3.5 h-3.5" />
                   Ajouter un module
@@ -411,8 +411,8 @@ const limitLabel = (slug: string): string => ({
                     :key="item.id"
                     class="flex items-center gap-3 p-3 rounded-xl border transition-colors"
                     :class="item.status === 'active'
-                      ? 'border-slate-100 bg-slate-50/60 hover:bg-slate-50'
-                      : 'border-slate-100 bg-slate-50/30 opacity-60 hover:bg-slate-50'"
+                      ? 'border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800'
+                      : 'border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/30 opacity-60 hover:bg-slate-50 dark:hover:bg-slate-800'"
                   >
                     <!-- Icône module -->
                     <div
@@ -425,10 +425,10 @@ const limitLabel = (slug: string): string => ({
                     <!-- Infos -->
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-2">
-                        <p class="text-xs font-bold text-slate-800 truncate">{{ item.name }}</p>
+                        <p class="text-xs font-bold text-slate-800 dark:text-white truncate">{{ item.name }}</p>
                         <span
                           v-if="item.limitCount"
-                          class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 shrink-0"
+                          class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-200 shrink-0"
                         >
                           {{ item.limitCount }} {{ limitLabel(item.slug) }}
                         </span>
@@ -445,10 +445,10 @@ const limitLabel = (slug: string): string => ({
                           />
                           {{ getSubStatusConfig(item.status).label }}
                         </span>
-                        <span class="text-slate-200">·</span>
+                        <span class="text-slate-200 dark:text-slate-700">·</span>
                         <!-- Prix -->
                         <span class="text-[10px] text-slate-400 font-medium">{{ formatPrice(item.price) }}/mois</span>
-                        <span class="text-slate-200">·</span>
+                        <span class="text-slate-200 dark:text-slate-700">·</span>
                         <!-- Période -->
                         <span class="text-[10px] text-slate-400">
                           {{ formatDate(item.startsAt) }} → {{ formatDate(item.endsAt) }}
@@ -477,7 +477,7 @@ const limitLabel = (slug: string): string => ({
                       <button
                         @click="deleteSub(item)"
                         :disabled="subActionLoading === item.id"
-                        class="p-1.5 rounded-lg text-red-400 cursor-pointer hover:bg-red-50 transition-colors disabled:opacity-40"
+                        class="p-1.5 rounded-lg text-red-400 cursor-pointer hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-40"
                         title="Supprimer"
                       >
                         <Trash2 :size="18" />
@@ -488,7 +488,7 @@ const limitLabel = (slug: string): string => ({
 
                 <!-- État vide -->
                 <div v-else class="flex flex-col items-center justify-center py-10 text-slate-400">
-                  <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center mb-3">
+                  <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3">
                     <Layers :size="22" class="opacity-40" />
                   </div>
                   <p class="text-sm font-semibold">Aucun produit souscrit</p>
@@ -508,15 +508,15 @@ const limitLabel = (slug: string): string => ({
         </div>
 
         <!-- ── Footer ── -->
-        <div class="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <p class="text-sm text-slate-500">
+        <div class="bg-white dark:bg-slate-900 p-4 md:p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <p class="text-sm text-slate-500 dark:text-slate-300">
             Dernière modification :
-            <span class="font-bold text-slate-900">
+            <span class="font-bold text-slate-900 dark:text-white">
               {{ hotel?.updatedAt ? new Date(hotel.updatedAt).toLocaleString('fr-FR') : '—' }}
             </span>
           </p>
           <div class="flex gap-3">
-            <button class="px-4 py-2 text-sm font-bold bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors cursor-pointer">
+            <button class="px-4 py-2 text-sm font-bold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer">
               Historique
             </button>
           </div>

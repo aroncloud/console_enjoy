@@ -1,6 +1,6 @@
 <!-- src/components/dashboard/RecentActivations.vue -->
 <template>
-  <div class="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col gap-4 h-full">
+  <div class="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-5 flex flex-col gap-4 h-full">
 
     <!-- Skeleton -->
     <template v-if="loading">
@@ -8,16 +8,16 @@
         <div v-for="i in 4" :key="i" class="relative flex gap-4">
           <div
             v-if="i < 4"
-            class="absolute left-4 top-10 bottom-[-1.5rem] w-[2px] bg-gray-100 z-0"
+            class="absolute left-4 top-10 bottom-[-1.5rem] w-[2px] bg-gray-100 dark:bg-slate-800 z-0"
           />
-          <div class="w-8 h-8 bg-gray-200 rounded-full shrink-0 z-10" />
+          <div class="w-8 h-8 bg-gray-200 dark:bg-slate-700 rounded-full shrink-0 z-10" />
           <div class="pb-6 flex flex-col gap-2 pt-1">
-            <div class="h-3 w-48 bg-gray-200 rounded" />
-            <div class="h-2 w-20 bg-gray-100 rounded" />
+            <div class="h-3 w-48 bg-gray-200 dark:bg-slate-700 rounded" />
+            <div class="h-2 w-20 bg-gray-100 dark:bg-slate-800 rounded" />
           </div>
         </div>
       </div>
-      <div class="h-8 bg-gray-100 rounded-lg animate-pulse" />
+      <div class="h-8 bg-gray-100 dark:bg-slate-800 rounded-lg animate-pulse" />
     </template>
 
     <!-- Contenu réel -->
@@ -30,7 +30,7 @@
         >
           <div
             v-if="index < enrichedActivations.length - 1"
-            class="absolute left-4 top-10 bottom-[-1.5rem] w-[2px] bg-gray-100 z-0"
+            class="absolute left-4 top-10 bottom-[-1.5rem] w-[2px] bg-gray-100 dark:bg-slate-800 z-0"
           />
           <div
             class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 z-10"
@@ -39,8 +39,8 @@
             <component :is="item.icon" class="w-4 h-4" :class="item.iconColor" />
           </div>
           <div class="pb-6">
-            <p class="text-sm font-semibold text-gray-800">{{ item.description }}</p>
-            <p class="text-[10px] text-gray-300 mt-2 font-medium">{{ item.time ?? '—' }}</p>
+            <p class="text-sm font-semibold text-gray-800 dark:text-white">{{ item.description }}</p>
+            <p class="text-[10px] text-gray-300 dark:text-slate-400 mt-2 font-medium">{{ item.time ?? '—' }}</p>
           </div>
         </div>
 
@@ -49,7 +49,7 @@
         </p>
       </div>
 
-      <button class="w-full py-2 text-xs font-bold text-gray-400 hover:text-blue-500 uppercase tracking-widest bg-gray-50 rounded-lg transition-colors">
+      <button class="w-full py-2 text-xs font-bold text-gray-400 dark:text-slate-400 hover:text-blue-500 uppercase tracking-widest bg-gray-50 dark:bg-slate-800 rounded-lg transition-colors">
         Voir tout l'historique
       </button>
     </template>

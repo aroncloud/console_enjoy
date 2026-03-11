@@ -1,13 +1,13 @@
 <template>
-  <div class="bg-white border border-gray-100 rounded-xl overflow-hidden flex flex-col h-full">
+  <div class="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-xl overflow-hidden flex flex-col h-full">
 
     <!-- ── TOOLBAR  -->
     <div
       v-if="title || showSearch || (showFilters && $slots.filters) || $slots.actions"
-      class="flex items-center justify-between flex-wrap gap-3 px-5 py-4 border-b border-gray-200 bg-white"
+      class="flex items-center justify-between flex-wrap gap-3 px-5 py-4 border-b border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900"
     >
       <div class="flex items-center gap-3">
-        <h3 v-if="title" class="text-sm font-bold tracking-tight text-gray-900">{{ title }}</h3>
+        <h3 v-if="title" class="text-sm font-bold tracking-tight text-gray-900 dark:text-white">{{ title }}</h3>
       </div>
       <div class="flex items-center gap-2">
         <slot name="actions" />
@@ -25,14 +25,14 @@
             v-model="searchQuery"
             type="text"
             placeholder="Rechercher…"
-            class="pl-8 pr-7 py-1.5 text-sm bg-gray-50 border border-gray-200 rounded-lg outline-none
-                   text-gray-800 placeholder-gray-400 w-52
+            class="pl-8 pr-7 py-1.5 text-sm bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg outline-none
+                   text-gray-800 dark:text-slate-200 placeholder-gray-400 dark:placeholder:text-slate-400 w-52
                    focus:border-purple-500 focus:ring-2 focus:ring-purple-100 focus:w-64
                    transition-all duration-150"
           />
           <button
             v-if="searchQuery"
-            class="absolute right-2 text-gray-400 hover:text-gray-600 text-base leading-none"
+            class="absolute right-2 text-gray-400 hover:text-gray-600 dark:hover:text-slate-200 text-base leading-none"
             @click="searchQuery = ''"
           >×</button>
         </div>
@@ -46,11 +46,11 @@
       <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-sm">
           <thead>
-            <tr class="bg-gray-50">
+            <tr class="bg-gray-50 dark:bg-slate-800">
               <th
                 v-for="col in columns"
                 :key="col.key"
-                class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-400 whitespace-nowrap select-none"
+                class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-slate-400 whitespace-nowrap select-none"
                 :class="[col.thClass, col.sortable !== false ? 'cursor-pointer group' : '']"
                 @click="col.sortable !== false && toggleSort(col.key)"
               >
@@ -69,14 +69,14 @@
               </th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-100">
+          <tbody class="divide-y divide-gray-100 dark:divide-slate-800">
 
             <!-- Skeleton -->
             <template v-if="loading">
               <tr v-for="i in pageSize" :key="`sk-${i}`">
                 <td v-for="col in columns" :key="col.key" class="px-4 py-4">
                   <div
-                    class="h-3.5 bg-gray-100 rounded-full animate-pulse"
+                    class="h-3.5 bg-gray-100 dark:bg-slate-700 rounded-full animate-pulse"
                     :style="{ width: i % 3 === 0 ? '40%' : i % 2 === 0 ? '65%' : '55%' }"
                   />
                 </td>
@@ -87,8 +87,8 @@
             <tr v-else-if="paginatedData.length === 0">
               <td :colspan="columns.length" class="py-16 text-center">
                 <slot name="empty">
-                  <div class="flex flex-col items-center gap-3 text-gray-400">
-                    <svg class="w-10 h-10 text-gray-300" viewBox="0 0 48 48" fill="none">
+                  <div class="flex flex-col items-center gap-3 text-gray-400 dark:text-slate-400">
+                    <svg class="w-10 h-10 text-gray-300 dark:text-slate-600" viewBox="0 0 48 48" fill="none">
                       <rect x="8" y="10" width="32" height="30" rx="3" stroke="currentColor" stroke-width="1.5"/>
                       <path d="M16 10V8a2 2 0 012-2h12a2 2 0 012 2v2" stroke="currentColor" stroke-width="1.5"/>
                       <path d="M16 22h16M16 29h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -104,14 +104,14 @@
               <tr
                 v-for="(row, rowIndex) in paginatedData"
                 :key="row.id ?? rowIndex"
-                class="hover:bg-slate-50 transition-colors"
+                class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
                 :class="onRowClick ? 'cursor-pointer' : ''"
                 @click="onRowClick?.(row)"
               >
                 <td
                   v-for="col in columns"
                   :key="col.key"
-                  class="px-4 py-3.5 text-gray-700 align-middle"
+                  class="px-4 py-3.5 text-gray-700 dark:text-slate-200 align-middle"
                   :class="col.tdClass"
                 >
                   <slot :name="`cell-${col.key}`" :row="row" :value="row[col.key]">
@@ -130,21 +130,21 @@
 
         <!-- Skeleton mobile -->
         <template v-if="loading">
-          <div v-for="i in pageSize" :key="`sk-m-${i}`" class="border border-gray-100 rounded-lg overflow-hidden bg-white">
-            <div class="px-3.5 py-3 bg-gray-50 border-b border-gray-100">
-              <div class="h-3.5 bg-gray-100 rounded-full animate-pulse w-2/5" />
+          <div v-for="i in pageSize" :key="`sk-m-${i}`" class="border border-gray-100 dark:border-slate-800 rounded-lg overflow-hidden bg-white dark:bg-slate-900">
+            <div class="px-3.5 py-3 bg-gray-50 dark:bg-slate-800 border-b border-gray-100 dark:border-slate-800">
+              <div class="h-3.5 bg-gray-100 dark:bg-slate-700 rounded-full animate-pulse w-2/5" />
             </div>
             <div class="px-3.5 py-3 flex flex-col gap-3">
               <div v-for="j in 3" :key="j" class="flex flex-col gap-1.5">
-                <div class="h-2.5 bg-gray-100 rounded-full animate-pulse w-1/4" />
-                <div class="h-3 bg-gray-100 rounded-full animate-pulse" :style="{ width: j % 2 === 0 ? '60%' : '45%' }" />
+                <div class="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full animate-pulse w-1/4" />
+                <div class="h-3 bg-gray-100 dark:bg-slate-700 rounded-full animate-pulse" :style="{ width: j % 2 === 0 ? '60%' : '45%' }" />
               </div>
             </div>
           </div>
         </template>
 
         <!-- Empty mobile -->
-        <div v-else-if="paginatedData.length === 0" class="py-14 flex flex-col items-center gap-3 text-gray-400">
+        <div v-else-if="paginatedData.length === 0" class="py-14 flex flex-col items-center gap-3 text-gray-400 dark:text-slate-400">
           <slot name="empty"><span class="text-sm">Aucune donnée disponible</span></slot>
         </div>
 
@@ -153,26 +153,26 @@
           <div
             v-for="(row, rowIndex) in paginatedData"
             :key="rowIndex"
-            class="border border-gray-200 rounded-lg overflow-hidden bg-white transition-all"
+            class="border border-gray-200 dark:border-slate-800 rounded-lg overflow-hidden bg-white dark:bg-slate-900 transition-all"
             :class="onRowClick ? 'cursor-pointer' : ''"
             @click="onRowClick?.(row)"
           >
-            <div class="px-3.5 py-3 bg-gray-50 border-b border-gray-200">
+            <div class="px-3.5 py-3 bg-gray-50 dark:bg-slate-800 border-b border-gray-200 dark:border-slate-800">
               <slot :name="`cell-${firstColumnKey}`" :row="row" :value="row[firstColumnKey]">
-                <span class="font-semibold text-sm text-gray-900">{{ row[firstColumnKey] }}</span>
+                <span class="font-semibold text-sm text-gray-900 dark:text-white">{{ row[firstColumnKey] }}</span>
               </slot>
             </div>
             <div class="px-3.5 py-3 flex flex-col gap-2.5">
               <template v-for="(col, idx) in columns" :key="col.key">
                 <div v-if="idx > 0 && col.key !== 'actions'" class="flex flex-col gap-0.5">
-                  <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400">{{ col.label }}</span>
-                  <div class="text-sm text-gray-700">
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-slate-400">{{ col.label }}</span>
+                  <div class="text-sm text-gray-700 dark:text-slate-200">
                     <slot :name="`cell-${col.key}`" :row="row" :value="row[col.key]">{{ row[col.key] }}</slot>
                   </div>
                 </div>
               </template>
             </div>
-            <div v-if="$slots['cell-actions']" class="px-3.5 py-2.5 border-t border-gray-200 bg-gray-50">
+            <div v-if="$slots['cell-actions']" class="px-3.5 py-2.5 border-t border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-800">
               <slot name="cell-actions" :row="row" />
             </div>
           </div>
@@ -182,13 +182,13 @@
     </div>
 
     <!-- ── FOOTER -->
-    <div class="flex items-center justify-between flex-wrap gap-3 px-5 py-3 border-t border-gray-200 bg-white">
+    <div class="flex items-center justify-between flex-wrap gap-3 px-5 py-3 border-t border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900">
       <!-- Page size -->
-      <div class="flex items-center gap-2 text-xs text-gray-400">
+      <div class="flex items-center gap-2 text-xs text-gray-400 dark:text-slate-400">
         <span>Lignes :</span>
         <select
           v-model="pageSize"
-          class="text-xs text-gray-700 bg-white border border-gray-200 rounded-md px-2 py-1 outline-none
+          class="text-xs text-gray-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-md px-2 py-1 outline-none
                  focus:border-purple-500 focus:ring-2 focus:ring-purple-100 cursor-pointer transition-all"
         >
           <option v-for="n in pageSizeOptions" :key="n" :value="n">{{ n }}</option>

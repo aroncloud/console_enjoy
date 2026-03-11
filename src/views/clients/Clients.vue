@@ -109,11 +109,11 @@ const countSuspended = computed(() => hotels.value.filter(h => h.status === 'sus
 const setFilter = (key: string) => { activeFilter.value = key; currentPage.value = 1 }
 
 const getStatusStyles = (status: string) => ({
-  active:    'bg-green-100 text-green-700',
-  inactive:  'bg-gray-100 text-gray-600',
-  suspended: 'bg-red-100 text-red-700',
-  demo:      'bg-orange-100 text-orange-700',
-}[status] ?? 'bg-gray-100 text-gray-500')
+  active:    'bg-green-100 text-green-700 dark:bg-emerald-900/30 dark:text-emerald-300',
+  inactive:  'bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-slate-300',
+  suspended: 'bg-red-100 text-red-700 dark:bg-red-900/25 dark:text-red-300',
+  demo:      'bg-orange-100 text-orange-700 dark:bg-amber-900/25 dark:text-amber-300',
+}[status] ?? 'bg-gray-100 text-gray-500 dark:bg-slate-800 dark:text-slate-300')
 
 const getStatusLabel = (status: string) => ({
   active:    'Actif',
@@ -141,12 +141,12 @@ const getProducts = (row: any) =>
   />
 
   <!-- ── Vue Liste ── -->
-  <div v-else class="p-4 md:p-8 bg-gray-50 min-h-screen font-sans">
+  <div v-else class="p-4 md:p-8 bg-gray-50 dark:bg-slate-950 min-h-screen font-sans">
 
     <div class="flex flex-col md:flex-row justify-between md:items-start mb-8 gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900">Gestion du Parc Client</h1>
-        <p class="text-gray-500 text-sm mt-1">Gérez les abonnements et les accès des établissements hôteliers.</p>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Gestion du Parc Client</h1>
+        <p class="text-gray-500 dark:text-slate-400 text-sm mt-1">Gérez les abonnements et les accès des établissements hôteliers.</p>
       </div>
       <ButtonComponent label="Ajouter un Hôtel" variant="primary" :iconLeft="Plus" @click="openCreate" />
     </div>
@@ -165,7 +165,7 @@ const getProducts = (row: any) =>
           'px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors cursor-pointer',
           activeFilter === filter.key
             ? 'bg-purple-600 text-white'
-            : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+            : 'bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800'
         ]"
       >{{ filter.label }}</button>
     </div>
@@ -178,25 +178,25 @@ const getProducts = (row: any) =>
             <BedDouble class="w-4 h-4 text-purple-600" />
           </div>
           <div>
-            <p class="font-semibold text-gray-900 text-sm">{{ row.hotelName }}</p>
-            <p class="text-[11px] text-gray-400 font-mono">{{ row.hotelCode }}</p>
+            <p class="font-semibold text-gray-900 dark:text-white text-sm">{{ row.hotelName }}</p>
+            <p class="text-[11px] text-gray-400 dark:text-slate-400 font-mono">{{ row.hotelCode }}</p>
           </div>
         </div>
       </template>
 
       <template #cell-location="{ row }">
         <div class="flex flex-col">
-          <span class="text-sm text-gray-800">{{ row.city }}</span>
-          <span class="text-xs text-gray-400">{{ row.country }}</span>
+          <span class="text-sm text-gray-800 dark:text-slate-200">{{ row.city }}</span>
+          <span class="text-xs text-gray-400 dark:text-slate-400">{{ row.country }}</span>
         </div>
       </template>
 
       <template #cell-products="{ row }">
-        <div class="flex items-center gap-2.5 text-gray-300">
-          <BedDouble  :size="17" :class="getProducts(row).includes('pms') ? 'text-purple-500' : 'text-gray-200'" title="PMS" />
-          <Utensils   :size="17" :class="getProducts(row).includes('pos') ? 'text-orange-400' : 'text-gray-200'" title="Point de vente" />
-          <RefreshCcw :size="17" :class="getProducts(row).includes('channel-manager')? 'text-green-500' : 'text-gray-200'" title="Channel Manager" />
-          <Smartphone :size="17" :class="getProducts(row).includes('mobile-app') ? 'text-blue-400'   : 'text-gray-200'" title="App mobile" />
+        <div class="flex items-center gap-2.5 text-gray-300 dark:text-slate-600">
+          <BedDouble  :size="17" :class="getProducts(row).includes('pms') ? 'text-purple-500' : 'text-gray-200 dark:text-slate-700'" title="PMS" />
+          <Utensils   :size="17" :class="getProducts(row).includes('pos') ? 'text-orange-400' : 'text-gray-200 dark:text-slate-700'" title="Point de vente" />
+          <RefreshCcw :size="17" :class="getProducts(row).includes('channel-manager')? 'text-green-500' : 'text-gray-200 dark:text-slate-700'" title="Channel Manager" />
+          <Smartphone :size="17" :class="getProducts(row).includes('mobile-app') ? 'text-blue-400'   : 'text-gray-200 dark:text-slate-700'" title="App mobile" />
         </div>
       </template>
 
@@ -210,14 +210,14 @@ const getProducts = (row: any) =>
       <template #cell-infos="{ row }">
         <div class="flex flex-col gap-0.5">
           <span class="text-xs text-amber-500 tracking-wide">{{ renderStars(row.grade ?? 0) }}</span>
-          <span class="text-xs text-gray-500">{{ row.currencyCode }}</span>
+          <span class="text-xs text-gray-500 dark:text-slate-400">{{ row.currencyCode }}</span>
         </div>
       </template>
 
       <template #cell-contact="{ row }">
         <div class="flex flex-col">
-          <span class="text-xs text-gray-700 truncate max-w-[140px]">{{ row.email }}</span>
-          <span class="text-xs text-gray-400">{{ row.phoneNumber }}</span>
+          <span class="text-xs text-gray-700 dark:text-slate-200 truncate max-w-[140px]">{{ row.email }}</span>
+          <span class="text-xs text-gray-400 dark:text-slate-400">{{ row.phoneNumber }}</span>
         </div>
       </template>
 

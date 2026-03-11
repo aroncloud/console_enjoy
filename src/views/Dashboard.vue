@@ -22,7 +22,7 @@
 
       <div class="lg:col-span-2 flex flex-col gap-3">
         <div class="flex items-center justify-between">
-          <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+          <h2 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
             <TriangleAlert class="w-5 h-5 text-red-500" />
             Alertes d'Expiration de Licence (30 jours)
           </h2>
@@ -35,7 +35,7 @@
 
       <div class="lg:col-span-1 flex flex-col gap-3">
         <div class="flex items-center justify-between">
-          <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+          <h2 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
             <Zap class="w-5 h-5 text-blue-500" />
             Activations Récentes
           </h2>

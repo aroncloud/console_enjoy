@@ -1,6 +1,6 @@
 
 <template>
-  <div class="flex h-screen bg-gray-50">
+  <div class="flex h-screen bg-gray-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
     <!-- mobile overlay -->
     <div
       v-if="isSidebarOpen"
@@ -11,7 +11,7 @@
     <!-- sidebar (hidden on small, slide-in/out) -->
     <Sidebar
       :class="[
-        'fixed inset-y-0 left-0 w-60 bg-white border-r border-gray-100 flex flex-col transform transition-transform duration-200 z-50',
+        'fixed inset-y-0 left-0 w-60 bg-white dark:bg-slate-900 border-r border-gray-100 dark:border-slate-800 flex flex-col transform transition-transform duration-200 z-50',
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full',
         'md:translate-x-0 md:relative md:block',
       ]"
@@ -19,7 +19,7 @@
 
     <div class="flex flex-col flex-1 overflow-hidden">
       <Navbar @toggle-sidebar="toggleSidebar" />
-      <main class="flex-1 overflow-y-auto p-6 customer-scrollbar">
+      <main class="flex-1 overflow-y-auto p-6 customer-scrollbar bg-gray-50 dark:bg-slate-950">
         <RouterView />
       </main>
     </div>

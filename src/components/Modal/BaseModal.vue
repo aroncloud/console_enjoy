@@ -5,13 +5,13 @@
       class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
       @click.self="close"
     >
-      <div :class="['bg-white rounded-2xl border border-slate-200 w-full max-w-lg shadow-2xl', customClass]">
+      <div :class="['bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 w-full max-w-lg shadow-2xl', customClass]">
 
         <!-- header slot with close button -->
-        <div v-if="$slots.header" class="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+        <div v-if="$slots.header" class="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
           <slot name="header" />
-          <button @click="close" class="p-2 hover:bg-slate-100 rounded-lg transition-colors">
-            <X :size="18" class="text-slate-500" />
+          <button @click="close" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+            <X :size="18" class="text-slate-500 dark:text-slate-300" />
           </button>
         </div>
 
@@ -21,7 +21,7 @@
         </div>
 
         <!-- footer slot -->
-        <div v-if="$slots.footer" class="px-6 py-4 border-t border-slate-200">
+        <div v-if="$slots.footer" class="px-6 py-4 border-t border-slate-200 dark:border-slate-800">
           <slot name="footer" />
         </div>
       </div>

@@ -4,7 +4,7 @@
     class="flex justify-between items-center py-1 space-x-2"
   >
     <!-- Info affichage -->
-    <span class="text-xs text-gray-400 font-medium">
+    <span class="text-xs text-gray-400 dark:text-slate-400 font-medium">
       Affichage de {{ startItem }} à {{ endItem }} sur {{ meta.total.toLocaleString() }}
     </span>
 
@@ -13,14 +13,14 @@
       <button
         :disabled="!meta.previousPageUrl"
         @click="changePage(meta.currentPage - 1)"
-        class="p-1.5 border border-gray-200 rounded-md text-gray-400 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="p-1.5 border border-gray-200 dark:border-slate-700 rounded-md text-gray-400 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <ChevronLeft :size="16" />
       </button>
 
       <!-- Numéros de page -->
       <template v-for="(p, index) in pages" :key="index">
-        <span v-if="p === '...'" class="px-1 text-gray-400">...</span>
+        <span v-if="p === '...'" class="px-1 text-gray-400 dark:text-slate-400">...</span>
         <button
           v-else
           @click="changePage(p as number)"
@@ -28,7 +28,7 @@
             'w-8 h-8 rounded-md text-xs font-bold',
             p === meta.currentPage
               ? 'bg-purple-500 text-white'
-              : 'text-gray-600 hover:bg-gray-100',
+              : 'text-gray-600 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-800',
           ]"
         >
           {{ p }}
@@ -39,7 +39,7 @@
       <button
         :disabled="!meta.nextPageUrl"
         @click="changePage(meta.currentPage + 1)"
-        class="p-1.5 border border-gray-200 rounded-md text-gray-400 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="p-1.5 border border-gray-200 dark:border-slate-700 rounded-md text-gray-400 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <ChevronRight :size="16" />
       </button>

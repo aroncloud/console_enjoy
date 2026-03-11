@@ -1,11 +1,11 @@
 <template>
   <div
-    class="bg-white rounded-2xl p-5 flex items-center justify-between  border border-gray-100"
+    class="bg-white dark:bg-slate-900 rounded-2xl p-5 flex items-center justify-between border border-gray-100 dark:border-slate-800"
   >
     <!-- Infos -->
     <div class="flex flex-col gap-1">
-      <p class="text-sm text-gray-500 font-medium">{{ title }}</p>
-      <p class="text-3xl font-bold text-gray-800">{{ value }}</p>
+      <p class="text-sm text-gray-500 dark:text-slate-400 font-medium">{{ title }}</p>
+      <p class="text-3xl font-bold text-gray-800 dark:text-white">{{ value }}</p>
 
       <!-- Tendance -->
       <div class="flex items-center gap-1 mt-1" v-if="trend">

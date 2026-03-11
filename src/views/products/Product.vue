@@ -218,13 +218,13 @@ const confirmDelete = async () => {
 </script>
 
 <template>
-  <div class="p-4 md:p-8 bg-slate-50 min-h-screen space-y-6">
+  <div class="p-4 md:p-8 bg-slate-50 dark:bg-slate-950 min-h-screen space-y-6">
 
     <!-- ── Header ── -->
     <div class="flex flex-col md:flex-row justify-between md:items-start gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-slate-900">Catalogue Produits</h1>
-        <p class="text-slate-500 text-sm mt-1">Gérez les produits disponibles à la souscription.</p>
+        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Catalogue Produits</h1>
+        <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Gérez les produits disponibles à la souscription.</p>
       </div>
       <ButtonComponent variant="primary" :iconLeft="Plus" @click="openCreate">
         Nouveau Produit
@@ -233,21 +233,21 @@ const confirmDelete = async () => {
 
     <!-- ── KPIs ── -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <div class="bg-white rounded-xl border border-slate-200 p-5">
+      <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
         <div class="flex items-center justify-between mb-2">
-          <div class="p-2 bg-slate-100 rounded-lg"><Package :size="18" class="text-slate-600" /></div>
-          <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-full">Total</span>
+          <div class="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg"><Package :size="18" class="text-slate-600 dark:text-slate-300" /></div>
+          <span class="text-[10px] font-bold text-slate-500 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-full">Total</span>
         </div>
-        <p class="text-xs text-slate-500 font-medium">Produits</p>
-        <p class="text-2xl font-black mt-1 text-slate-900">{{ meta?.total ?? 0 }}</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Produits</p>
+        <p class="text-2xl font-black mt-1 text-slate-900 dark:text-white">{{ meta?.total ?? 0 }}</p>
       </div>
-      <div class="bg-white rounded-xl border border-slate-200 p-5">
+      <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
         <div class="flex items-center justify-between mb-2">
-          <div class="p-2 bg-emerald-100 rounded-lg"><Check :size="18" class="text-emerald-600" /></div>
-          <span class="text-[10px] font-bold text-emerald-600 bg-emerald-100 px-2 py-1 rounded-full">Actifs</span>
+          <div class="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg"><Check :size="18" class="text-emerald-600 dark:text-emerald-400" /></div>
+          <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/30 px-2 py-1 rounded-full">Actifs</span>
         </div>
-        <p class="text-xs text-slate-500 font-medium">Produits actifs</p>
-        <p class="text-2xl font-black mt-1 text-slate-900">{{ countActive }}</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Produits actifs</p>
+        <p class="text-2xl font-black mt-1 text-slate-900 dark:text-white">{{ countActive }}</p>
       </div>
       <!-- <div class="bg-white rounded-xl border border-slate-200 p-5">
         <div class="flex items-center justify-between mb-2">
@@ -262,16 +262,16 @@ const confirmDelete = async () => {
     <!-- ── Filtres + Recherche ── -->
     <div class="flex flex-col sm:flex-row gap-3">
       <div class="flex-1 max-w-sm relative">
-        <Search :size="15" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
+        <Search :size="15" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 z-10" />
         <Input v-model="searchQuery" placeholder="Rechercher un produit..." customClass="pl-9" />
       </div>
-      <div class="flex gap-1 bg-slate-100 rounded-lg p-1">
+      <div class="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
         <button
           v-for="[key, label] in [['all', 'Tous'], ['active', 'Actifs'], ['inactive', 'Inactifs']]"
           :key="key"
           @click="filterActive = key as any"
           class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer"
-          :class="filterActive === key ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
+          :class="filterActive === key ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-300 hover:text-slate-700 dark:hover:text-white'"
         >
           {{ label }}
         </button>
@@ -279,7 +279,7 @@ const confirmDelete = async () => {
     </div>
 
     <!-- ── Table ── -->
-    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
       <BaseTable :columns="columns" :data="products" :loading="loading" :show-search="false" :meta="meta" @page-change="handlePageChange">
 
         <template #cell-name="{ row }">
@@ -291,22 +291,29 @@ const confirmDelete = async () => {
               <component :is="getIconComponent(row.slug)" :size="18" :style="{ color: getColor(row.slug) }" />
             </div>
             <div class="min-w-0">
-              <p class="font-bold text-sm text-slate-900 truncate">{{ row.name }}</p>
-              <p class="text-xs text-slate-400 truncate mt-0.5">{{ row.description ?? '—' }}</p>
+              <p class="font-bold text-sm text-slate-900 dark:text-white truncate">{{ row.name }}</p>
+              <p class="text-xs text-slate-400 dark:text-slate-400 truncate mt-0.5">{{ row.description ?? '—' }}</p>
             </div>
           </div>
         </template>
 
         <template #cell-slug="{ row }">
-          <span class="font-mono text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded">{{ row.slug }}</span>
+          <span class="font-mono text-xs text-slate-500 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">{{ row.slug }}</span>
         </template>
 
         <template #cell-priceMonthly="{ row }">
-          <span class="font-bold text-sm">{{ formatCurrency(row.priceMonthly) }}</span>
+          <span class="font-bold text-sm text-slate-900 dark:text-white">{{ formatCurrency(row.priceMonthly) }}</span>
         </template>
 
         <template #cell-isActive="{ row }">
-          <span :class="['text-xs font-semibold px-2 py-1 rounded-full', row.isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-500']">
+          <span
+            :class="[
+              'text-xs font-semibold px-2 py-1 rounded-full',
+              row.isActive
+                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200'
+                : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-300',
+            ]"
+          >
             {{ row.isActive ? 'Actif' : 'Inactif' }}
           </span>
         </template>
@@ -325,8 +332,8 @@ const confirmDelete = async () => {
     <BaseModal v-model="showForm">
       <template #header>
         <div>
-          <h3 class="font-black text-slate-900">{{ editingId ? 'Modifier le produit' : 'Nouveau produit' }}</h3>
-          <p class="text-xs text-slate-400 mt-0.5">
+          <h3 class="font-black text-slate-900 dark:text-white">{{ editingId ? 'Modifier le produit' : 'Nouveau produit' }}</h3>
+          <p class="text-xs text-slate-400 dark:text-slate-400 mt-0.5">
             {{ editingId ? 'Mettez à jour les informations du produit' : 'Ajoutez un nouveau produit au catalogue' }}
           </p>
         </div>
@@ -349,10 +356,10 @@ const confirmDelete = async () => {
           />
         </div>
 
-        <div class="flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-slate-50">
+        <div class="flex items-center justify-between p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
           <div>
-            <p class="text-sm font-semibold text-slate-700">Produit actif</p>
-            <p class="text-xs text-slate-400">Visible et souscriptible par les hôtels</p>
+            <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">Produit actif</p>
+            <p class="text-xs text-slate-400 dark:text-slate-400">Visible et souscriptible par les hôtels</p>
           </div>
           <Toggle v-model="form.isActive" />
         </div>

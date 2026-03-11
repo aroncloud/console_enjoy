@@ -8,20 +8,20 @@
           <div class="p-2 bg-emerald-100 text-emerald-600 rounded-lg">
             <Banknote :size="20" />
           </div>
-          <span class="text-[10px] font-bold text-emerald-600 bg-emerald-100 px-2 py-1 rounded-full">+12.5%</span>
+          <!-- <span class="text-[10px] font-bold text-emerald-600 bg-emerald-100 px-2 py-1 rounded-full">+12.5%</span> -->
         </div>
         <p class="text-slate-500 text-xs font-medium">Revenu Total</p>
-        <h3 class="text-2xl font-black mt-1">145 000 €</h3>
+        <h3 class="text-2xl font-black mt-1">{{ formatCurrency(totalRevenue) }}</h3>
       </div>
       <div class="p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 ">
         <div class="flex items-center justify-between mb-3">
           <div class="p-2 bg-orange-100 text-orange-500 rounded-lg">
             <Clock :size="20" />
           </div>
-          <span class="text-[10px] font-bold text-orange-500 bg-orange-100 px-2 py-1 rounded-full">{{ payments.length }} factures</span>
+          <span class="text-[10px] font-bold text-orange-500 bg-orange-100 px-2 py-1 rounded-full">{{ pendingCount }} facture{{ pendingCount>1 ? 's' : '' }}</span>
         </div>
         <p class="text-slate-500 text-xs font-medium">Factures en attente</p>
-        <h3 class="text-2xl font-black mt-1">5 420 €</h3>
+        <h3 class="text-2xl font-black mt-1">{{ formatCurrency(pendingAmount) }}</h3>
       </div>
       <div class="p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 ">
         <div class="flex items-center justify-between mb-3">
@@ -31,7 +31,7 @@
           <span class="text-[10px] font-bold text-red-500 bg-red-100 px-2 py-1 rounded-full">Urgent</span>
         </div>
         <p class="text-slate-500 text-xs font-medium">Paiements en retard</p>
-        <h3 class="text-2xl font-black mt-1">3 200 €</h3>
+        <h3 class="text-2xl font-black mt-1">{{ formatCurrency(overdueAmount) }}</h3>
       </div>
     </div>
 
@@ -82,10 +82,10 @@
 
       <!-- Table des factures -->
       <div class="lg:col-span-2  dark:border-slate-800  overflow-hidden flex flex-col">
-        <BaseTable :columns="columns" :data="paginatedPayments" :searchable="true" :sortable="false" :title="'Dernières Factures'" :showSearch="true">
+        <BaseTable :columns="columns" :data="invoiceData" :searchable="true" :sortable="false" :title="'Factures'" :showSearch="true" :loading="loading" :meta="metaData" @page-change="handlePage">
           <template #cell-amount="{ value }">
-            <span class="font-bold">
-              {{ Number(value).toLocaleString('fr-FR', { minimumFractionDigits: 2 }) }} FCFA
+            <span class="font-bold text-green-500">
+              {{ formatCurrency(Number(value) )}}
             </span>
           </template>
 
@@ -93,34 +93,55 @@
             <span
               class="px-2 py-1 text-[10px] font-bold rounded-full uppercase"
               :class="{
-                'bg-emerald-100 text-emerald-600': value === 'Payé',
-                'bg-purple-100 text-purple-600':   value === 'En attente',
-                'bg-red-100 text-red-600':          value === 'En retard',
-                'bg-slate-200 text-slate-500':      value === 'Annulé',
+                'bg-emerald-100 text-emerald-600': value === 'paid',
+                'bg-purple-100 text-purple-600':   value === 'pending',
+                'bg-red-100 text-red-600':          value === 'due',
+                'bg-slate-200 text-slate-500':      value === 'cancelled',
               }"
             >
               {{ value }}
             </span>
           </template>
 
+          <template #cell-description="{value}" >
+            <span class="text-sm text-gray-500 font-light">{{ value }}</span>
+          </template>
+
+           <template #cell-hotel="{value}" >
+            <span class="text-sm text-gray-900 font-semibold capitalize">{{ value }}</span>
+          </template>
+
           <template #cell-actions="{ row }">
             <div class="flex justify-end gap-2">
               <button
-                class="p-1.5 text-slate-400 hover:text-purple-500 transition-colors"
-                title="Télécharger PDF"
+                v-if="row.status === 'pending' || row.status === 'failed'"
+                @click="handleMarkAsPaid(row)"
+                class="p-1.5 text-emerald-400 hover:text-emerald-600 transition-colors cursor-pointer"
+                title="Marquer comme payé"
               >
-                <Download :size="16" />
+                <CheckCircle :size="16" />
               </button>
+
+              <span
+                v-else-if="row.status === 'paid'"
+                class="p-1.5 text-emerald-300 cursor-default"
+                title="Déjà payé"
+              >
+                <CheckCircle :size="16" />
+              </span>
+
+              <!-- Relance / rappel -->
               <button
-                class="p-1.5 transition-colors"
-                :class="row.status === 'En retard'
+                class="p-1.5 transition-colors cursor-pointer"
+                :class="row.status === 'failed'
                   ? 'text-red-400 hover:text-red-600'
                   : 'text-slate-400 hover:text-purple-500'"
-                :title="row.status === 'En retard' ? 'Envoyer relance' : 'Envoyer rappel'"
+                :title="row.status === 'failed' ? 'Envoyer relance' : 'Envoyer rappel'"
               >
-                <Megaphone v-if="row.status === 'En retard'" :size="16" />
+                <Megaphone v-if="row.status === 'failed'" :size="16" />
                 <Mail v-else :size="16" />
               </button>
+
             </div>
           </template>
         </BaseTable>
@@ -215,10 +236,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed,onMounted } from 'vue'
 import {
   Banknote, Clock, TriangleAlert, ChartLine, SquarePlus,
-  Download, Mail, Megaphone,
+  Mail, Megaphone,
   Gift, PlusCircle, CheckCircle
 } from 'lucide-vue-next'
 
@@ -226,52 +247,37 @@ import {
 import BaseTable      from '../../components/Table/BaseTable.vue'
 import BaseInput      from '../../components/FormElements/Input.vue'
 import BaseSelect     from '../../components/FormElements/Select.vue'
+import { invoiceService } from '../../servicesAPI/invoiceService'
+import { formatCurrency } from '../../components/Utilities/function'
 
-// ── Colonnes table ────────────────────────────────────────────────────────────
+
+// ── Colonnes table ─
 const columns = [
-  { key: 'id',      label: 'ID Facture' },
-  { key: 'date',    label: 'Date' },
-  { key: 'label',   label: 'Établissement' },
+  { key: 'invoiceNumber',      label: 'Numero Facture' },
+  { key: 'billingDate',    label: 'Date' },
+  { key: 'hotel',   label: 'Établissement' },
+  { key:'description' , label:'Description'},
   { key: 'amount',  label: 'Montant' },
   { key: 'status',  label: 'Statut' },
   { key: 'actions', label: '', thClass: 'text-right' },
 ]
 
-// ── Données ───────────────────────────────────────────────────────────────────
-const payments = ref([
-  { id: '#INV-2024-001', date: '12 Mai 2024', label: 'Royal Palm Hotel',    amount: 1240,   status: 'Payé'       },
-  { id: '#INV-2024-002', date: '10 Mai 2024', label: 'Ocean Breeze Resort', amount: 890.50, status: 'En attente' },
-  { id: '#INV-2024-003', date: '05 Mai 2024', label: 'Mountain View Lodge', amount: 2100,   status: 'En retard'  },
-  { id: '#INV-2024-004', date: '02 Mai 2024', label: 'Urban Stay Berlin',   amount: 450,    status: 'Annulé'     },
-  { id: '#INV-2024-005', date: '28 Avr 2024', label: 'Le Marais Boutique',  amount: 780,    status: 'Payé'       },
-  { id: '#INV-2024-006', date: '25 Avr 2024', label: 'Grand Hotel Paris',   amount: 3200,   status: 'En retard'  },
-])
 
-// ── Pagination ────────────────────────────────────────────────────────────────
 const searchQuery = ref('')
-const currentPage = ref(1)
-const pageSize    = 4
+const metaData = ref<any>()
+const invoiceData = ref<any[]>([])
+const loading = ref(false)
+const statsData = ref<any>(null)
 
-const filteredPayments = computed(() =>
-  payments.value.filter(p =>
-    p.label.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    p.id.toLowerCase().includes(searchQuery.value.toLowerCase())
-  )
-)
 
-const paginatedPayments = computed(() => {
-  const start = (currentPage.value - 1) * pageSize
-  return filteredPayments.value.slice(start, start + pageSize)
-})
-
-// ── Quotas ────────────────────────────────────────────────────────────────────
+// ── Quotas ───────────
 const quotaItems = ref([
   { name: 'Grand Hotel Paris', detail: '+10 chambres hors quota',    overLimit: true  },
   { name: 'City Hub Lyon',     detail: '+2 terminaux POS',           overLimit: true  },
   { name: 'Boutique Lodge',    detail: 'Utilisation API: +15k appels', overLimit: false },
 ])
 
-// ── Geste commercial ──────────────────────────────────────────────────────────
+// ── Geste commercial ───────
 const selectedModule = ref<string | number>('PMS')
 const moduleOptions = [
   { label: 'PMS',                value: 'PMS'                },
@@ -284,7 +290,7 @@ const grant = () => {
   alert(`1 mois gratuit appliqué sur ${selectedModule.value}`)
 }
 
-// ── Calculateur quotas ────────────────────────────────────────────────────────
+// ── Calculateur quotas ───────
 const rooms      = ref<number>(50)
 const pos        = ref<number>(2)
 const result     = ref('')
@@ -297,6 +303,57 @@ const calc = () => {
     ? `Dépassement détecté : ${extra} € à facturer.`
     : 'Aucun dépassement — quotas respectés.'
 }
+
+
+
+
+
+const fetchData = async ( currentPage=1) => {
+  loading.value = true
+  try {
+    const response  = await invoiceService.get({
+      page: currentPage,
+      search: searchQuery.value,
+    })
+    invoiceData.value = response.invoices?.data || []
+    metaData.value = response.invoices?.meta || []
+    statsData.value = response?.stats || null
+    console.log('response',response)
+  } catch(e:any){
+    console.log('error',e)
+  }
+  finally {
+    loading.value = false
+  }
+}
+
+const handlePage = (newPage:number)=>{
+  fetchData(newPage)
+}
+
+// Stats
+const totalRevenue  = computed(() => statsData.value?.totalRevenue  ?? 0)
+const pendingAmount = computed(() => statsData.value?.pendingAmount ?? 0)
+const pendingCount  = computed(() => statsData.value?.pendingCount  ?? 0)
+const overdueAmount = computed(() => statsData.value?.overdueAmount ?? 0)
+
+const handleMarkAsPaid = async () => {
+  try {
+    // await invoiceService.markAsPaid(row.id)
+    // await fetchData()
+  } catch (e) {
+    console.error('Erreur paiement', e)
+  }
+}
+onMounted(fetchData)
+
+
+
+
+
+
+
+
 </script>
 
 <style scoped>

@@ -45,9 +45,9 @@
           <ChartLine :size="16" class="text-slate-400" />
         </div>
 
-        <div class="p-5 space-y-3">
-          <div v-if="loadingQuotas" class="animate-pulse space-y-3 flex items-start">
-            <div v-for="i in 3" :key="i" class="h-20 bg-gray-100 rounded-lg" />
+        <div class="p-5 space-y-3 max-h-100 overflow-y-auto scrollbar">
+          <div v-if="loadingQuotas" class="space-y-3">
+            <div v-for="i in 3" :key="i" class="h-20 w-full bg-gray-100 rounded-lg animate-pulse" />
           </div>
 
           <div v-else-if="quotaItems.length === 0" class="text-center py-6 text-sm text-slate-400">
@@ -73,7 +73,7 @@
             </div>
             <button
               @click="openSurplusModal(quota)"
-              class="w-full py-2 text-xs font-bold rounded-lg transition-all bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-purple-500 hover:text-white"
+              class="w-full py-2 text-xs font-bold rounded-lg transition-all bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-purple-500 hover:text-white cursor-pointer"
             >
               Facturer surplus
             </button>
@@ -104,6 +104,9 @@
             </span>
           </template>
 
+           <template #cell-billingDate="{value}" >
+            <span class="text-sm text-gray-600 dark:text-white whitespace-nowrap">{{ value }}</span>
+          </template>
           <template #cell-description="{value}" >
             <span class="text-sm text-gray-500 dark:text-slate-400 font-light">{{ value }}</span>
           </template>
@@ -184,14 +187,11 @@
           <button
             :disabled="!selectedSubscriptionId || loadingExtend"
             @click="handleExtend"
-            class="w-full py-2.5 bg-purple-500 text-white font-bold rounded-lg text-sm hover:bg-purple-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="w-full py-2.5 bg-purple-500 text-white font-bold rounded-lg text-sm hover:bg-purple-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             <PlusCircle :size="16" />
             {{ loadingExtend ? 'Application...' : 'Appliquer le geste commercial' }}
           </button>
-          <p v-if="extendSuccess" class="text-xs text-emerald-600 font-medium text-center">
-            ✓ +1 mois appliqué avec succès
-          </p>
         </div>
       </div>
 
@@ -221,7 +221,7 @@
             :min="0"
           />
           <button
-            class="w-full py-2.5 bg-purple-500 text-white font-bold rounded-lg text-sm hover:bg-purple-600 transition-all"
+            class="w-full py-2.5 bg-purple-500 text-white font-bold rounded-lg text-sm hover:bg-purple-600 transition-all cursor-pointer"
             @click="calc"
             :disabled="!calcSubscriptionId"
           >
@@ -245,7 +245,7 @@
                 v-if="hasOverage"
                 @click="handleFactureSurplus"
                 :disabled="loadingFacture"
-                class="w-full py-2 bg-orange-500 text-white font-bold rounded-lg text-xs hover:bg-orange-600 transition-all disabled:opacity-50"
+                class="w-full py-2 bg-orange-500 text-white font-bold rounded-lg text-xs hover:bg-orange-600 transition-all disabled:opacity-50 cursor-pointer"
               >
                 {{ loadingFacture ? 'Génération...' : 'Générer la facture de surplus' }}
               </button>
@@ -260,13 +260,14 @@
 
 <script setup lang="ts">
 import { ref, computed,onMounted } from 'vue'
+import { useToastStore } from '../../composables/toast'
 import {
   Banknote, Clock, TriangleAlert, ChartLine,
   Mail, Megaphone,
   Gift, PlusCircle, CheckCircle
 } from 'lucide-vue-next'
 
-// Ajustez ces chemins selon votre structure de projet
+import { subscriptionService } from '../../servicesAPI/subscriptionService'
 import BaseTable      from '../../components/Table/BaseTable.vue'
 import BaseInput      from '../../components/FormElements/Input.vue'
 import BaseSelect     from '../../components/FormElements/Select.vue'
@@ -285,26 +286,33 @@ const columns = [
   { key: 'actions', label: '', thClass: 'text-right' },
 ]
 
-
+const toastore = useToastStore()
 const searchQuery = ref('')
 const metaData = ref<any>()
 const invoiceData = ref<any[]>([])
 const loading = ref(false)
 const statsData = ref<any>(null)
+// ── Calculateur ──────────
+const calcSubscriptionId = ref<number | null>(null)
+const usedQuantity = ref<number>(0)
+const result = ref('')
+const hasOverage = ref(false)
+const surplusAmount = ref(0)
+const loadingFacture = ref(false)
 
-
-// ── Quotas ───────────
-
-
-// ── Geste commercial ───────
-const selectedModule = ref<string | number>('PMS')
-
-
+// ── Geste commercial ──────────
+const selectedHotelId = ref<number | null>(null)
+const selectedSubscriptionId = ref<number | null>(null)
+const subscriptionOptions = ref<{ label: string; value: number }[]>([])
+const loadingExtend = ref(false)
+// ── Quotas ───────────────────
+const quotaItems = ref<any[]>([])
+const loadingQuotas = ref(false)
 
 
 const openSurplusModal = (quota: any) => {
   calcSubscriptionId.value = quota.id
-  usedQuantity.value = quota.limitCount // pré-rempli avec la limite
+  usedQuantity.value = quota.limitCount 
   result.value = ''
   hasOverage.value = false
 
@@ -325,7 +333,10 @@ const fetchData = async ( currentPage=1) => {
     statsData.value = response?.stats || null
     console.log('response',response)
   } catch(e:any){
-    console.log('error',e)
+    console.error('error',e)
+    toastore.show({
+      title : 'Erreur',message:'Erreur lors du chargement des données',type:'error'
+    })
   }
   finally {
     loading.value = false
@@ -352,27 +363,23 @@ const handleMarkAsPaid = async (row: any) => {
   }
 }
 
-import { subscriptionService } from '../../servicesAPI/subscriptionService'
 
-// ── Quotas ───────────────────
-const quotaItems = ref<any[]>([])
-const loadingQuotas = ref(false)
+
+
 
 const fetchQuotas = async () => {
   loadingQuotas.value = true
   try {
     quotaItems.value = await invoiceService.getQuotas()
+    console.log('quota',quotaItems.value)
+  }catch(e:any){
+    console.error(e)
   } finally {
     loadingQuotas.value = false
   }
 }
 
-// ── Geste commercial ──────────
-const selectedHotelId = ref<number | null>(null)
-const selectedSubscriptionId = ref<number | null>(null)
-const subscriptionOptions = ref<{ label: string; value: number }[]>([])
-const loadingExtend = ref(false)
-const extendSuccess = ref(false)
+
 
 const hotelOptions = computed(() =>
   [...new Map(quotaItems.value.map(q => [q.hotelId, { label: q.hotel, value: q.hotelId }])).values()]
@@ -388,23 +395,22 @@ const loadHotelSubscriptions = () => {
 const handleExtend = async () => {
   if (!selectedSubscriptionId.value) return
   loadingExtend.value = true
-  extendSuccess.value = false
   try {
     await subscriptionService.extend(selectedSubscriptionId.value)
-    extendSuccess.value = true
-    setTimeout(() => extendSuccess.value = false, 3000)
+    toastore.show({
+      title:'Mois Gratuit',message:'✓ +1 mois appliqué avec succès',type:'success'
+    })
+  }catch(e:any){
+    console.error(e)
+    toastore.show({
+      title:'Mois Gratuit',message:'Echec de l\'abonnement',type:'error'
+    })
   } finally {
     loadingExtend.value = false
   }
 }
 
-// ── Calculateur ───────────────────
-const calcSubscriptionId = ref<number | null>(null)
-const usedQuantity = ref<number>(0)
-const result = ref('')
-const hasOverage = ref(false)
-const surplusAmount = ref(0)
-const loadingFacture = ref(false)
+
 
 const calc = () => {
   const sub = quotaItems.value.find(q => q.id === calcSubscriptionId.value)
@@ -415,7 +421,7 @@ const calc = () => {
   surplusAmount.value = Math.round(extra * pricePerUnit)
   hasOverage.value = extra > 0
   result.value = extra
-    ? `Dépassement de ${extra} unités — surplus à facturer : ${formatCurrency(surplusAmount.value)}`
+    ? `Dépassement de ${extra}  — surplus à facturer : ${formatCurrency(surplusAmount.value)}`
     : 'Aucun dépassement — quota respecté.'
 }
 
@@ -428,11 +434,18 @@ const handleFactureSurplus = async () => {
       subscriptionId: sub.id,
       quantity: usedQuantity.value - sub.limitCount,
       amount: surplusAmount.value,
-      description: `Surplus de ${usedQuantity.value - sub.limitCount} ${sub.moduleName} (limite: ${sub.limitCount})`
+      description: `Surplus de ${usedQuantity.value - sub.limitCount}- ${sub.module} (limite: ${sub.limitCount})`
     })
-    result.value = '✓ Facture de surplus générée avec succès'
+    toastore.show({
+      title:'Facture',message:'Facture de surplus générée avec succès',type:'success'
+    })
     hasOverage.value = false
     await fetchData()
+  }catch(e:any){
+    console.error(e)
+    toastore.show({
+      title : 'Erreur',message:'Erreur lors de la génération',type:'error'
+    })
   } finally {
     loadingFacture.value = false
   }
@@ -442,14 +455,6 @@ onMounted(() => {
   fetchData()
   fetchQuotas()
 })
-
-
-
-
-
-
-
-
 
 </script>
 
@@ -462,5 +467,37 @@ onMounted(() => {
 .fade-leave-to {
   opacity: 0;
   transform: translateY(-4px);
+}
+
+/* Custom thin scrollbar */
+.scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e0 transparent;
+  scrollbar-gutter: stable;
+}
+
+.scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+  background-color: #cbd5e0;
+  border-radius: 3px;
+}
+
+.scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
+
+.dark .scrollbar::-webkit-scrollbar-thumb {
+  background-color: #4b5563;
+}
+
+.dark .scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #6b7280;
 }
 </style>

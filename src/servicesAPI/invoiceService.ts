@@ -52,6 +52,6 @@ export const invoiceService = {
   getQuotas: () =>
     api.get<any[]>('/console/billing/quotas').then((r) => r.data),
 
-  factureSurplus: (hotelId: number, data: { subscriptionId: number; quantity: number; amount: number }) =>
+  factureSurplus: (hotelId: number, data: { subscriptionId: number; quantity: number; amount: number;description:string }) =>
     api.post(`/console/hotels/${hotelId}/invoices`, data).then((r) => r.data),
 }

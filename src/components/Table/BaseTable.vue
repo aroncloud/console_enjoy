@@ -43,7 +43,7 @@
     <div class="flex-1 min-h-0 overflow-auto">
 
       <!-- Desktop -->
-      <div class="hidden md:block overflow-x-auto">
+      <div class="hidden md:block overflow-x-auto scrollbar">
         <table class="w-full text-sm">
           <thead>
             <tr class="bg-gray-50 dark:bg-slate-800">
@@ -294,3 +294,36 @@ const paginatedData = computed(() =>
   filteredData.value.slice((currentPage.value - 1) * pageSize.value, currentPage.value * pageSize.value)
 )
 </script>
+<style scoped>
+/* Custom thin scrollbar */
+.scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e0 transparent;
+  scrollbar-gutter: stable;
+}
+
+.scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+  background-color: #cbd5e0;
+  border-radius: 3px;
+}
+
+.scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
+
+.dark .scrollbar::-webkit-scrollbar-thumb {
+  background-color: #4b5563;
+}
+
+.dark .scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #6b7280;
+}
+</style>

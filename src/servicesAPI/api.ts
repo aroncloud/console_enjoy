@@ -2,7 +2,7 @@ import axios from 'axios'
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
-  withCredentials: true, 
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -24,19 +24,28 @@ const processQueue = (error: any, token: string | null = null) => {
   failedQueue = []
 }
 
+// ── URLs à ne jamais intercepter
+const PUBLIC_URLS = [
+  '/refresh_token_console',
+  '/authLoginConsole',
+  '/authLogin',
+  '/auth/signin',
+]
+
+const isPublicUrl = (url?: string) => PUBLIC_URLS.some((u) => url?.includes(u))
+
 // ── Intercepteur response
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config
 
-    // Évite une boucle infinie si le refresh lui-même échoue
-    if (originalRequest.url?.includes('/api/refresh-token')) {
+    // Ne jamais intercepter les routes publiques (login, refresh)
+    if (isPublicUrl(originalRequest.url)) {
       return Promise.reject(error)
     }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
-      // Si un refresh est déjà en cours → mettre en file d'attente
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject })
@@ -50,16 +59,13 @@ api.interceptors.response.use(
       isRefreshing = true
 
       try {
-        // Appel refresh — le cookie httpOnly est envoyé automatiquement
-        const { data } = await api.post('/api/refresh-token')
+        const { data } = await api.post('/refresh_token_console')
         const newToken = data.data.access_token.token
 
-        // Mise à jour du token partout
         localStorage.setItem('token', newToken)
         api.defaults.headers.common.Authorization = `Bearer ${newToken}`
         originalRequest.headers.Authorization = `Bearer ${newToken}`
 
-        // Mise à jour du store
         const { useAuthStore } = await import('../composables/useAuth')
         const authStore = useAuthStore()
         authStore.updateToken(newToken, data.data.access_token)
@@ -68,15 +74,17 @@ api.interceptors.response.use(
         }
 
         processQueue(null, newToken)
-        return api(originalRequest) // rejoue la requête originale
+        return api(originalRequest)
       } catch (refreshError) {
         processQueue(refreshError, null)
 
-        // Refresh échoué → déconnexion forcée
         localStorage.removeItem('token')
         const { useAuthStore } = await import('../composables/useAuth')
         useAuthStore().logout()
-        window.location.href = '/login'
+
+        // ── Navigation SPA sans rechargement de page
+        const { default: router } = await import('../router')
+        router.push('/login')
 
         return Promise.reject(refreshError)
       } finally {

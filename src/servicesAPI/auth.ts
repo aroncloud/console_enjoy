@@ -1,5 +1,6 @@
 import api from './api'
 import { useAuthStore } from '../composables/useAuth'
+import router from '../router';
 
 // ── Connexion
 export function auth(credentials: { email: string; password: string; keepLoggedIn?: boolean }) {
@@ -34,4 +35,32 @@ export function resendEmailVerification(email: string) {
 
 export function requestPasswordReset(payload: { email: string; hotelId?: number | string }) {
   return api.post('/auth/forgot-password', payload)
+}
+
+
+
+export async function logout(): Promise<void> {
+  const authStore = useAuthStore()
+  const currentToken = authStore.token
+
+  authStore.logout()
+  localStorage.removeItem('token')
+
+  if (currentToken) {
+    api.post(
+      '/authLogout',
+      {},
+      {
+        headers: { Authorization: `Bearer ${currentToken}` },
+        withCredentials: true,
+      }
+    ).catch((error) => {
+      console.warn('Logout API échoué:', error?.message)
+    })
+  }
+}
+
+export async function signOut(): Promise<void> {
+  await logout()
+  router.push('/login')  
 }

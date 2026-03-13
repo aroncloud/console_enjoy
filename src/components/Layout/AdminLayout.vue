@@ -10,6 +10,7 @@
 
     <!-- sidebar (hidden on small, slide-in/out) -->
     <Sidebar
+      @close="isSidebarOpen = false" 
       :class="[
         'fixed inset-y-0 left-0 w-60 bg-white dark:bg-slate-900 border-r border-gray-100 dark:border-slate-800 flex flex-col transform transition-transform duration-200 z-50',
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full',

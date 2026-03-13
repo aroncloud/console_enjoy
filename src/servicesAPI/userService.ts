@@ -8,6 +8,8 @@ export interface Role {
 export interface User {
   id: number
   fullName?: string
+  firstName?: string
+  lastName?: string
   username?: string
   email: string
   isActive?: boolean
@@ -29,6 +31,8 @@ export interface PaginatedResponse<T> {
 
 export interface CreateUserPayload {
   fullName?: string
+  firstName?: string
+  lastName?: string
   username?: string
   email: string
   roleId?: number
@@ -47,5 +51,10 @@ export const userService = {
 
   update: (id: number, payload: Partial<CreateUserPayload>) =>
     api.put<User>(`/console/users/${id}`, payload).then((r) => r.data),
+
+  getRoleAll: async (): Promise<Role[]> => {
+    const res = await api.get('console/roles')
+    return res.data
+  }
 }
 

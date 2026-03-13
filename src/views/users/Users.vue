@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch } from 'vue'
-import { Plus, Edit, KeyRound, Eye, Users as UsersIcon } from 'lucide-vue-next'
+import { Plus, Edit, KeyRound, Eye, Users as UsersIcon ,Search} from 'lucide-vue-next'
 
 import BaseTable, { type Column } from '../../components/Table/BaseTable.vue'
 import BaseModal from '../../components/Modal/BaseModal.vue'
@@ -35,12 +35,13 @@ const columns: Column[] = [
 
 const showForm = ref(false)
 const editingId = ref<number | null>(null)
-
+const loadingRole = ref(false)
 const showProfile = ref(false)
 const viewingUser = ref<User | null>(null)
 
 const form = reactive({
-  fullName: '',
+  firstName:'',
+  lastName: '',
   username: '',
   email: '',
   roleId: '' as '' | number,
@@ -48,16 +49,18 @@ const form = reactive({
 })
 
 const formErrors = reactive({
-  fullName: '',
+  firstName:'',
+  lastName: '',
   email: '',
 })
 
-const roleOptions = [
-  { label: 'Rôle (auto)', value: '' },
-  { label: 'Super Admin', value: 1 },
-  { label: 'Admin', value: 2 },
-  { label: 'Manager', value: 3 },
-]
+// const roleOptions = [
+//   { label: 'Rôle (auto)', value: '' },
+//   { label: 'Super Admin', value: 1 },
+//   { label: 'Admin', value: 2 },
+//   { label: 'Manager', value: 3 },
+// ]
+const roleOptions = ref<any[]>([])
 
 const initials = (name: string) =>
   name
@@ -69,6 +72,8 @@ const initials = (name: string) =>
     .slice(0, 2) || 'U'
 
 type UserLike = {
+  firstName?:string,
+  lastName?: string,
   fullName?: string
   username?: string
   email?: string
@@ -101,7 +106,27 @@ const fetchUsers = async (targetPage = 1) => {
   }
 }
 
-onMounted(() => fetchUsers(1))
+const fetchRole = async()=>{
+  
+  try {
+    loadingRole.value = true
+    const roles = await userService.getRoleAll()
+    console.log('roles',roles)
+    roleOptions.value = [
+      { label: 'Rôle (auto)', value: '' },
+      ...roles.map(r => ({ label: r.roleName, value: r.id }))
+    ]
+  } catch (e) {
+    console.error(e)
+  }finally{
+    loadingRole.value = false
+  }
+}
+
+onMounted(() => {
+  fetchRole()
+  fetchUsers(1)
+})
 
 const handlePageChange = (newPage: number) => {
   page.value = newPage
@@ -114,12 +139,14 @@ watch([searchQuery, filterActive], () => {
 })
 
 const resetForm = () => {
-  form.fullName = ''
+  form.firstName = ''
+  form.lastName = ''
   form.username = ''
   form.email = ''
   form.roleId = ''
   form.isActive = true
-  formErrors.fullName = ''
+  formErrors.firstName = ''
+  formErrors.lastName = ''
   formErrors.email = ''
   editingId.value = null
 }
@@ -133,7 +160,8 @@ const openEdit = (row: any) => {
   const u = row as User
   resetForm()
   editingId.value = u.id
-  form.fullName = u.fullName ?? ''
+  form.firstName = u.firstName ?? ''
+  form.lastName = u.lastName ?? ''
   form.username = u.username ?? ''
   form.email = u.email ?? ''
   form.roleId = u.roleId ?? ''
@@ -142,9 +170,10 @@ const openEdit = (row: any) => {
 }
 
 const validateForm = () => {
-  formErrors.fullName = form.fullName.trim() ? '' : 'Le nom est obligatoire'
-  formErrors.email = form.email.trim() ? '' : "L'email est obligatoire"
-  return !formErrors.fullName && !formErrors.email
+  formErrors.firstName = form.firstName.trim() ? '' : 'Le prénom est obligatoire'
+  formErrors.lastName = form.lastName.trim() ? '' : 'Le nom est obligatoire'
+  formErrors.email = form.email.trim() && /\S+@\S+\.\S+/.test(form.email) ? '' : "L'email est obligatoire"
+  return !formErrors.firstName && !formErrors.email && !formErrors.lastName
 }
 
 const handleSubmit = async () => {
@@ -152,13 +181,14 @@ const handleSubmit = async () => {
   saving.value = true
   try {
     const payload: CreateUserPayload = {
-      fullName: form.fullName.trim(),
+      firstName: form.firstName.trim(),
+      lastName: form.lastName.trim(),
       username: form.username.trim() || undefined,
       email: form.email.trim(),
       roleId: form.roleId === '' ? undefined : Number(form.roleId),
       isActive: form.isActive,
     }
-
+    console.log('payload',payload)
     if (editingId.value) {
       await userService.update(editingId.value, payload)
       toastStore.show({ type: 'success', message: 'Utilisateur mis à jour' })
@@ -213,8 +243,9 @@ const sendResetPassword = async (row: any) => {
     </div>
 
     <div class="flex flex-col md:flex-row gap-3">
-      <div class="flex-1">
-        <Input v-model="searchQuery" lb="Recherche" placeholder="Nom, username ou email" />
+      <div class="flex-1 relative">
+        <Search :size="15" class="absolute left-3 top-12 -translate-y-1/3 text-slate-400 dark:text-slate-500 z-10" />
+        <Input v-model="searchQuery" lb="Recherche" placeholder="Nom, username ou email" custom-class="pl-8" />
       </div>
       <div class="w-full md:w-64">
         <div class="text-sm font-medium text-gray-700 dark:text-gray-400 mb-1.5">Statut</div>
@@ -259,7 +290,7 @@ const sendResetPassword = async (row: any) => {
         </template>
 
         <template #cell-email="{ row }">
-          <span class="text-sm text-slate-700 dark:text-slate-200">{{ row.email }}</span>
+          <span class="text-sm text-purple-700 dark:text-slate-200 hover:underline">{{ row.email }}</span>
         </template>
 
         <template #cell-role="{ row }">
@@ -307,22 +338,25 @@ const sendResetPassword = async (row: any) => {
       </template>
 
       <div class="space-y-4">
-        <Input v-model="form.fullName" lb="Nom complet" :error-msg="formErrors.fullName" />
-        <Input v-model="form.username" lb="Username" placeholder="Optionnel" />
-        <Input v-model="form.email" lb="Email" :error-msg="formErrors.email" />
-        <Select v-model="form.roleId" lb="Rôle" :options="roleOptions" />
+        <div class="grid md:grid-cols-2 grid-cols-1 gap-2">
+          <Input v-model="form.firstName" lb="Prénom" :error-msg="formErrors.firstName" :placeholder="'Aline'" :is-required="true" :disabled="saving" />
+          <Input v-model="form.lastName" lb="Nom" :error-msg="formErrors.lastName" :placeholder="'Mbarga'" :is-required="true" :disabled="saving"/>
+        </div>
+        <Input v-model="form.username" lb="Username" placeholder="Optionnel" :disabled="saving" />
+        <Input v-model="form.email" lb="Email" :error-msg="formErrors.email" :placeholder="'info@gmail.com'" :is-required="true" :disabled="saving" />
+        <Select v-model="form.roleId" lb="Rôle" :options="roleOptions" :isLoading="loadingRole" :disabled="saving" />
         <div class="flex items-center justify-between rounded-xl border border-slate-200 dark:border-slate-800 p-3">
           <div>
             <p class="text-sm font-semibold text-slate-900 dark:text-white">Compte actif</p>
             <p class="text-xs text-slate-400 dark:text-slate-400">Désactivez pour bloquer la connexion</p>
           </div>
-          <Toggle v-model="form.isActive" />
+          <Toggle v-model="form.isActive"  :disabled="saving"/>
         </div>
       </div>
 
       <template #footer>
         <div class="flex items-center justify-end gap-2">
-          <ButtonComponent variant="secondary" @click="showForm = false">Annuler</ButtonComponent>
+          <ButtonComponent variant="secondary" @click="showForm = false" :disabled="saving">Annuler</ButtonComponent>
           <ButtonComponent :loading="saving" @click="handleSubmit">{{ editingId ? 'Enregistrer' : 'Créer' }}</ButtonComponent>
         </div>
       </template>
@@ -360,7 +394,7 @@ const sendResetPassword = async (row: any) => {
 
       <template #footer>
         <div class="flex items-center justify-end gap-2">
-          <ButtonComponent variant="secondary" @click="showProfile = false">Fermer</ButtonComponent>
+          <ButtonComponent variant="secondary" @click="showProfile = false" >Fermer</ButtonComponent>
         </div>
       </template>
     </BaseModal>

@@ -576,7 +576,7 @@
 
 <script setup lang="ts">
 import { ref, computed, reactive, onMounted, type Component } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter ,useRoute } from 'vue-router'
 import { productService, type Product } from '../../servicesAPI/productService'
 import { formatCurrency } from '../../components/Utilities/function'
 import Input from '../../components/FormElements/Input.vue'
@@ -598,6 +598,8 @@ const toastStore = useToastStore()
 const loading = ref(false)
 const pageLoading = ref(true) 
 const existingSubscriptions = ref<any[]>([])
+
+const route = useRoute()
 
 
 
@@ -654,11 +656,46 @@ const activeModuleSlugs = computed(() =>
 )
 
 const availableModules = computed(() =>
-  modules.value.filter(m => !activeModuleSlugs.value.includes(m.slug))
+  modules.value.filter(m =>
+    !activeModuleSlugs.value.includes(m.slug) ||
+    m.slug === editingSubSlug.value  
+  )
 )
+const openEditMode = (sub: any) => {
+  const mod = modules.value.find(m => m.slug === sub.module?.slug)
+  if (!mod) return
+
+  if (!availableModules.value.find(m => m.id === mod.id)) {
+    modules.value = [...modules.value]  
+  }
+
+  selections[mod.id] = {
+    billingCycle : sub.billingCycle ?? 'monthly',
+    rooms        : sub.limitCount ?? 10,
+    units        : sub.limitCount ?? 1,
+    staffQuota   : sub.limitCount ?? 5,
+    guestApp     : false,
+    otas         : DEFAULT_OTAS.map(o => ({ ...o })),
+    startMonth   : sub.startsAt?.split('T')[0] ?? '',
+    endMonth     : sub.endsAt?.split('T')[0] ?? '',
+    customPrice  : Number(sub.price) ?? 0,
+  }
+}
+
 onMounted(async () => {
   pageLoading.value = true
   await Promise.all([loadModules(), loadExistingSubscriptions()])
+  
+  const editSubId = route.query.editSubId
+  if (editSubId) {
+    const sub = existingSubscriptions.value.find(
+      (s: any) => s.id === Number(editSubId)
+    )
+    if (sub) {
+      openEditMode(sub)
+    }
+  }
+  
   pageLoading.value = false
 })
 
@@ -810,21 +847,35 @@ const goToStep3 = async () => {
   try {
     loading.value = true
     for (const mod of selectedModules.value) {
-      console.log('buildSubscriptionPayload',buildSubscriptionPayload(mod))
-      await subscriptionService.create(hotelId, buildSubscriptionPayload(mod))
-      toastStore.show({ type: 'success', title: 'Produit activé', message: `${mod.name} a été ajouté à votre abonnement.` })
+      const payload = buildSubscriptionPayload(mod)
+
+      if (editSubId.value) {
+       
+        await subscriptionService.update(editSubId.value, {
+          status       : 'active',
+          billing_cycle: payload.billing_cycle,
+          price        : payload.price,
+          limit_count  : payload.limit_count,
+          starts_at    : payload.starts_at,
+          ends_at      : payload.ends_at,
+        })
+        toastStore.show({ type: 'success', title: 'Abonnement mis à jour', message: `${mod.name} a été modifié.` })
+      } else {
+        await subscriptionService.create(hotelId, payload)
+        toastStore.show({ type: 'success', title: 'Produit activé', message: `${mod.name} a été ajouté.` })
+      }
     }
     currentStep.value = 3
   } catch (error: any) {
     const code = error.response?.data?.code
     const codeMessages: Record<string, { title: string; message: string }> = {
-      DEPENDENCY_MISSING:    { title: 'Dépendance manquante', message: 'Le Channel Manager nécessite un abonnement PMS actif.' },
-      DUPLICATE_SUBSCRIPTION:{ title: 'Abonnement existant',  message: 'Un abonnement actif existe déjà pour ce module.' },
-      INTERNAL_SERVER_ERROR : {title: 'Erreur',message : 'Une erreur est survenue.'}
+      DEPENDENCY_MISSING    : { title: 'Dépendance manquante', message: 'Le Channel Manager nécessite un abonnement PMS actif.' },
+      DUPLICATE_SUBSCRIPTION: { title: 'Abonnement existant',  message: 'Un abonnement actif existe déjà pour ce module.' },
+      INTERNAL_SERVER_ERROR : { title: 'Erreur', message: 'Une erreur est survenue.' }
     }
     const toast = codeMessages[code] ?? { title: 'Erreur', message: error.response?.data?.message ?? 'Une erreur est survenue.' }
     toastStore.show({ type: 'error', title: toast.title, message: toast.message })
-  }finally {
+  } finally {
     loading.value = false
   }
 }
@@ -833,6 +884,16 @@ const resetAndRestart = () => {
   Object.keys(selections).forEach(k => delete selections[Number(k)])
   currentStep.value = 1
 }
+
+const editSubId = computed(() => route.query.editSubId ? Number(route.query.editSubId) : null)
+
+const editingSubSlug = computed(() => {
+  if (!editSubId.value) return null
+  const sub = existingSubscriptions.value.find((s: any) => s.id === editSubId.value)
+  return sub?.module?.slug ?? null
+})
+
+
 </script>
 
 <style scoped>

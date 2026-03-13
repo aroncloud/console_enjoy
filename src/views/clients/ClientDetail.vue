@@ -3,7 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   ArrowLeft, Edit, Info,
-  ListChecks, Banknote, Layers, Trash2,
+  ListChecks, Layers, Trash2,
   BedDouble, Utensils, ArrowLeftRight, Smartphone, BarChart2, Users,
 } from 'lucide-vue-next'
 import { type Component } from 'vue'
@@ -178,7 +178,7 @@ const hotelPhone  = computed(() => hotel.value?.phoneNumber        ?? '—')
 const hotelGrade  = computed(() => hotel.value?.grade              ?? 0)
 const currency    = computed(() => hotel.value?.currencyCode       ?? '—')
 const timezone    = computed(() => hotel.value?.timezone           ?? '—')
-const workingDate = computed(() => hotel.value?.currentWorkingDate ?? '—')
+// const workingDate = computed(() => hotel.value?.currentWorkingDate ?? '—')
 
 const initials = computed(() =>
   hotelName.value.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()
@@ -216,6 +216,16 @@ const limitLabel = (slug: string): string => ({
   'mobile-app'     : 'staff',
   'channel-manager': 'OTA',
 }[slug] ?? '')
+
+const handleHistory = () =>{
+  router.push({ name: 'history', query: { hotelId: route.params.id, hotelName: hotelName.value } })
+}
+const updateSub = (sub: any) => {
+  router.push({
+    path: `/clients/${route.params.id}/subscriptions`,
+    query: { editSubId: sub.id }
+  })
+}
 </script>
 
 <template>
@@ -239,14 +249,10 @@ const limitLabel = (slug: string): string => ({
         <div class="h-6 w-3/4 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div>
         <div class="h-4 w-1/4 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div>
       </div>
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
-        <div class="space-y-6">
-          <div class="h-40 bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse"></div>
-          <div class="h-48 bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse"></div>
-        </div>
-        <div class="lg:col-span-2 space-y-6">
-          <div class="h-60 bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse"></div>
-        </div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8"> 
+          <div class="h-80 bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse"></div>
+          <div class="h-80 bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse"></div>
+   
       </div>
     </div>
 
@@ -258,8 +264,8 @@ const limitLabel = (slug: string): string => ({
     </div>
 
     <!-- Contenu -->
-    <div v-else class="flex flex-1 flex-col bg-slate-50 dark:bg-slate-950">
-      <div class="p-4 md:p-8 space-y-6 md:space-y-8 w-full">
+    <div v-else class="flex flex-1 flex-col bg-slate-50 dark:bg-slate-950 min-h-screen">
+      <div class="p-4 md:p-8 flex flex-col gap-6 md:gap-8 w-full ">
 
         <!-- ── Header ── -->
         <section class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
@@ -272,18 +278,23 @@ const limitLabel = (slug: string): string => ({
                 {{ statusLabel }}
               </span>
             </div>
+            <div>
+            <button @click="handleHistory" class="px-4 py-2 text-sm font-bold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer">
+              Historique
+            </button>
+            </div>
          
           </div>
         </section>
 
         <!-- ── Grille principale ── -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 flex-1 items-stretch">
 
           <!-- ── Colonne gauche ── -->
-          <div class="lg:col-span-1 space-y-6">
+          <div class="flex flex-col h-full">
 
             <!-- Infos générales -->
-            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden h-full">
               <div class="p-4 md:p-5 border-b border-slate-100 flex justify-between items-center">
                 <h3 class="font-bold text-slate-900 dark:text-white flex items-center gap-2 text-sm">
                   <Info class="w-5 h-5 text-yellow-600" /> Informations Générales
@@ -327,7 +338,7 @@ const limitLabel = (slug: string): string => ({
                   <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Téléphone</p>
                   <p class="text-sm text-slate-700 dark:text-slate-200">{{ hotelPhone }}</p>
                 </div>
-                <div class="grid grid-cols-2 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <div class="grid grid-cols-3 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
                   <div class="space-y-1">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Devise</p>
                     <p class="text-sm font-semibold text-slate-900 dark:text-white">{{ currency }}</p>
@@ -336,12 +347,16 @@ const limitLabel = (slug: string): string => ({
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Fuseau</p>
                     <p class="text-xs text-slate-600 dark:text-slate-300">{{ timezone }}</p>
                   </div>
+                  <div class="space-y-1">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Dernière modification </p>
+                    <p class="text-xs text-slate-600 dark:text-slate-300">{{ hotel?.updatedAt ? new Date(hotel.updatedAt).toLocaleString('fr-FR') : '—' }}</p>
+                  </div>
                 </div>
               </div>
             </div>
 
             <!-- Technique & Facturation -->
-            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <!-- <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
               <div class="p-4 md:p-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800">
                 <h3 class="font-bold text-slate-900 dark:text-white flex items-center gap-2 text-sm">
                   <Banknote class="w-5 h-5 text-yellow-600" /> Technique & Facturation
@@ -373,13 +388,13 @@ const limitLabel = (slug: string): string => ({
                   </button>
                 </div>
               </div>
-            </div>
+            </div> -->
 
           </div>
 
           <!-- ── Colonne droite ── -->
-          <div class="lg:col-span-2">
-            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+          <div class="flex flex-col h-full">
+            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden h-full">
 
               <!-- Header produits -->
               <div class="p-4 md:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
@@ -473,7 +488,17 @@ const limitLabel = (slug: string): string => ({
                         @update:modelValue="toggleSubStatus(item)"
                       />
 
-                      <!-- Supprimer -->
+                      <!-- modifier -->
+                      <button
+                        @click="updateSub(item)"
+                        :disabled="subActionLoading === item.id"
+                        class="p-1.5 rounded-lg text-yellow-600 cursor-pointer hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-colors disabled:opacity-40"
+                        title="Modifier"
+                      >
+                        <Edit :size="18" />
+                      </button>
+
+                      <!--Supprimer-->
                       <button
                         @click="deleteSub(item)"
                         :disabled="subActionLoading === item.id"
@@ -507,8 +532,10 @@ const limitLabel = (slug: string): string => ({
 
         </div>
 
+          <div class="flex-1"></div>
+
         <!-- ── Footer ── -->
-        <div class="bg-white dark:bg-slate-900 p-4 md:p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <!-- <div class="bg-white  dark:bg-slate-900 p-4 md:p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <p class="text-sm text-slate-500 dark:text-slate-300">
             Dernière modification :
             <span class="font-bold text-slate-900 dark:text-white">
@@ -516,11 +543,11 @@ const limitLabel = (slug: string): string => ({
             </span>
           </p>
           <div class="flex gap-3">
-            <button class="px-4 py-2 text-sm font-bold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer">
+            <button @click="handleHistory" class="px-4 py-2 text-sm font-bold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer">
               Historique
             </button>
           </div>
-        </div>
+        </div> -->
 
       </div>
     </div>

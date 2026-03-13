@@ -17,6 +17,7 @@
         v-for="item in menuItems"
         :key="item.path"
         :to="item.path"
+        @click="emit('close')"
         class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-normal text-gray-800 dark:text-slate-200 hover:bg-purple-50 dark:hover:bg-slate-800 hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
         :class="{ 'bg-purple-50 dark:bg-slate-800 text-purple-600 dark:text-purple-300 font-semibold': isActive(item.path) }"
       >
@@ -35,6 +36,7 @@ import { LayoutDashboard, Building2, Receipt, Shield, Package, Users as UsersIco
 
 const route = useRoute()
 const authStore = useAuthStore()
+const emit = defineEmits(['close'])
 
 // user.role.roleName selon la réponse backend
 const roleName = computed(() => authStore.user?.role?.roleName ?? 'Super Admin')

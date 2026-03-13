@@ -1,10 +1,10 @@
 <template>
-  <header class="bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 px-6 py-3 flex items-center justify-between">
+  <header class="bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 px-6 py-3 flex items-center justify-end">
     <button class="md:hidden p-2 mr-2" @click="$emit('toggle-sidebar')">
       <Menu class="w-6 h-6 text-gray-600 dark:text-slate-300" />
     </button>
 
-    <div class="flex items-center gap-2 bg-gray-50 dark:bg-slate-800 rounded-lg px-4 py-2 max-w-full md:w-96">
+    <!-- <div class="flex items-center gap-2 bg-gray-50 dark:bg-slate-800 rounded-lg px-4 py-2 max-w-full md:w-96">
       <Search class="w-4 h-4 text-gray-400 dark:text-slate-400" />
       <input
         v-model="search"
@@ -12,9 +12,9 @@
         placeholder="Rechercher un hôtel, une facture ou un ticket..."
         class="bg-transparent outline-none text-sm text-gray-600 dark:text-slate-200 placeholder:text-gray-400 dark:placeholder:text-slate-400 w-full"
       />
-    </div>
+    </div> -->
 
-    <div class="flex items-center gap-4">
+    <div class="flex  gap-4">
       <div class="border-r border-gray-200 pr-4">
         <button class="relative p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition cursor-pointer">
           <Bell class="w-5 h-5 text-gray-500 dark:text-slate-300" />
@@ -25,11 +25,11 @@
       <button
         type="button"
         @click="toggleTheme"
-        class="relative inline-flex h-9 w-16 items-center rounded-full border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 px-1 transition-colors cursor-pointer"
+        class="relative inline-flex h-8 w-16 items-center rounded-full border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 px-1 transition-colors cursor-pointer"
         aria-label="Basculer le thème"
       >
         <span
-          class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white dark:bg-slate-900 shadow transition-transform"
+          class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white dark:bg-slate-900 shadow transition-transform"
           :class="isDark ? 'translate-x-7' : 'translate-x-0'"
         >
           <Moon v-if="isDark" class="w-4 h-4 text-slate-300" />
@@ -89,16 +89,17 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { onClickOutside } from '@vueuse/core'
-import { Search, Bell, LogOut, User, Menu, Sun, Moon } from 'lucide-vue-next'
+import {  Bell, LogOut, User, Menu, Sun, Moon } from 'lucide-vue-next'
 import { useAuthStore } from '../../composables/useAuth'
 import { useThemeStore } from '../../composables/theme'
+import { signOut } from '../../servicesAPI/auth'
 
 defineEmits(['toggle-sidebar'])
 
 const router = useRouter()
 const authStore = useAuthStore()
 
-const search = ref('')
+// const search = ref('')
 const isOpen = ref(false)
 const dropdownRef = ref<HTMLElement | null>(null)
 
@@ -130,9 +131,20 @@ const goProfile = () => {
   router.push({ name: 'profile' })
 }
 
-const handleLogout = () => {
-  isOpen.value = false
-  authStore.logout()
-  router.push({ name: 'login' })
+// const handleLogout = () => {
+//   isOpen.value = false
+//   authStore.logout()
+//   router.push({ name: 'login' })
+// }
+
+const handleLogout = async() =>{
+  try{
+      isOpen.value = false
+     await signOut();
+  }catch(e:any){
+    console.error(e)
+  }
 }
+
+
 </script>

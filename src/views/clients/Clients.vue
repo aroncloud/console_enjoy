@@ -78,7 +78,7 @@ const handleSubmit = async (data: any) => {
     closeForm()
     await fetchHotels()
   } catch (e: any) {
-    console.log('error',e)
+    
      console.error('Status:', e.response)
   console.error('Data:', JSON.stringify(e.response?.data, null, 2))
     toastStore.show({ message: "Erreur lors de l'ajout", type: 'error' })
@@ -125,7 +125,7 @@ const getStatusLabel = (status: string) => ({
 const renderStars = (grade: number) => '★'.repeat(grade) + '☆'.repeat(5 - grade)
 
 const getProducts = (row: any) => 
-  (row.subscriptions || []).map((sub: any) => sub.module?.slug).filter(Boolean)
+  (row.subscriptions || []).filter((r:any)=>r.status === 'active').map((sub: any) => sub.module?.slug).filter(Boolean)
 </script>
 
 <template>
@@ -216,7 +216,7 @@ const getProducts = (row: any) =>
 
       <template #cell-contact="{ row }">
         <div class="flex flex-col">
-          <span class="text-xs text-gray-700 dark:text-slate-200 truncate max-w-[140px]">{{ row.email }}</span>
+          <span class="text-xs text-gray-700 dark:text-slate-200 truncate max-w-35">{{ row.email }}</span>
           <span class="text-xs text-gray-400 dark:text-slate-400">{{ row.phoneNumber }}</span>
         </div>
       </template>

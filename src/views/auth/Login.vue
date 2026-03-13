@@ -151,7 +151,7 @@
           <!-- Submit -->
           <button
             type="button"
-            @click="handleSubmit"
+            @click.prevent="handleSubmit"
             :disabled="isLoading"
             class="w-full py-2.5 bg-purple-600 hover:bg-purple-700 active:bg-purple-800
                    disabled:opacity-60 disabled:cursor-not-allowed
@@ -289,13 +289,13 @@
 
         <!-- Headline -->
         <h2 class="text-4xl font-extrabold text-gray-900 leading-tight mb-4">
-          Tous vos clients.<br/>
+          Tous les clients.<br/>
           <span class="text-purple-600">Tout sous contrôle.</span>
         </h2>
 
         <!-- Sub -->
         <p class="text-gray-500 text-base leading-relaxed mb-10 max-w-sm">
-          EnjoyConsole est votre interface d'administration centrale. Suivez en temps réel l'activité de chaque établissement qui utilise votre solution Enjoy PMS.
+          EnjoyConsole est l' interface d'administration centrale. Suis en temps réel l'activité de chaque établissement qui utilise la solution Enjoy PMS.
         </p>
 
         <!-- Feature list -->
@@ -366,23 +366,22 @@ const verificationResent = ref(false)
 const resendVerificationError = ref<string | null>(null)
 
 const loginAttempts = ref(0)
-const MAX_LOGIN_ATTEMPTS = 3
 
 const features = [
   {
-    label: 'Surveillez l\'activité de chaque client en direct',
+    label: 'Surveille l\'activité de chaque client en direct',
     icon: '<polyline points="2 12 6 8 10 12 14 6 18 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
   },
   {
-    label: 'Activez, suspendez ou renouvelez les abonnements',
+    label: 'Active, suspend ou renouvèle les abonnements',
     icon: '<rect x="2" y="5" width="16" height="11" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M2 9h16" stroke="currentColor" stroke-width="1.5"/><circle cx="6" cy="13" r="1" fill="currentColor"/>',
   },
   {
-    label: 'Gérez les modules POS et Channel Manager par compte',
+    label: 'Gère les modules POS et Channel Manager par compte',
     icon: '<rect x="2" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="11" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M14.5 11v7M11 14.5h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
   },
   {
-    label: 'Consultez les chiffres clés de votre parc clients',
+    label: 'Consulte les chiffres clés du parc clients',
     icon: '<rect x="2" y="12" width="4" height="6" rx="1" fill="currentColor" opacity=".3"/><rect x="8" y="7" width="4" height="11" rx="1" fill="currentColor" opacity=".6"/><rect x="14" y="3" width="4" height="15" rx="1" fill="currentColor"/>',
   },
 ]
@@ -408,11 +407,11 @@ function getCookie(name: string): string | null {
 
 onMounted(() => {
   try {
-    let raw = getCookie('rememberedAccounts')
-    const ls = localStorage.getItem('rememberedAccounts')
+    let raw = getCookie('console_rememberedAccounts')  
+    const ls = localStorage.getItem('console_rememberedAccounts')  
     if (!raw && ls) {
-      setCookie('rememberedAccounts', ls, { days: 30, secure: location.protocol === 'https:', sameSite: 'Lax' })
-      localStorage.removeItem('rememberedAccounts')
+      setCookie('console_rememberedAccounts', ls, { days: 30, secure: location.protocol === 'https:', sameSite: 'Lax' })  
+      localStorage.removeItem('console_rememberedAccounts')  
       raw = ls
     }
     const list = raw ? (JSON.parse(raw) as RememberedAccount[]) : []
@@ -429,14 +428,20 @@ const useAnotherAccount = () => { selectedAccount.value = null; accountPickerMod
 const handleSubmit = async () => {
   error.value = null
   loginAttempts.value++
-  if (!email.value.trim() || !password.value.trim()) { error.value = 'Email et mot de passe requis.'; return }
+
+  if (!email.value.trim() || !password.value.trim()) {
+    error.value = 'Email et mot de passe requis.'
+    return
+  }
+
   isLoading.value = true
-   try {
+
+  try {
     const res = await auth({ email: email.value.trim().toLowerCase(), password: password.value, keepLoggedIn: keepLoggedIn.value })
+
     const { user, access_token } = res.data.data
     const token = access_token.token
 
-    // ── Nouveau : injecte le token dans axios pour toutes les futures requêtes
     localStorage.setItem('token', token)
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`
 
@@ -448,30 +453,44 @@ const handleSubmit = async () => {
       const entry: RememberedAccount = { id: user.id, name: user.name || user.fullName || user.username || user.email, email: user.email || email.value }
       const existing = rememberedAccounts.value.filter((a) => a.email !== entry.email)
       rememberedAccounts.value = [entry, ...existing].slice(0, 5)
-      setCookie('rememberedAccounts', JSON.stringify(rememberedAccounts.value), { days: 30, secure: location.protocol === 'https:', sameSite: 'Lax' })
+      setCookie('console_rememberedAccounts', JSON.stringify(rememberedAccounts.value), { days: 30, secure: location.protocol === 'https:', sameSite: 'Lax' })  
     }
 
     loginAttempts.value = 0
     router.push({ path: '/' })
 
   } catch (err: any) {
+    console.log(' Erreur status:', err.response?.status, '| data:', err.response?.data)
+
     if (err.response?.status === 403) {
       const data = err.response.data
       if (data?.error === 'EMAIL_NOT_VERIFIED' || data?.requiresVerification) {
-        emailVerificationRequired.value = true; verificationEmail.value = data.email || email.value; isLoading.value = false; return
+        console.warn(' Email non vérifié')
+        emailVerificationRequired.value = true
+        verificationEmail.value = data.email || email.value
+        return
       }
       error.value = 'Accès interdit.'
     } else if (err.response?.status === 503) {
       error.value = 'Service temporairement indisponible.'
-      if (loginAttempts.value < MAX_LOGIN_ATTEMPTS) { setTimeout(() => handleSubmit(), 2000); return }
-    } else if (err.response?.status === 401) { error.value = 'Email ou mot de passe incorrect.'
-    } else if (err.response?.status === 400 && err.response.data?.message === 'Login failed') { error.value = 'Échec de connexion. Vérifiez vos identifiants.'
-    } else if (err.response?.status === 400) { error.value = err.response.data?.message || 'Données de requête invalides.'
-    } else if (err.response?.status === 422) { error.value = 'Erreur de validation.'
-    } else if (err.response) { error.value = 'Erreur serveur. Veuillez réessayer.'
-    } else if (err.request) { error.value = 'Erreur réseau. Vérifiez votre connexion.'
-    } else { error.value = 'Une erreur inattendue est survenue.' }
-  } finally { isLoading.value = false }
+    } else if (err.response?.status === 401) {
+      error.value = 'Email ou mot de passe incorrect.'
+    } else if (err.response?.status === 400 && err.response.data?.message === 'Login failed') {
+      error.value = 'Échec de connexion. Vérifiez vos identifiants.'
+    } else if (err.response?.status === 400) {
+      error.value = err.response.data?.message || 'Données de requête invalides.'
+    } else if (err.response?.status === 422) {
+      error.value = 'Erreur de validation.'
+    } else if (err.response) {
+      error.value = 'Erreur serveur. Veuillez réessayer.'
+    } else if (err.request) {
+      error.value = 'Erreur réseau. Vérifiez votre connexion.'
+    } else {
+      error.value = 'Une erreur inattendue est survenue.'
+    }
+  } finally {
+    isLoading.value = false
+  }
 }
 
 const sendAdminResetLink = async () => {

@@ -43,7 +43,7 @@
     <div class="flex-1 min-h-0 overflow-auto">
 
       <!-- Desktop -->
-      <div class="hidden md:block overflow-x-auto scrollbar">
+      <div class="hidden md:block overflow-x-auto scrollbar w-full">
         <table class="w-full text-sm">
           <thead>
             <tr class="bg-gray-50 dark:bg-slate-800">

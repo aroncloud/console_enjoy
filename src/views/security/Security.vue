@@ -1,9 +1,8 @@
 <template>
   <div class="space-y-6 p-6 bg-slate-50 dark:bg-slate-950 min-h-screen">
-
     <!-- KPIs -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div class="p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 ">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- <div class="p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 ">
         <div class="flex items-center justify-between mb-3">
           <div class="p-2 bg-emerald-100 text-emerald-600 rounded-lg">
             <ShieldCheck :size="20" />
@@ -12,43 +11,58 @@
         </div>
         <p class="text-slate-500 dark:text-slate-400 text-xs font-medium">Statut système</p>
         <h3 class="text-2xl font-black mt-1">Nominal</h3>
-      </div>
+      </div> -->
 
-      <div class="p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 ">
+      <div
+        class="p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800"
+      >
         <div class="flex items-center justify-between mb-3">
           <div class="p-2 bg-blue-100 text-blue-500 rounded-lg">
             <Wifi :size="20" />
           </div>
-          <span class="text-[10px] font-bold text-blue-500 bg-blue-100 px-2 py-1 rounded-full">En ligne</span>
+          <span
+            class="text-[10px] font-bold text-blue-500 bg-blue-100 px-2 py-1 rounded-full"
+            >En ligne</span
+          >
         </div>
-        <p class="text-slate-500 dark:text-slate-400 text-xs font-medium">Tenants actifs</p>
-        <h3 class="text-2xl font-black mt-1">{{ tenantStatuses.filter(t => !t.suspended).length }} / {{ tenantStatuses.length }}</h3>
+        <p class="text-slate-500 dark:text-slate-400 text-xs font-medium">
+          Tenants actifs
+        </p>
+        <h3 class="text-2xl font-black mt-1">
+          {{ activeCount }} / {{ totalCount }}
+        </h3>
       </div>
 
-      <div class="p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 ">
+      <div
+        class="p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800"
+      >
         <div class="flex items-center justify-between mb-3">
           <div class="p-2 bg-red-100 text-red-500 rounded-lg">
             <Power :size="20" />
           </div>
-          <span class="text-[10px] font-bold text-red-500 bg-red-100 px-2 py-1 rounded-full">Suspendus</span>
+          <span
+            class="text-[10px] font-bold text-red-500 bg-red-100 px-2 py-1 rounded-full"
+            >Suspendus</span
+          >
         </div>
-        <p class="text-slate-500 dark:text-slate-400 text-xs font-medium">Accès révoqués</p>
-        <h3 class="text-2xl font-black mt-1">{{ tenantStatuses.filter(t => t.suspended).length }}</h3>
+        <p class="text-slate-500 dark:text-slate-400 text-xs font-medium">
+          Accès révoqués
+        </p>
+        <h3 class="text-2xl font-black mt-1">{{ suspendedCount }}</h3>
       </div>
     </div>
 
     <!-- Kill-Switch + Tenants -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Kill-Switch -->
-      <div class="lg:col-span-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+      <!-- <div class="lg:col-span-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
         <div class="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
           <h3 class="font-bold text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">Kill-Switch API</h3>
           <Power :size="16" class="text-red-400" />
         </div>
 
         <div class="p-5 space-y-4">
-          <!-- Motif -->
+         
           <BaseSelect
             lb="Motif de suspension"
             v-model="killReason"
@@ -56,7 +70,7 @@
             placeholder="Choisir un motif..."
           />
 
-          <!-- Tenant ID -->
+         
           <BaseInput
             lb="Tenant ID"
             :is-required="true"
@@ -64,7 +78,7 @@
             placeholder="ex: hotel_grand_paris_01"
           />
 
-          <!-- Quick picks -->
+          
           <div class="flex flex-wrap gap-1.5">
             <span class="text-xs text-slate-400 w-full">Récents :</span>
             <button
@@ -77,7 +91,7 @@
             </button>
           </div>
 
-          <!-- Confirm toggle -->
+         
           <div v-if="!confirmMode">
             <button
               class="w-full py-2.5 bg-red-500 text-white font-bold rounded-lg text-sm hover:bg-red-600 transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
@@ -116,175 +130,262 @@
             Usage : non-paiement prolongé ou incident de sécurité.
           </p>
         </div>
-      </div>
+      </div> -->
 
       <!-- Tenant statuses -->
-      <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800  overflow-hidden flex flex-col">
-
-
-        <BaseTable :columns="tenantColumns" :data="tenantStatuses" :title="'Statut des tenants'">
-
-          <template #cell-name="{ value }">
-            <span class="font-semibold text-gray-800 dark:text-white">{{ value }}</span>
+      <div
+        class="lg:col-span-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col"
+      >
+        <BaseTable
+          :columns="tenantColumns"
+          :data="tenantStatuses"
+          :title="'Statut des tenants'"
+          :meta="metaData"
+          @page-change="handlePageChange"
+          :loading="isLoading"
+        >
+          <template #cell-hotel="{ value }">
+            <span
+              class="font-semibold text-gray-800 dark:text-white capitalize"
+              >{{ value.hotelName }}</span
+            >
           </template>
 
-          <template #cell-id="{ value }">
-            <span class="font-mono text-xs text-slate-400">{{ value }}</span>
+          <template #cell-module="{ value }">
+            <div class="flex flex-col">
+              <span
+                class="text-sm font-semibold text-slate-800 dark:text-white"
+                >{{ value.name ?? "—" }}</span
+              >
+              <span class="font-mono text-xs text-slate-400">{{
+                value.slug ?? "—"
+              }}</span>
+            </div>
           </template>
 
-          <template #cell-suspended="{ value }">
+          <template #cell-status="{ value }">
             <span
               class="px-2 py-1 text-[10px] font-bold rounded-full uppercase flex items-center gap-1.5 w-fit"
-              :class="value ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600'"
+              :class="
+                value === 'canceled'
+                  ? 'bg-red-100 text-red-600'
+                  : 'bg-emerald-100 text-emerald-600'
+              "
             >
-              <span class="w-1.5 h-1.5 rounded-full" :class="value ? 'bg-red-500' : 'bg-emerald-500 animate-pulse'" />
-              {{ value ? 'Suspendu' : 'Actif' }}
+              <span
+                class="w-1.5 h-1.5 rounded-full"
+                :class="value === 'canceled' ? 'bg-red-500' : 'bg-emerald-500 animate-pulse'"
+              />
+              {{ value === 'canceled' ? "Suspendu" : "Actif" }}
             </span>
           </template>
 
           <template #cell-actions="{ row }">
             <div class="flex justify-end">
               <button
-                class="p-1.5 rounded-lg border transition-colors text-xs font-semibold flex items-center gap-1"
-                :class="row.suspended
-                  ? 'border-emerald-200 text-emerald-600 hover:bg-emerald-50 dark:border-emerald-900/40 dark:hover:bg-emerald-900/10'
-                  : 'border-red-200 text-red-500 hover:bg-red-50 dark:border-red-900/40 dark:hover:bg-red-900/10'"
+                :disabled="loadingStatus"
+                class="p-1.5 rounded-lg border transition-colors text-xs font-semibold flex items-center gap-1 cursor-pointer disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 disabled:opacity-60 disabled:border-gray-100"
+                :class="
+                  row.status === 'canceled'
+                    ? 'border-emerald-200 text-emerald-600 hover:bg-emerald-50 dark:border-emerald-900/40 dark:hover:bg-emerald-900/10'
+                    : 'border-red-200 text-red-500 hover:bg-red-50 dark:border-red-900/40 dark:hover:bg-red-900/10'
+                "
                 @click="toggleTenant(row)"
               >
                 <Power :size="12" />
-                {{ row.suspended ? 'Restaurer' : 'Suspendre' }}
+                {{ row.status === 'canceled' ? "Restaurer" : "Suspendre" }}
               </button>
             </div>
           </template>
-
         </BaseTable>
-
       </div>
-    </div>
 
-    <!-- Audit log -->
-    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-      <div class="px-5 py-4 border-b rounded-md border-slate-200 dark:border-slate-800 flex items-center justify-between">
+      <!-- Audit log -->
+      <div class="">
+        <!-- <div class="px-5 py-4 border-b rounded-md border-slate-200 dark:border-slate-800 flex items-center justify-between">
         <h3 class="font-bold text-sm">Journal d'audit</h3>
         <button class="p-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-500 hover:text-purple-500 transition-colors">
           <Download :size="14" />
         </button>
+      </div> -->
+
+        <BaseTable
+          :columns="auditColumns"
+          :data="auditLogs"
+          :meta="meta"
+          :title="'Journal d\'audit'"
+          :loading="loading"
+          @page-change="handlePageAudit"
+        >
+          <template #cell-action="{ value }">
+            <span
+              class="px-2 py-1 text-[10px] font-bold rounded-full uppercase whitespace-nowrap"
+              :class="getActionBadge(value).class"
+            >
+              {{ getActionBadge(value).label }}
+            </span>
+          </template>
+
+          <template #cell-description="{ value }">
+            <span class="text-sm text-slate-700 dark:text-slate-200">{{
+              value ?? "—"
+            }}</span>
+          </template>
+
+          <template #cell-hotel="{ value }">
+            <span class="text-xs text-slate-500 dark:text-slate-400">{{
+              value?.hotelName ?? "—"
+            }}</span>
+          </template>
+
+          <template #cell-user="{ value }">
+            <span class="text-xs text-slate-500 dark:text-slate-400">{{
+              value?.fullName ?? "—"
+            }}</span>
+          </template>
+
+          <template #cell-createdAt="{ value }">
+            <span class="text-xs text-slate-400">
+              {{ value ? new Date(value).toLocaleString("fr-FR") : "—" }}
+            </span>
+          </template>
+        </BaseTable>
       </div>
-
-      <BaseTable :columns="auditColumns" :data="auditLogs">
-
-        <template #cell-type="{ value }">
-          <span
-            class="px-2 py-1 text-[10px] font-bold rounded-full uppercase"
-            :class="value === 'kill' ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600'"
-          >
-            {{ value === 'kill' ? 'Suspension' : 'Restauration' }}
-          </span>
-        </template>
-
-        <template #cell-action="{ value }">
-          <span class="text-sm text-gray-800 dark:text-white font-medium">{{ value }}</span>
-        </template>
-
-        <template #cell-meta="{ value }">
-          <span class="text-xs text-slate-400">{{ value }}</span>
-        </template>
-
-        <template #cell-time="{ value }">
-          <span class="text-xs text-slate-400">{{ value }}</span>
-        </template>
-
-      </BaseTable>
     </div>
-
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { ShieldCheck, Wifi, Power, Info, Download } from 'lucide-vue-next'
+import { ref, onMounted, computed } from "vue";
+import { Wifi, Power } from "lucide-vue-next";
+import BaseTable from "../../components/Table/BaseTable.vue";
+import { subscriptionService } from "../../servicesAPI/subscriptionService";
+import { historyService } from "../../servicesAPI/historyService";
+import { useToastStore } from "../../composables/toast";
 
-import BaseTable       from '../../components/Table/BaseTable.vue'
-import BaseInput       from '../../components/FormElements/Input.vue'
-import BaseSelect      from '../../components/FormElements/Select.vue'
+// ── Stats globales  ──
+const allTenants = ref<any[]>([]);
+const activeCount    = computed(() => allTenants.value.filter((t) => t.status !== 'canceled').length)
+const suspendedCount = computed(() => allTenants.value.filter((t) => t.status === 'canceled').length)
+const totalCount = computed(() => allTenants.value.length);
 
+const fetchAllTenants = async () => {
+  try {
+    const res = await subscriptionService.getAll({ limit: 1000 });
+    allTenants.value = res.data;
+  } catch (e) {
+    console.error(e);
+  }
+};
 
-// ── Kill-Switch 
-const tenant      = ref('')
-const confirmMode = ref(false)
-const killReason  = ref<string | number>('payment')
-
-const reasonOptions = [
-  { label: 'Non-paiement prolongé',   value: 'payment'  },
-  { label: 'Incident de sécurité',    value: 'security' },
-  { label: "Abus d'API",              value: 'abuse'    },
-]
-
-const recentTenants = ['hotel_grand_paris_01', 'city_hub_lyon_02', 'boutique_lodge_03']
-
-const kill = () => {
-  if (!tenant.value.trim()) return
-  const found = tenantStatuses.value.find(t => t.id === tenant.value.trim())
-  if (found) found.suspended = true
-  auditLogs.value.unshift({
-    type:   'kill',
-    action: `Accès suspendus — ${tenant.value.trim()}`,
-    meta:   `Motif : ${reasonOptions.find(r => r.value === killReason.value)?.label} · par Admin`,
-    time:   "À l'instant",
-  })
-  tenant.value      = ''
-  confirmMode.value = false
-}
-
-// ── Tenants ───────────────────────────────────────────────────────────────────
+// ── Table tenants paginée ──
 const tenantColumns = [
-  { key: 'name',      label: 'Établissement' },
-  { key: 'id',        label: 'Tenant ID' },
-  { key: 'suspended', label: 'Statut' },
-  { key: 'actions',   label: '', thClass: 'text-right' },
-]
+  { key: "hotel", label: "Établissement" },
+  { key: "module", label: "Tenant" },
+  { key: "status", label: "Statut" },
+  { key: "actions", label: "", thClass: "text-right" },
+  
+];
 
-const tenantStatuses = ref([
-  { id: 'hotel_grand_paris_01',   name: 'Grand Hotel Paris',   suspended: false },
-  { id: 'city_hub_lyon_02',       name: 'City Hub Lyon',       suspended: false },
-  { id: 'boutique_lodge_03',      name: 'Boutique Lodge',      suspended: true  },
-  { id: 'ocean_breeze_resort_04', name: 'Ocean Breeze Resort', suspended: false },
-  { id: 'mountain_view_lodge_05', name: 'Mountain View Lodge', suspended: false },
-])
+const tenantStatuses = ref<any[]>([]);
+const metaData = ref<any>(null);
+const isLoading = ref(false);
+const toastStore = useToastStore()
+const loadingStatus = ref(false)
 
+const fetchSubscriptions = async (page = 1) => {
+  isLoading.value = true;
+  try {
+    const res = await subscriptionService.getAll({ page, limit: 5 });
+    tenantStatuses.value = res.data;
+    metaData.value = res.meta;
+  } catch (e) {
+    console.error(e);
+  } finally {
+    isLoading.value = false;
+  }
+};
 
+const handlePageChange = (newPage: number) => fetchSubscriptions(newPage);
 
-const toggleTenant = (t: Record<string, any>) => {
-  const tenant = t as { id: string; name: string; suspended: boolean }
-  tenant.suspended = !tenant.suspended
-  auditLogs.value.unshift({
-    type:   tenant.suspended ? 'kill' : 'restore',
-    action: tenant.suspended ? `Accès suspendus — ${tenant.name}` : `Accès restaurés — ${tenant.name}`,
-    meta:   'Action manuelle · par Admin',
-    time:   "À l'instant",
-  })
+// ── Toggle suspend/restore ──
+const toggleTenant = async (row: any) => {
+  try {
+    loadingStatus.value = true
+    const newStatus = row.status === 'canceled' ? 'active' : 'canceled'
+    await subscriptionService.patch(row.id)
+
+    // Mise à jour locale
+    row.status = newStatus
+    const found = allTenants.value.find((t) => t.id === row.id)
+    if (found) found.status = newStatus
+    toastStore.show({
+      message:newStatus === 'canceled'? 'Produit Suspendu avec succès ' : 'Produit restauré avec succès',type:'success'
+    })
+    await fetchAudit(1)
+  } catch (e) {
+    console.error(e)
+    toastStore.show({
+      message:'Erreur lors de la mise à jour',type:'error'
+    })
+  }finally{
+     loadingStatus.value = false
+  }
 }
 
-// ── Audit log ─────────────────────────────────────────────────────────────────
+// ── Audit  ──
 const auditColumns = [
-  { key: 'type',   label: 'Type'    },
-  { key: 'action', label: 'Action'  },
-  { key: 'meta',   label: 'Détails' },
-  { key: 'time',   label: 'Date'    },
-]
+  { key: "action", label: "Action" },
+  { key: "description", label: "Description" },
+  { key: "hotel", label: "Établissement" },
+  { key: "user", label: "Par" },
+  { key: "createdAt", label: "Date" },
+];
 
-const auditLogs = ref([
-  { type: 'kill',    action: 'Accès suspendus — Boutique Lodge',   meta: 'Motif : Non-paiement · par Admin',   time: 'Il y a 2h'  },
-  { type: 'restore', action: 'Accès restaurés — Mountain View',    meta: 'Paiement reçu · par Système',        time: 'Il y a 5h'  },
-  { type: 'kill',    action: 'Accès suspendus — Urban Stay Berlin', meta: "Motif : Abus d'API · par Admin",     time: 'Hier 14:32' },
-  { type: 'restore', action: 'Accès restaurés — Urban Stay Berlin', meta: 'Vérification complète · par Admin', time: 'Hier 16:10' },
-])
+const auditLogs = ref<any[]>([]);
+const meta = ref<any>(null);
+const loading = ref(false);
+
+const fetchAudit = async (page = 1) => {
+  loading.value = true;
+  try {
+    const res = await historyService.getAll({
+      page,
+      limit: 5,
+      action: "subscription.toggleStatus",
+    });
+    auditLogs.value = res.data
+    meta.value = res.meta;
+  } catch (e) {
+    console.error(e);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const handlePageAudit = (newPage: number) => fetchAudit(newPage);
+
+const getActionBadge = (action: string) => {
+  if (action.endsWith('.create')) return { label: 'Création',     class: 'bg-blue-100 text-blue-600' }
+  if (action.endsWith('.toggleStatus')) return { label: 'Mise à jour',  class: 'bg-amber-100 text-amber-600' }
+  if (action.endsWith('.delete')) return { label: 'Suppression',  class: 'bg-red-100 text-red-600' }
+  if (action.endsWith('.extend')) return { label: 'Extension',    class: 'bg-purple-100 text-purple-600' }
+  return { label: action, class: 'bg-slate-100 text-slate-500' }
+}
+
+onMounted(() => {
+  fetchAllTenants();
+  fetchSubscriptions(1);
+  fetchAudit(1);
+});
 </script>
 
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 .fade-enter-from,
 .fade-leave-to {

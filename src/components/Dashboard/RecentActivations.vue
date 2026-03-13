@@ -49,18 +49,21 @@
         </p>
       </div>
 
-      <button class="w-full py-2 text-xs font-bold text-gray-400 dark:text-slate-400 hover:text-blue-500 uppercase tracking-widest bg-gray-50 dark:bg-slate-800 rounded-lg transition-colors">
+      <button @click="handleHistory" class="w-full py-2 text-xs font-bold text-gray-400 dark:text-slate-400 hover:text-blue-500 uppercase tracking-widest bg-gray-50 dark:bg-slate-800 rounded-lg transition-colors cursor-pointer">
         Voir tout l'historique
       </button>
     </template>
 
   </div>
+
+
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Smartphone, RefreshCcw, Cloud, UserPlus, Bell } from 'lucide-vue-next'
 import type { RecentActivation } from '../../servicesAPI/dashboardService'
+import router from '../../router';
 
 const props = withDefaults(defineProps<{
   data: RecentActivation[]
@@ -74,6 +77,10 @@ interface IconConfig {
   icon: unknown
   iconBg: string
   iconColor: string
+}
+
+const handleHistory = () =>{
+  router.push({ name: 'history' })
 }
 
 const getIconConfig = (action: string): IconConfig => {
@@ -97,4 +104,5 @@ const enrichedActivations = computed(() =>
     ...getIconConfig(item.action),
   }))
 )
+
 </script>

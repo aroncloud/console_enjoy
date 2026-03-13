@@ -56,51 +56,76 @@
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-8 space-y-8" :class="loading ? 'pointer-events-none opacity-60' : ''">
 
           <!-- ── Informations Générales ── -->
-          <section v-show="activeTab === 'general'">
-            <div class="grid grid-cols-2 gap-5">
-              <div class="flex flex-col gap-1.5">
-                <Input lb="Nom de l'hôtel" v-model="form.hotelName" placeholder="Ex: Grand Hôtel Rivage" :is-required="true" />
-                <p v-if="errors.hotelName" class="text-sm font-light italic text-red-500">{{ errors.hotelName }}</p>
-              </div>
-              <Input lb="Enseigne / Chaîne" v-model="form.chain" placeholder="Ex: Luxury Collection" />
-              <Input lb="Code Postal" v-model="form.postalCode" placeholder="Ex: 06000" />
-              <InputCountries lb="Pays" v-model="form.country" />
-              <div class="flex flex-col gap-1.5">
-              <InputSelectCity lb="Ville" v-model="form.city" placeholder="Ville" :country="form.country" :is-required="true" />
-               <p v-if="errors.city" class="text-sm font-light italic text-red-500">{{ errors.city }}</p>
-               </div>
-              <Input lb="Email Professionnel" v-model="form.managerEmail" type="email" placeholder="j.dupont@hotel.com" />
-              
+      <section v-show="activeTab === 'general'">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          
+          <div class="flex flex-col gap-1.5">
+            <Input lb="Nom de l'hôtel" v-model="form.hotelName" placeholder="Ex: Grand Hôtel Rivage" :is-required="true" />
+            <p v-if="errors.hotelName" class="text-sm font-light italic text-red-500">{{ errors.hotelName }}</p>
+          </div>
 
-              <div class="flex flex-col gap-1.5">
-                <label class="text-sm font-medium text-gray-700 dark:text-slate-300">Site Web</label>
-                <div class="flex">
-                  <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 text-gray-500 dark:text-slate-300 text-sm">https://</span>
-                  <input v-model="form.website" type="text" placeholder="www.hotel.com" class="h-11 w-full rounded-r-lg border border-gray-300 dark:border-slate-700 bg-transparent dark:bg-slate-800 px-4 py-2.5 text-sm text-gray-800 dark:text-slate-200 placeholder:text-gray-400 dark:placeholder:text-slate-400 focus:border-purple-500 focus:outline-hidden focus:ring-3 focus:ring-purple-500/10 dark:focus:border-purple-800" />
-                </div>
-              </div>
-              <InputPhone :title="'Numéro de Téléphone'" v-model="form.phone" :isRequired="false" />
-              <Input lb="Nombre d'étages" v-model.number="form.totalFloors" type="number" placeholder="Ex: 5" :is-required="true" />
+          <Input lb="Enseigne / Chaîne" v-model="form.chain" placeholder="Ex: Luxury Collection" />
 
-              <div class="flex flex-col gap-1.5">
-                <label class="text-sm font-medium text-gray-700">Classement (étoiles)<span class="text-red-500">*</span> </label> 
-                <div class="flex items-center gap-2 h-11">
-                  <button v-for="star in 5" :key="star" type="button" @click="form.starRating = star" class="transition-transform hover:scale-110">
-                    <svg class="w-7 h-7 transition-colors" :class="star <= form.starRating ? 'text-amber-400' : 'text-gray-200'" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                    </svg>
-                  </button>
-                  <span class="text-sm text-gray-500 ml-1">{{ form.starRating > 0 ? `${form.starRating} étoile${form.starRating > 1 ? 's' : ''}` : 'Non classé' }}</span>
-                </div>
-                <p v-if="errors.starRating" class="text-sm font-light italic text-red-500">{{ errors.starRating }}</p>
-              </div>
+          <Input lb="Code Postal" v-model="form.postalCode" placeholder="Ex: 06000" />
 
-              <div class="col-span-2">
-                <Input lb="Adresse (Rue)" v-model="form.address" placeholder="Ex: 42 Avenue des Palmiers" :is-required = "true" />
-                  <p v-if="errors.address" class="text-sm font-light italic text-red-500">{{ errors.address }}</p>
-              </div>
+          <InputCountries lb="Pays" v-model="form.country" />
+
+          <div class="flex flex-col gap-1.5">
+            <InputSelectCity lb="Ville" v-model="form.city" placeholder="Ville" :country="form.country" :is-required="true" />
+            <p v-if="errors.city" class="text-sm font-light italic text-red-500">{{ errors.city }}</p>
+          </div>
+
+          <Input lb="Email Professionnel" v-model="form.managerEmail" type="email" placeholder="j.dupont@hotel.com" />
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-sm font-medium text-gray-700 dark:text-slate-300">Site Web</label>
+            <div class="flex">
+              <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 text-gray-500 dark:text-slate-300 text-sm">
+                https://
+              </span>
+              <input
+                v-model="form.website"
+                type="text"
+                placeholder="www.hotel.com"
+                class="h-11 w-full rounded-r-lg border border-gray-300 dark:border-slate-700 bg-transparent dark:bg-slate-800 px-4 py-2.5 text-sm text-gray-800 dark:text-slate-200 placeholder:text-gray-400 dark:placeholder:text-slate-400 focus:border-purple-500 focus:outline-hidden focus:ring-3 focus:ring-purple-500/10 dark:focus:border-purple-800"
+              />
             </div>
-          </section>
+          </div>
+
+          <InputPhone :title="'Numéro de Téléphone'" v-model="form.phone" :isRequired="false" />
+
+          <Input lb="Nombre d'étages" v-model.number="form.totalFloors" type="number" placeholder="Ex: 5" :is-required="true" />
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-sm font-medium text-gray-700">
+              Classement (étoiles)<span class="text-red-500">*</span>
+            </label>
+            <div class="flex items-center gap-2 h-11">
+              <button
+                v-for="star in 5"
+                :key="star"
+                type="button"
+                @click="form.starRating = star"
+                class="transition-transform hover:scale-110"
+              >
+                <svg class="w-7 h-7 transition-colors" :class="star <= form.starRating ? 'text-amber-400' : 'text-gray-200'" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              </button>
+              <span class="text-sm text-gray-500 ml-1">
+                {{ form.starRating > 0 ? `${form.starRating} étoile${form.starRating > 1 ? 's' : ''}` : 'Non classé' }}
+              </span>
+            </div>
+            <p v-if="errors.starRating" class="text-sm font-light italic text-red-500">{{ errors.starRating }}</p>
+          </div>
+
+          <div class="col-span-1 sm:col-span-2 flex flex-col gap-1.5">
+            <Input lb="Adresse (Rue)" v-model="form.address" placeholder="Ex: 42 Avenue des Palmiers" :is-required="true" />
+            <p v-if="errors.address" class="text-sm font-light italic text-red-500">{{ errors.address }}</p>
+          </div>
+
+        </div>
+      </section>
 
           <!-- ── Contact Principal ── -->
           <section v-show="activeTab === 'contact'">

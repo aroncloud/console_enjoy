@@ -11,6 +11,7 @@ import Security from '../views/security/Security.vue'
 import Product from '../views/products/Product.vue'
 import Users from '../views/users/Users.vue'
 import Profile from '../views/profile/Profile.vue'
+import HistoryView from '../views/history/HistoryView.vue'
 import { useAuthStore } from '../composables/useAuth'
 
 const router = createRouter({
@@ -54,6 +55,11 @@ const router = createRouter({
         { path: 'products', name: 'products', component: Product },
         { path: 'users',    name: 'users',    component: Users },
         { path: 'profile',  name: 'profile',  component: Profile },
+        {
+          path: '/history',
+          name: 'history',
+          component: HistoryView,
+        }
       ],
     },
     {
@@ -61,6 +67,7 @@ const router = createRouter({
       name: 'not-found',
       redirect: '/login',
     },
+    
   ],
 })
 

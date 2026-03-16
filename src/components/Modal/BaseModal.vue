@@ -5,7 +5,7 @@
       class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
       @click.self="close"
     >
-      <div :class="['bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 w-full max-w-lg shadow-2xl', customClass]">
+      <div :class="['bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 w-full shadow-2xl ', customClass || 'max-w-lg']">
 
         <!-- header slot with close button -->
         <div v-if="$slots.header" class="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
@@ -16,7 +16,7 @@
         </div>
 
         <!-- default slot for body -->
-        <div class="p-6">
+        <div class="p-6 overflow-y-auto h-120 custom-scrollbar">
           <slot />
         </div>
 
@@ -47,4 +47,16 @@ function close() {
 <style scoped>
 .fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease; }
 .fade-enter-from, .fade-leave-to       { opacity: 0; }
+/* Chrome, Safari, Edge, Opera */
+  .custom-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* IE, Edge, Firefox */
+  .custom-scrollbar {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
 </style>

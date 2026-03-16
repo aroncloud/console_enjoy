@@ -1,6 +1,6 @@
 <template>
   <header class="bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 px-6 py-3 flex items-center justify-end">
-    <button class="md:hidden p-2 mr-2" @click="$emit('toggle-sidebar')">
+    <button class="md:hidden p-2 mr-10" @click="$emit('toggle-sidebar')">
       <Menu class="w-6 h-6 text-gray-600 dark:text-slate-300" />
     </button>
 

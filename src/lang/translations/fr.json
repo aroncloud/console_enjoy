@@ -2,6 +2,175 @@
 	"country": "Pays",
 	"search_country": "Rechercher un pays...",
 	"no_results": "Aucun résultat",
+	"common": {
+		"back": "Retour",
+		"cancel": "Annuler",
+		"create": "Créer",
+		"error": "Erreur",
+		"genericError": "Une erreur est survenue.",
+		"loading": "Chargement...",
+		"save": "Enregistrer",
+		"actions": "Actions",
+		"errors": {
+			"save": "Erreur lors de la sauvegarde",
+			"delete": "Erreur lors de la suppression"
+		}
+	},
+	"products": {
+		"product": "Produit",
+		"errors": {
+			"notFound": "Produit introuvable"
+		}
+	},
+	"addons": {
+		"title": "Add-ons",
+		"actions": {
+			"add": "Ajouter un add-on"
+		},
+		"delete": {
+			"title": "Supprimer l'add-on"
+		},
+		"modal": {
+			"createTitle": "Ajouter un add-on",
+			"editTitle": "Modifier un add-on"
+		},
+		"fields": {
+			"name": "Nom",
+			"min": "Min",
+			"max": "Max",
+			"priceMonth": "Prix / mois",
+			"priceYear": "Prix / an"
+		},
+		"errors": {
+			"load": "Erreur lors du chargement des add-ons"
+		},
+		"success": {
+			"created": "Add-on créé",
+			"updated": "Add-on mis à jour",
+			"deleted": "Add-on supprimé"
+		}
+	},
+	"subscriptions": {
+		"steps": {
+			"plan": "Plan",
+			"payment": "Paiement",
+			"confirmation": "Confirmation"
+		},
+		"header": {
+			"step1": {
+				"title": "Choisissez vos produits",
+				"subtitle": "Sélectionnez les produits adaptés à votre établissement"
+			},
+			"step2": {
+				"title": "Paiement",
+				"subtitle": "Finalisez votre souscription en choisissant un mode de paiement"
+			}
+		},
+		"dependency": {
+			"title": "Dépendance requise",
+			"requiresStart": "Le ",
+			"requiresMiddle": " nécessite le module ",
+			"activateFirst": "Activez d'abord le PMS pour pouvoir souscrire au Channel Manager."
+		},
+		"modules": {
+			"allActive": {
+				"title": "Tous les modules sont déjà actifs",
+				"subtitle": "Cet établissement a souscrit à tous les produits disponibles."
+			}
+		},
+		"addon": {
+			"label": "Add-on",
+			"none": "Aucun add-on disponible",
+			"placeholder": "Sélectionner un add-on",
+			"range": "Min {min} · Max {max}",
+			"optionLabel": "{name} — {price} (min {min}, max {max})"
+		},
+		"billing": {
+			"label": "Facturation",
+			"monthly": "Mensuel",
+			"yearly": "Annuel",
+			"monthlyFull": "Facturation mensuelle",
+			"yearlyFull": "Facturation annuelle",
+			"suffixMonth": "/mois",
+			"suffixYear": "/an"
+		},
+		"period": {
+			"label": "Période de souscription"
+		},
+		"price": {
+			"label": "Prix de souscription",
+			"monthly": "Mensuel",
+			"yearly": "Annuel"
+		},
+		"summary": {
+			"title": "Récapitulatif",
+			"none": "Aucun produit sélectionné"
+		},
+		"total": {
+			"total": "Total",
+			"perMonth": "Total / mois",
+			"perYear": "Total / an",
+			"suffixMonth": "/ mois",
+			"suffixYear": "/ an",
+			"amount": "Montant total"
+		},
+		"validation": {
+			"missingPeriod": "Veuillez définir la période pour tous les modules.",
+			"missingAddOn": "Veuillez sélectionner un add-on pour chaque module.",
+			"addOnOutOfRange": "La valeur choisie dépasse la plage autorisée de l'add-on."
+		},
+		"selectedPlan": {
+			"title": "Plan sélectionné"
+		},
+		"orderSummary": {
+			"title": "Récapitulatif de commande"
+		},
+		"footer": {
+			"mixed": "Total mixte (mensuel + annuel)",
+			"recurringMonthly": "Récurrent mensuel à partir d'aujourd'hui",
+			"recurringYearly": "Récurrent annuel à partir d'aujourd'hui"
+		},
+		"terms": {
+			"prefix": "En continuant, vous acceptez nos ",
+			"termsOfUse": "Conditions d'utilisation",
+			"and": " et notre ",
+			"privacyPolicy": "Politique de confidentialité"
+		},
+		"actions": {
+			"continue": "Continuer →",
+			"edit": "Modifier",
+			"finalize": "Finaliser la souscription →",
+			"dashboard": "Tableau de bord",
+			"addProducts": "Ajouter des produits"
+		},
+		"confirmation": {
+			"title": "Souscription confirmée !",
+			"subtitle": "Vos produits sont maintenant actifs. Vous pouvez commencer à les utiliser immédiatement.",
+			"activatedProducts": "Produits activés"
+		},
+		"status": {
+			"active": "Actif"
+		},
+		"toast": {
+			"updatedTitle": "Abonnement mis à jour",
+			"updatedMessage": "{module} a été modifié.",
+			"createdTitle": "Produit activé",
+			"createdMessage": "{module} a été ajouté."
+		},
+		"errors": {
+			"dependencyMissing": {
+				"title": "Dépendance manquante",
+				"message": "Le Channel Manager nécessite un abonnement PMS actif."
+			},
+			"duplicate": {
+				"title": "Abonnement existant",
+				"message": "Un abonnement actif existe déjà pour ce module."
+			}
+		}
+	},
+	"validation": {
+		"required": "{field} est obligatoire"
+	},
 	"countries_lists": {
 		"af": "Afghanistan",
 		"al": "Albanie",

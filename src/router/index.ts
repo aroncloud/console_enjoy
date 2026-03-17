@@ -9,6 +9,7 @@ import Support from '../views/support/Support.vue'
 import Billing from '../views/billing/Billing.vue'
 import Security from '../views/security/Security.vue'
 import Product from '../views/products/Product.vue'
+import ProductDetail from '../views/products/ProductDetail.vue'
 import Users from '../views/users/Users.vue'
 import UserProfile from '../views/users/UserProfile.vue'
 import Profile from '../views/profile/Profile.vue'
@@ -55,6 +56,7 @@ const router = createRouter({
         { path: 'billing',  name: 'billing',  component: Billing },
         { path: 'security', name: 'security', component: Security },
         { path: 'products', name: 'products', component: Product },
+        { path: 'products/:id', name: 'product-detail', component: ProductDetail },
         { path: 'users',    name: 'users',    component: Users },
         {
           path: '/users/:id',

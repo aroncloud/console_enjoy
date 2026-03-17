@@ -3,8 +3,12 @@
 	"search_country": "Search country...",
 	"no_results": "No results",
 	"common": {
+		"back": "Back",
 		"cancel": "Cancel",
 		"create": "Create",
+		"error": "Error",
+		"genericError": "An error occurred",
+		"loading": "Loading...",
 		"save": "Save",
 		"actions": "Actions",
 		"errors": {
@@ -44,6 +48,124 @@
 			"created": "Add-on created",
 			"updated": "Add-on updated",
 			"deleted": "Add-on deleted"
+		}
+	},
+	"subscriptions": {
+		"steps": {
+			"plan": "Plan",
+			"payment": "Payment",
+			"confirmation": "Confirmation"
+		},
+		"header": {
+			"step1": {
+				"title": "Choose your products",
+				"subtitle": "Select the products suited to your property"
+			},
+			"step2": {
+				"title": "Payment",
+				"subtitle": "Complete your subscription by choosing a payment method"
+			}
+		},
+		"dependency": {
+			"title": "Required dependency",
+			"requiresStart": "The ",
+			"requiresMiddle": " requires the ",
+			"activateFirst": "Activate PMS first to subscribe to Channel Manager."
+		},
+		"modules": {
+			"allActive": {
+				"title": "All modules are already active",
+				"subtitle": "This property has subscribed to all available products."
+			}
+		},
+		"addon": {
+			"label": "Add-on",
+			"none": "No add-on available",
+			"placeholder": "Select an add-on",
+			"range": "Min {min} · Max {max}",
+			"optionLabel": "{name} — {price} (min {min}, max {max})"
+		},
+		"billing": {
+			"label": "Billing",
+			"monthly": "Monthly",
+			"yearly": "Yearly",
+			"monthlyFull": "Monthly billing",
+			"yearlyFull": "Yearly billing",
+			"suffixMonth": "/month",
+			"suffixYear": "/year"
+		},
+		"period": {
+			"label": "Subscription period"
+		},
+		"price": {
+			"label": "Subscription price",
+			"monthly": "Monthly",
+			"yearly": "Yearly"
+		},
+		"summary": {
+			"title": "Summary",
+			"none": "No product selected"
+		},
+		"total": {
+			"total": "Total",
+			"perMonth": "Total / month",
+			"perYear": "Total / year",
+			"suffixMonth": "/ month",
+			"suffixYear": "/ year",
+			"amount": "Total amount"
+		},
+		"validation": {
+			"missingPeriod": "Please set the period for all modules.",
+			"missingAddOn": "Please select an add-on for each module.",
+			"addOnOutOfRange": "The selected value is outside the add-on allowed range."
+		},
+		"selectedPlan": {
+			"title": "Selected plan"
+		},
+		"orderSummary": {
+			"title": "Order summary"
+		},
+		"footer": {
+			"mixed": "Mixed total (monthly + yearly)",
+			"recurringMonthly": "Monthly recurring from today",
+			"recurringYearly": "Yearly recurring from today"
+		},
+		"terms": {
+			"prefix": "By continuing, you accept our ",
+			"termsOfUse": "Terms of Use",
+			"and": " and our ",
+			"privacyPolicy": "Privacy Policy"
+		},
+		"actions": {
+			"continue": "Continue →",
+			"edit": "Edit",
+			"finalize": "Finalize subscription →",
+			"dashboard": "Dashboard",
+			"addProducts": "Add products"
+		},
+		"confirmation": {
+			"title": "Subscription confirmed!",
+			"subtitle": "Your products are now active. You can start using them immediately.",
+			"activatedProducts": "Activated products"
+		},
+		"status": {
+			"active": "Active"
+		},
+		"toast": {
+			"updatedTitle": "Subscription updated",
+			"updatedMessage": "{module} has been updated.",
+			"createdTitle": "Product activated",
+			"createdMessage": "{module} has been added."
+		},
+		"errors": {
+			"dependencyMissing": {
+				"title": "Missing dependency",
+				"message": "Channel Manager requires an active PMS subscription."
+			},
+			"duplicate": {
+				"title": "Existing subscription",
+				"message": "An active subscription already exists for this module."
+			}
 		}
 	},
 	"validation": {

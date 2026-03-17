@@ -11,17 +11,17 @@
             class="flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-800 dark:hover:text-white transition-colors cursor-pointer"
           >
             <ArrowLeft />
-            Retour
+            {{ t('common.back') }}
           </button>
         </div>
 
         <div v-if="currentStep === 1" class="pb-5">
-          <h2 class="text-xl font-black text-slate-900 dark:text-white">Choisissez vos produits</h2>
-          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Sélectionnez les produits adaptés à votre établissement</p>
+          <h2 class="text-xl font-black text-slate-900 dark:text-white">{{ t('subscriptions.header.step1.title') }}</h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">{{ t('subscriptions.header.step1.subtitle') }}</p>
         </div>
         <div v-else-if="currentStep === 2" class="pb-5">
-          <h2 class="text-xl font-black text-slate-900 dark:text-white">Paiement</h2>
-          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Finalisez votre souscription en choisissant un mode de paiement</p>
+          <h2 class="text-xl font-black text-slate-900 dark:text-white">{{ t('subscriptions.header.step2.title') }}</h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">{{ t('subscriptions.header.step2.subtitle') }}</p>
         </div>
 
         <!-- Steps -->
@@ -68,10 +68,13 @@
               <div v-if="showChannelWarning" class="flex items-start gap-3 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700">
                 <AlertTriangle :size="16" class="text-amber-600 mt-0.5 shrink-0" />
                 <div>
-                  <p class="text-sm font-bold text-amber-800 dark:text-amber-400">Dépendance requise</p>
+                  <p class="text-sm font-bold text-amber-800 dark:text-amber-400">{{ t('subscriptions.dependency.title') }}</p>
                   <p class="text-xs text-amber-700 dark:text-amber-500 mt-0.5">
-                    Le <strong>Channel Manager</strong> nécessite le module <strong>PMS</strong>.
-                    Activez d'abord le PMS pour pouvoir souscrire au Channel Manager.
+                    {{ t('subscriptions.dependency.requiresStart') }}
+                    <strong>Channel Manager</strong>
+                    {{ t('subscriptions.dependency.requiresMiddle') }}
+                    <strong>PMS</strong>.
+                    {{ t('subscriptions.dependency.activateFirst') }}
                   </p>
                 </div>
               </div>
@@ -117,13 +120,13 @@
                   <!-- ── Add-on (one per module) ── -->
                   <div v-if="isSelected(mod.id)" class="mb-4" @click.stop>
                     <div v-if="addOnsLoadedByModule[mod.id] && (addOnsByModule[mod.id] || []).length === 0" class="p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
-                      <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Add-on</p>
-                      <p class="mt-1 text-xs text-slate-500 dark:text-slate-300">Aucun add-on disponible</p>
+                      <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ t('subscriptions.addon.label') }}</p>
+                      <p class="mt-1 text-xs text-slate-500 dark:text-slate-300">{{ t('subscriptions.addon.none') }}</p>
                     </div>
                     <div v-else class="p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
                       <Select
-                        lb="Add-on"
-                        placeholder="Sélectionner un add-on"
+                        :lb="t('subscriptions.addon.label')"
+                        :placeholder="t('subscriptions.addon.placeholder')"
                         :isRequired="(addOnsByModule[mod.id] || []).length > 0"
                         :options="addOnOptionsForModule(mod.id)"
                         :isLoading="addOnsLoadingByModule[mod.id]"
@@ -131,9 +134,7 @@
                         @change="() => handleAddOnChange(mod.id)"
                       />
                       <div v-if="getSelectedAddOn(mod.id)" class="mt-2 flex items-center justify-between gap-3 text-[11px] text-slate-500 dark:text-slate-300">
-                        <span class="truncate">
-                          Min {{ getSelectedAddOn(mod.id)?.min }} · Max {{ getSelectedAddOn(mod.id)?.max }}
-                        </span>
+                        <span class="truncate">{{ t('subscriptions.addon.range', { min: getSelectedAddOn(mod.id)?.min, max: getSelectedAddOn(mod.id)?.max }) }}</span>
                         <span class="shrink-0 font-bold text-slate-700 dark:text-slate-200">
                           {{
                             formatCurrency(
@@ -151,17 +152,17 @@
 
                   <!-- ── Billing cycle ── -->
                   <div v-if="isSelected(mod.id)" class="mb-4" @click.stop>
-                  <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Facturation</p>
+                  <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{{ t('subscriptions.billing.label') }}</p>
                     <div class="grid grid-cols-2 gap-2">
                       <button
-                        v-for="[val, label] in [['monthly', 'Mensuel'], ['yearly', 'Annuel']]"
+                        v-for="val in ['monthly', 'yearly']"
                         :key="val"
                         @click="setSel(mod.id, 'billingCycle', val); ensurePeriodMatchesCycle(mod.id)"
                         class="py-1.5 px-2 rounded-lg text-[11px] font-bold border transition-all"
                         :class="getSel(mod.id).billingCycle === val
                           ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'
                           : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'"
-                      >{{ label }}</button>
+                      >{{ val === 'yearly' ? t('subscriptions.billing.yearly') : t('subscriptions.billing.monthly') }}</button>
                     </div>
                   </div>
 
@@ -169,7 +170,7 @@
                   <div v-if="isSelected(mod.id)" class="mb-4" @click.stop>
                     <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                       <CalendarRange :size="11" />
-                      Période de souscription
+                      {{ t('subscriptions.period.label') }}
                     </p>
                     <InputDoubleDate
                       :modelValue="{ start: getSel(mod.id).startMonth, end: getSel(mod.id).endMonth }"
@@ -185,11 +186,11 @@
                   <div v-if="isSelected(mod.id)" class="mb-4" @click.stop>
                     <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                       <Tag :size="11" />
-                      Prix de souscription
+                      {{ t('subscriptions.price.label') }}
                     </p>
                     <div class="p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex items-center justify-between">
                       <span class="text-xs font-semibold text-slate-600 dark:text-slate-300">
-                        {{ getSel(mod.id).billingCycle === 'yearly' ? 'Annuel' : 'Mensuel' }}
+                        {{ getSel(mod.id).billingCycle === 'yearly' ? t('subscriptions.price.yearly') : t('subscriptions.price.monthly') }}
                       </span>
                       <span class="text-sm font-black text-slate-900 dark:text-white">
                         {{ formatCurrency(getPrice(mod)) }}
@@ -255,8 +256,8 @@
               <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center mb-3">
                 <Package :size="22" class="opacity-40" />
               </div>
-              <p class="text-sm font-semibold">Tous les modules sont déjà actifs</p>
-              <p class="text-xs mt-1">Cet établissement a souscrit à tous les produits disponibles.</p>
+              <p class="text-sm font-semibold">{{ t('subscriptions.modules.allActive.title') }}</p>
+              <p class="text-xs mt-1">{{ t('subscriptions.modules.allActive.subtitle') }}</p>
             </div>
           </div>
 
@@ -264,12 +265,12 @@
           <div class="space-y-4">
             <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden sticky top-6">
               <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
-                <h3 class="font-black text-sm text-slate-900 dark:text-white">Récapitulatif</h3>
+                <h3 class="font-black text-sm text-slate-900 dark:text-white">{{ t('subscriptions.summary.title') }}</h3>
               </div>
               <div class="p-5">
                 <div v-if="selectedModules.length === 0" class="text-center py-6">
                   <Package :size="28" class="text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-                  <p class="text-xs text-slate-400">Aucun produit sélectionné</p>
+                  <p class="text-xs text-slate-400">{{ t('subscriptions.summary.none') }}</p>
                 </div>
                 <div v-else class="space-y-3">
                   <div v-for="mod in selectedModules" :key="mod.id" class="flex items-start justify-between gap-2">
@@ -279,7 +280,7 @@
                       </div>
                       <div class="min-w-0">
                         <p class="text-xs font-bold text-slate-700 dark:text-slate-300 truncate">{{ mod.name }}</p>
-                        <p class="text-[10px] text-slate-400">{{ getSel(mod.id).billingCycle === 'yearly' ? 'Annuel' : 'Mensuel' }}</p>
+                        <p class="text-[10px] text-slate-400">{{ getSel(mod.id).billingCycle === 'yearly' ? t('subscriptions.price.yearly') : t('subscriptions.price.monthly') }}</p>
                         <p v-if="getSel(mod.id).addOnId" class="text-[10px] text-slate-400 truncate">{{ getSelectedAddOn(mod.id)?.name }}</p>
                        
                       </div>
@@ -291,18 +292,18 @@
                     <template v-if="isMixedBilling">
                       <div class="w-full space-y-2">
                         <div class="flex justify-between items-center">
-                          <span class="text-sm font-black text-slate-900 dark:text-white">Total / mois</span>
+                          <span class="text-sm font-black text-slate-900 dark:text-white">{{ t('subscriptions.total.perMonth') }}</span>
                           <span class="text-lg font-black text-purple-600">{{ formatCurrency(totalMonthly) }}</span>
                         </div>
                         <div class="flex justify-between items-center">
-                          <span class="text-sm font-black text-slate-900 dark:text-white">Total / an</span>
+                          <span class="text-sm font-black text-slate-900 dark:text-white">{{ t('subscriptions.total.perYear') }}</span>
                           <span class="text-lg font-black text-purple-600">{{ formatCurrency(totalYearly) }}</span>
                         </div>
                       </div>
                     </template>
                     <template v-else>
                       <span class="text-sm font-black text-slate-900 dark:text-white">
-                        Total {{ isYearlyOnlyBilling ? '/ an' : '/ mois' }}
+                        {{ t('subscriptions.total.total') }} {{ isYearlyOnlyBilling ? t('subscriptions.total.suffixYear') : t('subscriptions.total.suffixMonth') }}
                       </span>
                       <span class="text-lg font-black text-purple-600">
                         {{ formatCurrency(isYearlyOnlyBilling ? totalYearly : totalMonthly) }}
@@ -314,21 +315,21 @@
                 <Transition name="slide-down">
                   <div v-if="hasMissingPeriod" class="mt-3 flex items-start gap-2 p-3 rounded-xl bg-amber-50 border border-amber-200">
                     <AlertTriangle :size="13" class="text-amber-500 mt-0.5 shrink-0" />
-                    <p class="text-[11px] text-amber-700 font-medium">Veuillez définir la période pour tous les modules en facturation mensuelle.</p>
+                    <p class="text-[11px] text-amber-700 font-medium">{{ t('subscriptions.validation.missingPeriod') }}</p>
                   </div>
                 </Transition>
 
                 <Transition name="slide-down">
                   <div v-if="hasMissingAddOn" class="mt-3 flex items-start gap-2 p-3 rounded-xl bg-amber-50 border border-amber-200">
                     <AlertTriangle :size="13" class="text-amber-500 mt-0.5 shrink-0" />
-                    <p class="text-[11px] text-amber-700 font-medium">Veuillez sélectionner un add-on pour chaque module.</p>
+                    <p class="text-[11px] text-amber-700 font-medium">{{ t('subscriptions.validation.missingAddOn') }}</p>
                   </div>
                 </Transition>
 
                 <Transition name="slide-down">
                   <div v-if="hasAddOnOutOfRange" class="mt-3 flex items-start gap-2 p-3 rounded-xl bg-amber-50 border border-amber-200">
                     <AlertTriangle :size="13" class="text-amber-500 mt-0.5 shrink-0" />
-                    <p class="text-[11px] text-amber-700 font-medium">La valeur choisie dépasse la plage autorisée de l'add-on.</p>
+                    <p class="text-[11px] text-amber-700 font-medium">{{ t('subscriptions.validation.addOnOutOfRange') }}</p>
                   </div>
                 </Transition>
 
@@ -339,7 +340,7 @@
                   :class="selectedModules.length > 0 && !hasMissingPeriod && !hasMissingAddOn && !hasAddOnOutOfRange
                     ? 'bg-purple-600 hover:bg-purple-700 shadow-lg shadow-purple-200 dark:shadow-purple-900/30'
                     : 'bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed'"
-                >Continuer →</button>
+                >{{ t('subscriptions.actions.continue') }}</button>
               </div>
             </div>
           </div>
@@ -353,8 +354,8 @@
           <div class="space-y-4">
             <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden sticky top-6">
               <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                <h3 class="font-black text-sm text-slate-900 dark:text-white">Plan sélectionné</h3>
-                <button :disabled="loading" @click="currentStep = 1" class="text-xs text-purple-600 font-bold hover:underline cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">Modifier</button>
+                <h3 class="font-black text-sm text-slate-900 dark:text-white">{{ t('subscriptions.selectedPlan.title') }}</h3>
+                <button :disabled="loading" @click="currentStep = 1" class="text-xs text-purple-600 font-bold hover:underline cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">{{ t('subscriptions.actions.edit') }}</button>
               </div>
               <div class="p-5 space-y-3">
                 <div v-for="mod in selectedModules" :key="mod.id" class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800">
@@ -363,7 +364,9 @@
                   </div>
                   <div class="flex-1 min-w-0">
                     <p class="text-xs font-bold text-slate-800 dark:text-white truncate">{{ mod.name }}</p>
-                    <p class="text-[10px] text-slate-400">{{ getSel(mod.id).billingCycle === 'yearly' ? 'Facturation annuelle' : 'Facturation mensuelle' }}</p>
+                    <p class="text-[10px] text-slate-400">
+                      {{ getSel(mod.id).billingCycle === 'yearly' ? t('subscriptions.billing.yearlyFull') : t('subscriptions.billing.monthlyFull') }}
+                    </p>
                     <p v-if="getSel(mod.id).billingCycle === 'monthly' && getSel(mod.id).startMonth && getSel(mod.id).endMonth" class="text-[10px] text-purple-500 font-semibold mt-0.5 flex items-center gap-1">
                       <CalendarRange :size="9" />{{ formatMonthShort(getSel(mod.id).startMonth) }} → {{ formatMonthShort(getSel(mod.id).endMonth) }}
                     </p>
@@ -375,17 +378,19 @@
                   <template v-if="isMixedBilling">
                     <div class="w-full space-y-2">
                       <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold text-slate-500">Total / mois</span>
+                        <span class="text-xs font-bold text-slate-500">{{ t('subscriptions.total.perMonth') }}</span>
                         <span class="text-sm font-black text-purple-600">{{ formatCurrency(totalMonthly) }}</span>
                       </div>
                       <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold text-slate-500">Total / an</span>
+                        <span class="text-xs font-bold text-slate-500">{{ t('subscriptions.total.perYear') }}</span>
                         <span class="text-sm font-black text-purple-600">{{ formatCurrency(totalYearly) }}</span>
                       </div>
                     </div>
                   </template>
                   <template v-else>
-                    <span class="text-xs font-bold text-slate-500">Total {{ isYearlyOnlyBilling ? '/ an' : '/ mois' }}</span>
+                    <span class="text-xs font-bold text-slate-500">
+                      {{ t('subscriptions.total.total') }} {{ isYearlyOnlyBilling ? t('subscriptions.total.suffixYear') : t('subscriptions.total.suffixMonth') }}
+                    </span>
                     <span class="text-sm font-black text-purple-600">
                       {{ formatCurrency(isYearlyOnlyBilling ? totalYearly : totalMonthly) }}
                     </span>
@@ -510,7 +515,7 @@
                 <div class="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center">
                   <Receipt :size="15" class="text-slate-600 dark:text-slate-300" />
                 </div>
-                <h3 class="font-black text-sm text-slate-900 dark:text-white">Récapitulatif de commande</h3>
+                <h3 class="font-black text-sm text-slate-900 dark:text-white">{{ t('subscriptions.orderSummary.title') }}</h3>
               </div>
               <div class="p-6 space-y-3">
                 <div v-for="mod in selectedModules" :key="mod.id" class="flex justify-between items-start gap-4">
@@ -530,7 +535,7 @@
                     <span class="font-semibold text-slate-800 dark:text-white text-sm block">
                       {{ formatCurrency(getPrice(mod)) }}
                       <span class="text-[10px] text-slate-400 font-bold">
-                        {{ getSel(mod.id).billingCycle === 'yearly' ? '/an' : '/mois' }}
+                        {{ getSel(mod.id).billingCycle === 'yearly' ? t('subscriptions.billing.suffixYear') : t('subscriptions.billing.suffixMonth') }}
                       </span>
                     </span>
                    
@@ -541,17 +546,19 @@
                   <template v-if="isMixedBilling">
                     <div class="w-full space-y-2">
                       <div class="flex justify-between items-center">
-                        <span class="font-black text-slate-900 dark:text-white">Total / mois</span>
+                        <span class="font-black text-slate-900 dark:text-white">{{ t('subscriptions.total.perMonth') }}</span>
                         <span class="text-2xl font-black text-purple-600">{{ formatCurrency(totalMonthly) }}</span>
                       </div>
                       <div class="flex justify-between items-center">
-                        <span class="font-black text-slate-900 dark:text-white">Total / an</span>
+                        <span class="font-black text-slate-900 dark:text-white">{{ t('subscriptions.total.perYear') }}</span>
                         <span class="text-2xl font-black text-purple-600">{{ formatCurrency(totalYearly) }}</span>
                       </div>
                     </div>
                   </template>
                   <template v-else>
-                    <span class="font-black text-slate-900 dark:text-white">Montant total {{ isYearlyOnlyBilling ? '/ an' : '/ mois' }}</span>
+                    <span class="font-black text-slate-900 dark:text-white">
+                      {{ t('subscriptions.total.amount') }} {{ isYearlyOnlyBilling ? t('subscriptions.total.suffixYear') : t('subscriptions.total.suffixMonth') }}
+                    </span>
                     <span class="text-2xl font-black text-purple-600">
                       {{ formatCurrency(isYearlyOnlyBilling ? totalYearly : totalMonthly) }}
                     </span>
@@ -559,8 +566,8 @@
                 </div>
                 <p class="text-[10px] text-slate-400 text-right flex items-center justify-end gap-1">
                   <RefreshCw :size="10" />
-                  <span v-if="isMixedBilling">Total mixte (mensuel + annuel)</span>
-                  <span v-else>{{ isYearlyOnlyBilling ? 'Récurrent annuel' : 'Récurrent mensuel' }} à partir d'aujourd'hui</span>
+                  <span v-if="isMixedBilling">{{ t('subscriptions.footer.mixed') }}</span>
+                  <span v-else>{{ isYearlyOnlyBilling ? t('subscriptions.footer.recurringYearly') : t('subscriptions.footer.recurringMonthly') }}</span>
                 </p>
                 <button
                   @click="goToStep3"
@@ -576,14 +583,17 @@
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  <span v-if="loading">Chargement...</span>
+                  <span v-if="loading">{{ t('common.loading') }}</span>
                   <template v-else>
                     <ShieldCheck :size="16" />
-                    Finaliser la souscription →
+                    {{ t('subscriptions.actions.finalize') }}
                   </template>
                 </button>
                 <p class="text-[10px] text-slate-400 text-center mt-1">
-                  En continuant, vous acceptez nos <span class="underline cursor-pointer">Conditions d'utilisation</span> et notre <span class="underline cursor-pointer">Politique de confidentialité</span>.
+                  {{ t('subscriptions.terms.prefix') }}
+                  <span class="underline cursor-pointer">{{ t('subscriptions.terms.termsOfUse') }}</span>
+                  {{ t('subscriptions.terms.and') }}
+                  <span class="underline cursor-pointer">{{ t('subscriptions.terms.privacyPolicy') }}</span>.
                 </p>
               </div>
             </div>
@@ -597,11 +607,11 @@
           <div class="w-20 h-20 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mx-auto mb-6">
             <CheckCircle2 :size="40" class="text-emerald-500" />
           </div>
-          <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-2">Souscription confirmée !</h2>
-          <p class="text-sm text-slate-500 mb-8">Vos produits sont maintenant actifs. Vous pouvez commencer à les utiliser immédiatement.</p>
+          <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-2">{{ t('subscriptions.confirmation.title') }}</h2>
+          <p class="text-sm text-slate-500 mb-8">{{ t('subscriptions.confirmation.subtitle') }}</p>
 
           <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 mb-6 text-left space-y-3">
-            <h3 class="font-black text-sm text-slate-900 dark:text-white mb-3">Produits activés</h3>
+            <h3 class="font-black text-sm text-slate-900 dark:text-white mb-3">{{ t('subscriptions.confirmation.activatedProducts') }}</h3>
             <div v-for="mod in selectedModules" :key="mod.id" class="flex items-center gap-3">
               <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" :style="{ background: mod.color + '15', color: mod.color }">
                 <component :is="mod.icon" :size="15" />
@@ -610,9 +620,9 @@
                 <p class="text-xs font-bold text-slate-800 dark:text-white">{{ mod.fullName }}</p>
                 <p class="text-[10px] text-slate-400">
                   <span v-if="getSel(mod.id).billingCycle === 'monthly'">{{ formatDateFull(getSel(mod.id).startMonth) }} → {{ formatDateFull(getSel(mod.id).endMonth) }}</span>
-                  <span v-else>Facturation annuelle</span>
+                  <span v-else>{{ t('subscriptions.billing.yearlyFull') }}</span>
                 </p>
-                <p class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1"><Check :size="9" /> Actif</p>
+                <p class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1"><Check :size="9" /> {{ t('subscriptions.status.active') }}</p>
               </div>
               <span class="text-xs font-black text-slate-700 dark:text-slate-300">{{ getPrice(mod).toLocaleString('fr-FR') }} XAF</span>
             </div>
@@ -620,10 +630,10 @@
 
           <div class="grid grid-cols-2 gap-3">
             <button @click="router.back()" class="py-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center justify-center gap-2">
-              <LayoutDashboard :size="15" />Tableau de bord
+              <LayoutDashboard :size="15" />{{ t('subscriptions.actions.dashboard') }}
             </button>
             <button @click="resetAndRestart" class="py-3 rounded-xl bg-purple-600 text-sm font-bold text-white hover:bg-purple-700 transition-colors flex items-center justify-center gap-2">
-              <Plus :size="15" />Ajouter des produits
+              <Plus :size="15" />{{ t('subscriptions.actions.addProducts') }}
             </button>
           </div>
         </div>
@@ -636,6 +646,7 @@
 <script setup lang="ts">
 import { ref, computed, reactive, onMounted, type Component } from 'vue'
 import { useRouter ,useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { productService, type Product } from '../../servicesAPI/productService'
 import { formatCurrency } from '../../components/Utilities/function'
 import InputDoubleDate from '../../components/FormElements/InputDoubleDate.vue'
@@ -655,6 +666,7 @@ import { hotelService } from '../../servicesAPI/clientService'
 
 const router = useRouter()
 const toastStore = useToastStore()
+const { t } = useI18n()
 const loading = ref(false)
 const pageLoading = ref(true) 
 const existingSubscriptions = ref<any[]>([])
@@ -789,7 +801,11 @@ const DEFAULT_OTAS: OTA[] = [
 
 // ── State ───────
 const currentStep        = ref(1)
-const steps              = ['Plan', 'Paiement', 'Confirmation']
+const steps              = computed(() => [
+  t('subscriptions.steps.plan'),
+  t('subscriptions.steps.payment'),
+  t('subscriptions.steps.confirmation'),
+])
 const showChannelWarning = ref(false)
 const selections         = reactive<Record<number, Selection>>({})
 const addOnsByModule     = reactive<Record<number, AddOn[]>>({})
@@ -815,13 +831,18 @@ const getSelectedAddOn = (moduleId: number) => {
 const addOnOptionsForModule = (moduleId: number) =>
   (addOnsByModule[moduleId] || []).map((a) => ({
     value: a.id,
-    label: `${a.name} — ${formatCurrency(
-      (selections[moduleId]?.billingCycle ?? 'monthly') === 'yearly'
-        ? a.priceYear != null
-          ? Number(a.priceYear)
-          : Number(a.priceMonth) * 12
-        : Number(a.priceMonth)
-    )} (min ${a.min}, max ${a.max})`,
+    label: t('subscriptions.addon.optionLabel', {
+      name: a.name,
+      price: formatCurrency(
+        (selections[moduleId]?.billingCycle ?? 'monthly') === 'yearly'
+          ? a.priceYear != null
+            ? Number(a.priceYear)
+            : Number(a.priceMonth) * 12
+          : Number(a.priceMonth)
+      ),
+      min: a.min,
+      max: a.max,
+    }),
   }))
 
 const handleAddOnChange = (moduleId: number) => {
@@ -1042,21 +1063,29 @@ const goToStep3 = async () => {
           ends_at      : payload.ends_at,
           add_on_id    : payload.add_on_id,
         })
-        toastStore.show({ type: 'success', title: 'Abonnement mis à jour', message: `${mod.name} a été modifié.` })
+        toastStore.show({
+          type: 'success',
+          title: t('subscriptions.toast.updatedTitle'),
+          message: t('subscriptions.toast.updatedMessage', { module: mod.name }),
+        })
       } else {
         await subscriptionService.create(hotelId, payload)
-        toastStore.show({ type: 'success', title: 'Produit activé', message: `${mod.name} a été ajouté.` })
+        toastStore.show({
+          type: 'success',
+          title: t('subscriptions.toast.createdTitle'),
+          message: t('subscriptions.toast.createdMessage', { module: mod.name }),
+        })
       }
     }
     currentStep.value = 3
   } catch (error: any) {
     const code = error.response?.data?.code
     const codeMessages: Record<string, { title: string; message: string }> = {
-      DEPENDENCY_MISSING    : { title: 'Dépendance manquante', message: 'Le Channel Manager nécessite un abonnement PMS actif.' },
-      DUPLICATE_SUBSCRIPTION: { title: 'Abonnement existant',  message: 'Un abonnement actif existe déjà pour ce module.' },
-      INTERNAL_SERVER_ERROR : { title: 'Erreur', message: 'Une erreur est survenue.' }
+      DEPENDENCY_MISSING    : { title: t('subscriptions.errors.dependencyMissing.title'), message: t('subscriptions.errors.dependencyMissing.message') },
+      DUPLICATE_SUBSCRIPTION: { title: t('subscriptions.errors.duplicate.title'), message: t('subscriptions.errors.duplicate.message') },
+      INTERNAL_SERVER_ERROR : { title: t('common.error'), message: t('common.genericError') }
     }
-    const toast = codeMessages[code] ?? { title: 'Erreur', message: error.response?.data?.message ?? 'Une erreur est survenue.' }
+    const toast = codeMessages[code] ?? { title: t('common.error'), message: error.response?.data?.message ?? t('common.genericError') }
     toastStore.show({ type: 'error', title: toast.title, message: toast.message })
   } finally {
     loading.value = false

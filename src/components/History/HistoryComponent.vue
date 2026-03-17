@@ -9,7 +9,7 @@
           <History class="w-4 h-4 text-purple-600 dark:text-purple-300" />
         </div>
         <div>
-          <h3 class="text-sm font-bold text-slate-900 dark:text-white">{{ title }}</h3>
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white">{{ computedTitle }}</h3>
           <p v-if="subtitle" class="text-xs text-slate-400">{{ subtitle }}</p>
         </div>
       </div>
@@ -20,16 +20,16 @@
    <div v-if="showFilters" class="flex flex-col md:flex-row items-start md:items-center gap-2 px-5 py-3 border-b border-gray-100 dark:border-slate-800">
   <Input
     v-model="search"
-    lb="Recherche"
-    placeholder="Rechercher..."
+    :lb="t('common.search')"
+    :placeholder="t('history.filters.searchPlaceholder')"
     class="flex-1 w-full"
   />
   <div class="w-full md:w-64">
     <Select
       v-model="filterAction"
-      lb="Action"
+      :lb="t('history.filters.action')"
       :options="availableActions"
-      :default-value="'Action'"
+      :default-value="t('history.filters.actionDefault')"
     />
   </div>
 </div>
@@ -74,10 +74,10 @@
                 {{ getActionBadge(item.action).label }}
               </span>
               <span v-if="item.username" class="text-[10px] text-slate-400 dark:text-slate-500">
-                par {{ item.username }}
+                {{ t('history.byUser', { user: item.username }) }}
               </span>
               <span v-else  class="text-[10px] text-slate-400 dark:text-slate-500">
-                par {{ item.user?.fullName }}
+                {{ t('history.byUser', { user: item.user?.fullName }) }}
               </span>
               <span v-if="showHotelName && item.hotelName" class="text-[10px] text-slate-400 dark:text-slate-500 truncate">
                 · {{ item.hotelName }}
@@ -93,8 +93,8 @@
 
       <div v-else class="flex flex-col items-center justify-center py-10 text-slate-400">
         <History class="w-10 h-10 opacity-20 mb-2" />
-        <p class="text-sm font-semibold">Aucune activité</p>
-        <p class="text-xs mt-1">Aucun événement trouvé</p>
+        <p class="text-sm font-semibold">{{ t('history.empty.title') }}</p>
+        <p class="text-xs mt-1">{{ t('history.empty.subtitle') }}</p>
       </div>
     </div>
 
@@ -103,7 +103,7 @@
       v-if="meta && meta.lastPage > 1"
       class="flex items-center justify-between px-5 py-3 border-t border-gray-100 dark:border-slate-800"
     >
-      <span class="text-xs text-slate-400">Page {{ meta.currentPage }} / {{ meta.lastPage }}</span>
+      <span class="text-xs text-slate-400">{{ t('history.pagination', { current: meta.currentPage, last: meta.lastPage }) }}</span>
       <div class="flex items-center gap-1">
         <button
           :disabled="meta.currentPage === 1"
@@ -128,6 +128,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { History, Smartphone, RefreshCcw, UserPlus, Bell, Trash2, PenLine } from 'lucide-vue-next'
+import { useI18n } from 'vue-i18n'
 import Input from '../FormElements/Input.vue'
 import Select from '../FormElements/Select.vue'
 import { formatDate } from '../Utilities/function'
@@ -157,7 +158,7 @@ const props = withDefaults(defineProps<{
 }>(), {
   logs: () => [],
   loading: false,
-  title: 'Historique',
+  title: '',
   showFilters: false,
   showHotelName: false,
 })
@@ -169,13 +170,15 @@ defineEmits<{
 
 const search = ref('')
 const filterAction = ref('')
+const { t } = useI18n()
+const computedTitle = computed(() => props.title || t('history.title'))
 
-const availableActions = [
-  { label: 'Création',     value: 'hotel.create' },
-  { label: 'Abonnement',   value: 'subscription.create' },
-  { label: 'Mise à jour',  value: 'subscription.update' },
-  { label: 'Suppression',  value: 'subscription.delete' },
-]
+const availableActions = computed(() => [
+  { label: t('history.actions.create'), value: 'hotel.create' },
+  { label: t('history.actions.subscription'), value: 'subscription.create' },
+  { label: t('history.actions.update'), value: 'subscription.update' },
+  { label: t('history.actions.delete'), value: 'subscription.delete' },
+])
 
 const filteredLogs = computed(() => {
   return props.logs.filter((log) => {
@@ -200,11 +203,11 @@ const getIconConfig = (action: string) => {
 }
 
 const getActionBadge = (action: string) => {
-  if (action.endsWith('.create')) return { label: 'Création',    class: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300' }
-  if (action.endsWith('.extend')) return { label: 'extension',    class: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-300' }
-  if (action.endsWith('.update')) return { label: 'Mise à jour', class: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300' }
-  if (action.endsWith('.toggleStatus')) return { label: 'Mise à jour', class: 'bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-300' }
-  if (action.endsWith('.delete')) return { label: 'Suppression', class: 'bg-red-100 text-red-500 dark:bg-red-900/30 dark:text-red-300' }
+  if (action.endsWith('.create')) return { label: t('history.badges.create'), class: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300' }
+  if (action.endsWith('.extend')) return { label: t('history.badges.extend'), class: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-300' }
+  if (action.endsWith('.update')) return { label: t('history.badges.update'), class: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300' }
+  if (action.endsWith('.toggleStatus')) return { label: t('history.badges.update'), class: 'bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-300' }
+  if (action.endsWith('.delete')) return { label: t('history.badges.delete'), class: 'bg-red-100 text-red-500 dark:bg-red-900/30 dark:text-red-300' }
   return { label: action, class: 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-300' }
 }
 </script>

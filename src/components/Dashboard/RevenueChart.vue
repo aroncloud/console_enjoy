@@ -11,7 +11,7 @@
         </div>
       </template>
       <template v-else>
-        <h2 class="text-lg font-bold text-gray-800 dark:text-white">Répartition du Chiffre d'Affaires</h2>
+        <h2 class="text-lg font-bold text-gray-800 dark:text-white">{{ t('dashboard.revenueChart.title') }}</h2>
         <div class="flex gap-2">
           <button
             v-for="period in periods"
@@ -57,7 +57,7 @@
             v-if="bar.current"
             class="absolute inset-x-0 -top-7 text-center text-xs font-bold text-blue-600 dark:text-blue-400"
           >
-            Actuel
+            {{ t('dashboard.revenueChart.current') }}
           </div>
         </div>
 
@@ -104,8 +104,8 @@
         <div class="w-12 h-12 bg-gray-100 dark:bg-slate-800 rounded-xl flex items-center justify-center">
           <BarChart2 class="w-6 h-6 text-gray-300 dark:text-slate-600" />
         </div>
-        <p class="text-sm font-semibold text-gray-400 dark:text-slate-400">Aucune donnée disponible</p>
-        <p class="text-xs text-gray-300 dark:text-slate-500">Les revenus s'afficheront ici dès qu'il y aura des abonnements actifs.</p>
+        <p class="text-sm font-semibold text-gray-400 dark:text-slate-400">{{ t('dashboard.revenueChart.empty.title') }}</p>
+        <p class="text-xs text-gray-300 dark:text-slate-500">{{ t('dashboard.revenueChart.empty.subtitle') }}</p>
       </div>
     </template>
 
@@ -114,9 +114,12 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { TrendingUp, TrendingDown,BarChart2 } from 'lucide-vue-next'
 import type { ChartPoint } from '../../servicesAPI/dashboardService'
 import { formatCurrency } from '../Utilities/function';
+
+const { t } = useI18n()
 
 const props = withDefaults(defineProps<{
   data?: { week: ChartPoint[]; year: ChartPoint[] }
@@ -128,10 +131,10 @@ const props = withDefaults(defineProps<{
 
 const activePeriod = ref<'week' | 'year'>('year')
 
-const periods = [
-  { label: 'Semaine', value: 'week' as const },
-  { label: 'Année',   value: 'year' as const },
-]
+const periods = computed(() => [
+  { label: t('dashboard.revenueChart.periods.week'), value: 'week' as const },
+  { label: t('dashboard.revenueChart.periods.year'), value: 'year' as const },
+])
 
 interface Bar {
   label: string

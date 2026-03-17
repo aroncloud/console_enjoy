@@ -16,16 +16,16 @@
         <div class="flex items-start justify-between mb-6">
           <div>
             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-              {{ isEditMode ? 'Modifier l\'établissement' : 'Ajouter un nouvel établissement' }}
+              {{ isEditMode ? t('hotelForm.header.editTitle') : t('hotelForm.header.createTitle') }}
             </h1>
             <p class="text-gray-500 dark:text-slate-400 text-sm mt-1">
               {{ isEditMode
-                ? `Mettez à jour les informations de ${form.hotelName}`
-                : 'Configurez les détails du nouveau client pour son activation.' }}
+                ? t('hotelForm.header.editSubtitle', { name: form.hotelName })
+                : t('hotelForm.header.createSubtitle') }}
             </p>
           </div>
           <ButtonComponent
-            label="Retour à la liste"
+            :label="t('hotelForm.actions.backToList')"
             variant="ghost"
             :iconLeft="ArrowLeft"
             :disabled="loading"
@@ -60,25 +60,25 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
           
           <div class="flex flex-col gap-1.5">
-            <Input lb="Nom de l'hôtel" v-model="form.hotelName" placeholder="Ex: Grand Hôtel Rivage" :is-required="true" />
+            <Input :lb="t('hotelForm.fields.hotelName')" v-model="form.hotelName" :placeholder="t('hotelForm.placeholders.hotelName')" :is-required="true" />
             <p v-if="errors.hotelName" class="text-sm font-light italic text-red-500">{{ errors.hotelName }}</p>
           </div>
 
-          <Input lb="Enseigne / Chaîne" v-model="form.chain" placeholder="Ex: Luxury Collection" />
+          <Input :lb="t('hotelForm.fields.chain')" v-model="form.chain" :placeholder="t('hotelForm.placeholders.chain')" />
 
-          <Input lb="Code Postal" v-model="form.postalCode" placeholder="Ex: 06000" />
+          <Input :lb="t('hotelForm.fields.postalCode')" v-model="form.postalCode" :placeholder="t('hotelForm.placeholders.postalCode')" />
 
-          <InputCountries lb="Pays" v-model="form.country" />
+          <InputCountries :lb="t('hotelForm.fields.country')" v-model="form.country" />
 
           <div class="flex flex-col gap-1.5">
-            <InputSelectCity lb="Ville" v-model="form.city" placeholder="Ville" :country="form.country" :is-required="true" />
+            <InputSelectCity :lb="t('hotelForm.fields.city')" v-model="form.city" :placeholder="t('hotelForm.placeholders.city')" :country="form.country" :is-required="true" />
             <p v-if="errors.city" class="text-sm font-light italic text-red-500">{{ errors.city }}</p>
           </div>
 
-          <Input lb="Email Professionnel" v-model="form.managerEmail" type="email" placeholder="j.dupont@hotel.com" />
+          <Input :lb="t('hotelForm.fields.managerEmail')" v-model="form.managerEmail" type="email" placeholder="j.dupont@hotel.com" />
 
           <div class="flex flex-col gap-1.5">
-            <label class="text-sm font-medium text-gray-700 dark:text-slate-300">Site Web</label>
+            <label class="text-sm font-medium text-gray-700 dark:text-slate-300">{{ t('hotelForm.fields.website') }}</label>
             <div class="flex">
               <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 text-gray-500 dark:text-slate-300 text-sm">
                 https://
@@ -92,13 +92,13 @@
             </div>
           </div>
 
-          <InputPhone :title="'Numéro de Téléphone'" v-model="form.phone" :isRequired="false" />
+          <InputPhone :title="t('hotelForm.fields.phoneNumber')" v-model="form.phone" :isRequired="false" />
 
-          <Input lb="Nombre d'étages" v-model.number="form.totalFloors" type="number" placeholder="Ex: 5" :is-required="true" />
+          <Input :lb="t('hotelForm.fields.totalFloors')" v-model.number="form.totalFloors" type="number" :placeholder="t('hotelForm.placeholders.totalFloors')" :is-required="true" />
 
           <div class="flex flex-col gap-1.5">
             <label class="text-sm font-medium text-gray-700">
-              Classement (étoiles)<span class="text-red-500">*</span>
+              {{ t('hotelForm.fields.starRating') }}<span class="text-red-500">*</span>
             </label>
             <div class="flex items-center gap-2 h-11">
               <button
@@ -113,14 +113,16 @@
                 </svg>
               </button>
               <span class="text-sm text-gray-500 ml-1">
-                {{ form.starRating > 0 ? `${form.starRating} étoile${form.starRating > 1 ? 's' : ''}` : 'Non classé' }}
+                {{ form.starRating > 0
+                  ? t('hotelForm.starRating.stars', { count: form.starRating, suffix: form.starRating > 1 ? 's' : '' })
+                  : t('hotelForm.starRating.unrated') }}
               </span>
             </div>
             <p v-if="errors.starRating" class="text-sm font-light italic text-red-500">{{ errors.starRating }}</p>
           </div>
 
           <div class="col-span-1 sm:col-span-2 flex flex-col gap-1.5">
-            <Input lb="Adresse (Rue)" v-model="form.address" placeholder="Ex: 42 Avenue des Palmiers" :is-required="true" />
+            <Input :lb="t('hotelForm.fields.address')" v-model="form.address" :placeholder="t('hotelForm.placeholders.address')" :is-required="true" />
             <p v-if="errors.address" class="text-sm font-light italic text-red-500">{{ errors.address }}</p>
           </div>
 
@@ -140,25 +142,25 @@
               </div> -->
 
               <div class=" ">
-                <h3 class="text-sm font-semibold text-gray-500 dark:text-slate-300 uppercase tracking-wider mb-4">Administrateur Système</h3>
+                <h3 class="text-sm font-semibold text-gray-500 dark:text-slate-300 uppercase tracking-wider mb-4">{{ t('hotelForm.admin.title') }}</h3>
                 <p class="text-xs text-gray-400 dark:text-slate-400 mb-4">
-                  {{ isEditMode ? 'Modifier les accès administrateur de cet établissement.' : 'Cet utilisateur recevra les accès pour gérer l\'établissement.' }}
+                  {{ isEditMode ? t('hotelForm.admin.editHelp') : t('hotelForm.admin.createHelp') }}
                 </p>
                 <div class="grid md:grid-cols-2 grid-cols-1 gap-5">
                   <div class="flex flex-col gap-1.5">
-                    <Input lb="Prénom" v-model="form.adminFirstName" placeholder="Ex: Alice" :is-required="true" />
+                    <Input :lb="t('users.fields.firstName')" v-model="form.adminFirstName" :placeholder="t('hotelForm.placeholders.firstName')" :is-required="true" />
                     <p v-if="errors.adminFirstName" class="text-sm font-light italic text-red-500">{{ errors.adminFirstName }}</p>
                   </div>
                   <div class="flex flex-col gap-1.5">
-                    <Input lb="Nom" v-model="form.adminLastName" placeholder="Ex: Martin" :is-required="true" />
+                    <Input :lb="t('users.fields.lastName')" v-model="form.adminLastName" :placeholder="t('hotelForm.placeholders.lastName')" :is-required="true" />
                     <p v-if="errors.adminLastName" class="text-red-500 text-sm font-light italic">{{ errors.adminLastName }}</p>
                   </div>
                   <div class="flex flex-col gap-1.5">
-                    <Input lb="Email" v-model="form.adminEmail" type="email" placeholder="admin@hotel.com" :is-required="true" />
+                    <Input :lb="t('users.fields.email')" v-model="form.adminEmail" type="email" placeholder="admin@hotel.com" :is-required="true" />
                     <p v-if="errors.adminEmail" class="text-red-500 text-sm font-light italic">{{ errors.adminEmail }}</p>
                   </div>
                   <div class="flex flex-col gap-1.5">
-                  <InputPhone :title="'Numéro de Téléphone'" v-model="form.adminPhoneNumber" :isRequired="true" />
+                  <InputPhone :title="t('hotelForm.fields.phoneNumber')" v-model="form.adminPhoneNumber" :isRequired="true" />
                   <p v-if="errors.adminPhoneNumber" class="text-sm font-light italic text-red-500">{{ errors.adminPhoneNumber }}</p>
                   </div>
                 </div>
@@ -170,10 +172,10 @@
           <section v-show="activeTab === 'config'">
             <div class="space-y-6">
               <div>
-                <h3 class="text-sm font-semibold text-gray-500 dark:text-slate-300 uppercase tracking-wider mb-4">Identifiants & Localisation</h3>
+                <h3 class="text-sm font-semibold text-gray-500 dark:text-slate-300 uppercase tracking-wider mb-4">{{ t('hotelForm.config.credentialsTitle') }}</h3>
                 <div class="grid  md:grid-cols-3 grid-cols-1 gap-5">
                   <div class="flex flex-col gap-1.5">
-                    <label class="text-sm font-medium text-gray-700 dark:text-slate-300">Tenant ID</label>
+                    <label class="text-sm font-medium text-gray-700 dark:text-slate-300">{{ t('hotelForm.fields.tenantId') }}</label>
                     <div class="flex gap-2">
                       <input v-model="form.tenantId" readonly class="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-700 rounded-lg bg-gray-50 dark:bg-slate-800 text-gray-600 dark:text-slate-200 focus:outline-none" />
                       <!-- Régénération uniquement en mode création -->
@@ -181,44 +183,44 @@
                         v-if="!isEditMode"
                         @click="regenerateTenantId"
                         class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-500 dark:text-slate-300 transition-colors"
-                        title="Régénérer"
+                        :title="t('common.refresh')"
                       >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                         </svg>
                       </button>
                     </div>
-                    <p class="text-xs text-gray-400 dark:text-slate-400">Identifiant unique auto-généré.</p>
+                    <p class="text-xs text-gray-400 dark:text-slate-400">{{ t('hotelForm.config.tenantHint') }}</p>
                   </div>
-                  <Select lb="Fuseau Horaire" v-model="form.timezone" :options="timezoneOptions" />
-                  <Select lb="Devise par défaut" v-model="form.currency" :options="currencyOptions" />
+                  <Select :lb="t('hotelForm.fields.timezone')" v-model="form.timezone" :options="timezoneOptions" />
+                  <Select :lb="t('hotelForm.fields.currencyDefault')" v-model="form.currency" :options="currencyOptions" />
                 </div>
               </div>
 
               <div class="border-t border-gray-100 dark:border-slate-800 pt-6">
-                <h3 class="text-sm font-semibold text-gray-500 dark:text-slate-300 uppercase tracking-wider mb-4">Horaires</h3>
+                <h3 class="text-sm font-semibold text-gray-500 dark:text-slate-300 uppercase tracking-wider mb-4">{{ t('hotelForm.config.scheduleTitle') }}</h3>
                 <div class="grid grid-cols-1 md:grid-cols-4  gap-5">
                   <div class="flex flex-col gap-1.5">
-                    <InputTime title="Heure de Check-in" v-model="form.checkInTime" />
+                    <InputTime :title="t('hotelForm.fields.checkInTime')" v-model="form.checkInTime" />
                   </div>
                   <div class="flex flex-col gap-1.5">
-                    <InputTime title="Heure de Check-out" v-model="form.checkOutTime" />
+                    <InputTime :title="t('hotelForm.fields.checkOutTime')" v-model="form.checkOutTime" />
                   </div>
-                  <Input lb="Taux de taxe (%)" v-model.number="form.taxRate" type="number" placeholder="Ex: 19.25" />
-                  <Input :lb="'Nombre de Chambres'" v-model.number="form.pmsRooms" type="number" min="1" placeholder="Ex: 20" />
+                  <Input :lb="t('hotelForm.fields.taxRate')" v-model.number="form.taxRate" type="number" :placeholder="t('hotelForm.placeholders.taxRate')" />
+                  <Input :lb="t('hotelForm.fields.roomsCount')" v-model.number="form.pmsRooms" type="number" min="1" :placeholder="t('hotelForm.placeholders.roomsCount')" />
                 </div>
               </div>
 
               <div class="border-t border-gray-100 dark:border-slate-800 pt-6">
-                <h3 class="text-sm font-semibold text-gray-500 dark:text-slate-300 uppercase tracking-wider mb-4">Politiques</h3>
+                <h3 class="text-sm font-semibold text-gray-500 dark:text-slate-300 uppercase tracking-wider mb-4">{{ t('hotelForm.config.policiesTitle') }}</h3>
                 <div class="grid grid-cols-1 gap-5">
                   <div class="flex flex-col gap-1.5">
-                    <label class="text-sm font-medium text-gray-700 dark:text-slate-300">Politique d'annulation</label>
-                    <textarea v-model="form.cancellationPolicy" rows="3" placeholder="Ex: Annulation gratuite jusqu'à 48h avant l'arrivée..." class="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-transparent dark:bg-slate-800 px-4 py-2.5 text-sm text-gray-800 dark:text-slate-200 placeholder:text-gray-400 dark:placeholder:text-slate-400 focus:border-purple-500 focus:outline-none focus:ring-3 focus:ring-purple-500/10 resize-none" />
+                    <label class="text-sm font-medium text-gray-700 dark:text-slate-300">{{ t('hotelForm.fields.cancellationPolicy') }}</label>
+                    <textarea v-model="form.cancellationPolicy" rows="3" :placeholder="t('hotelForm.placeholders.cancellationPolicy')" class="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-transparent dark:bg-slate-800 px-4 py-2.5 text-sm text-gray-800 dark:text-slate-200 placeholder:text-gray-400 dark:placeholder:text-slate-400 focus:border-purple-500 focus:outline-none focus:ring-3 focus:ring-purple-500/10 resize-none" />
                   </div>
                   <div class="flex flex-col gap-1.5">
-                    <label class="text-sm font-medium text-gray-700 dark:text-slate-300">Politique de l'établissement</label>
-                    <textarea v-model="form.policies" rows="3" placeholder="Ex: Non-fumeur. Animaux non admis. Accès PMR disponible..." class="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-transparent dark:bg-slate-800 px-4 py-2.5 text-sm text-gray-800 dark:text-slate-200 placeholder:text-gray-400 dark:placeholder:text-slate-400 focus:border-purple-500 focus:outline-none focus:ring-3 focus:ring-purple-500/10 resize-none" />
+                    <label class="text-sm font-medium text-gray-700 dark:text-slate-300">{{ t('hotelForm.fields.hotelPolicy') }}</label>
+                    <textarea v-model="form.policies" rows="3" :placeholder="t('hotelForm.placeholders.hotelPolicy')" class="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-transparent dark:bg-slate-800 px-4 py-2.5 text-sm text-gray-800 dark:text-slate-200 placeholder:text-gray-400 dark:placeholder:text-slate-400 focus:border-purple-500 focus:outline-none focus:ring-3 focus:ring-purple-500/10 resize-none" />
                   </div>
                 </div>
               </div>
@@ -231,7 +233,7 @@
         <div class="flex justify-end gap-3 mt-6">
           <ButtonComponent
             v-if="!isFirstTab"
-            label="Précédent"
+            :label="t('common.previous')"
             variant="secondary"
             :iconLeft="ChevronLeft"
             :disabled="loading"
@@ -239,14 +241,14 @@
           />
           <ButtonComponent
             v-if="!isLastTab"
-            label="Suivant"
+            :label="t('common.next')"
             variant="primary"
             :iconRight="ChevronRight"
             @click="nextTab"
           />
           <ButtonComponent
             v-if="isLastTab"
-            :label="isEditMode ? 'Enregistrer les modifications' : 'Créer l\'établissement'"
+            :label="isEditMode ? t('hotelForm.actions.saveChanges') : t('hotelForm.actions.createHotel')"
             variant="primary"
             :loading="loading"
             @click="handleSubmit"
@@ -262,6 +264,7 @@
 import { ref, reactive, computed, onMounted,toRaw ,watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { useI18n } from 'vue-i18n'
 
 import Input           from '../FormElements/Input.vue'
 import InputSelectCity from '../FormElements/InputSelectCity.vue'
@@ -303,22 +306,23 @@ const emit = defineEmits<{
 
 const router     = useRouter()
 const toastStore = useToastStore()
+const { t } = useI18n()
 
 // ── Mode ──────────
 const isEditMode  = computed(() => !!props.hotelId)
 const loadingHotel = ref(false)
 
 // ── Tabs ────────────
-const tabs = [
-  { key: 'general', label: 'Informations Générales' },
-  { key: 'contact', label: 'Contact Principal'      },
-  { key: 'config',  label: 'Configuration Initiale' },
-]
+const tabs = computed(() => [
+  { key: 'general', label: t('hotelForm.tabs.general') },
+  { key: 'contact', label: t('hotelForm.tabs.contact') },
+  { key: 'config',  label: t('hotelForm.tabs.config') },
+])
 
 const activeTab    = ref('general')
-const currentIndex = computed(() => tabs.findIndex(t => t.key === activeTab.value))
+const currentIndex = computed(() => tabs.value.findIndex(tab => tab.key === activeTab.value))
 const isFirstTab   = computed(() => currentIndex.value === 0)
-const isLastTab    = computed(() => currentIndex.value === tabs.length - 1)
+const isLastTab    = computed(() => currentIndex.value === tabs.value.length - 1)
 
 // ── Erreurs ─────
 const errors = reactive({
@@ -408,7 +412,7 @@ onMounted(async () => {
 
   } catch (e) {
     console.error(e)
-    toastStore.show({ type: 'error', message: 'Impossible de charger les données de l\'établissement' })
+    toastStore.show({ type: 'error', message: t('hotelForm.toast.loadError') })
     router.back()
   } finally {
     loadingHotel.value = false
@@ -419,18 +423,18 @@ onMounted(async () => {
 const validateTab = (tabKey: string): boolean => {
   let valid = true
   if (tabKey === 'general') {
-    errors.hotelName = form.hotelName.trim() ? '' : "Le nom de l'hôtel est obligatoire"
-    errors.address = form.address.trim() ? '' : 'L \' adresse est obligatoire'
-    errors.city = form.city.trim() ? '' : 'La ville est obligatoire'
-    errors.starRating = form.starRating ? '' : 'Les etoiles sont obligations'
+    errors.hotelName = form.hotelName.trim() ? '' : t('hotelForm.validation.hotelNameRequired')
+    errors.address = form.address.trim() ? '' : t('hotelForm.validation.addressRequired')
+    errors.city = form.city.trim() ? '' : t('hotelForm.validation.cityRequired')
+    errors.starRating = form.starRating ? '' : t('hotelForm.validation.starRatingRequired')
     if (errors.hotelName || errors.address || errors.city || errors.starRating ) valid = false
   }
   if (tabKey === 'contact') {
-    errors.adminFirstName = form.adminFirstName.trim() ? '' : 'Le prénom est obligatoire'
-    errors.adminLastName  = form.adminLastName.trim()  ? '' : 'Le nom est obligatoire'
-    errors.adminPhoneNumber = form.adminPhoneNumber ? '' : 'Le numéro de téléphone est obligatoire'
+    errors.adminFirstName = form.adminFirstName.trim() ? '' : t('users.validation.firstNameRequired')
+    errors.adminLastName  = form.adminLastName.trim()  ? '' : t('users.validation.lastNameRequired')
+    errors.adminPhoneNumber = form.adminPhoneNumber ? '' : t('hotelForm.validation.phoneRequired')
     errors.adminEmail     = form.adminEmail.trim() && /\S+@\S+\.\S+/.test(form.adminEmail)
-      ? '' : 'Un email valide est requis'
+      ? '' : t('hotelForm.validation.emailValid')
     if (errors.adminFirstName || errors.adminLastName || errors.adminEmail || errors.adminPhoneNumber ) valid = false
   }
   return valid
@@ -440,17 +444,17 @@ const validateTab = (tabKey: string): boolean => {
 const nextTab = () => {
   if (isLastTab.value || props.loading) return
   if (!validateTab(activeTab.value)) return
-  const next = tabs[currentIndex.value + 1]
+  const next = tabs.value[currentIndex.value + 1]
   if (next) activeTab.value = next.key
 }
 const prevTab = () => {
   if (!isFirstTab.value && !props.loading) {
-    const prev = tabs[currentIndex.value - 1]
+    const prev = tabs.value[currentIndex.value - 1]
     if (prev) activeTab.value = prev.key
   }
 }
 const goToTab = (key: string) => {
-  const targetIndex = tabs.findIndex(t => t.key === key)
+  const targetIndex = tabs.value.findIndex(tab => tab.key === key)
   if (targetIndex > currentIndex.value && !validateTab(activeTab.value)) return
   activeTab.value = key
 }

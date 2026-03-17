@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, reactive } from "vue";
+import { useI18n } from 'vue-i18n'
 import {
   MonitorPlay,
   Search,
@@ -48,6 +49,7 @@ const saving = ref(false);
 const searchQuery = ref("");
 const filterStatus = ref<DemoStatus | "all">("all");
 const toastStore = useToastStore();
+const { t, locale } = useI18n()
 const page = ref(1);
 const limit = ref(20);
 const meta = ref<any>(null);
@@ -575,7 +577,7 @@ const handleResendEmail = async (id: number) => {
               variant="ghost"
               size="sm"
               :iconLeft="row.emailSend ? MailCheck : Mail"
-              :aria-label="row.emailSend ? 'Email envoyé' : 'Renvoyer email'"
+              :aria-label="row.emailSend ? t('demos.actions.emailSent') : t('demos.actions.resendEmail')"
               :class="row.emailSend ? 'text-emerald-500' : ''"
               @click.stop="handleResendEmail(row.id)"
             />
@@ -830,3 +832,4 @@ const handleResendEmail = async (id: number) => {
   animation-duration: 0.3s;
 }
 </style>
+

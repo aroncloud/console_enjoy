@@ -24,7 +24,7 @@
         <div class="flex items-center justify-between">
           <h2 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
             <TriangleAlert class="w-5 h-5 text-red-500" />
-            Alertes d'Expiration de Licence (30 jours)
+            {{ t('dashboard.licenseAlerts.title') }}
           </h2>
         </div>
         <LicenseTable :data="dashboard?.licenseAlerts"
@@ -37,7 +37,7 @@
         <div class="flex items-center justify-between">
           <h2 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
             <Zap class="w-5 h-5 text-blue-500" />
-            Activations Récentes
+            {{ t('dashboard.recentActivations.title') }}
           </h2>
         </div>
         <RecentActivations :data="dashboard?.recentActivations ?? []" :loading="loading" class="flex-1 min-h-0"/>
@@ -54,6 +54,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { Building2, BadgeDollarSign, RefreshCcw, TriangleAlert, Zap } from 'lucide-vue-next'
+import { useI18n } from 'vue-i18n'
 import StatsCard from '../components/Dashboard/StatsCard.vue'
 import LicenseTable from '../components/Dashboard/LicenseTable.vue'
 import RecentActivations from '../components/Dashboard/RecentActivations.vue'
@@ -75,6 +76,7 @@ interface Stat {
 const dashboard = ref<DashboardData | null>(null)
 const loading = ref(false)
 const toastore = useToastStore()
+const { t } = useI18n()
 
 const fetchData = async(page: number) =>{
    loading.value = true
@@ -82,7 +84,7 @@ const fetchData = async(page: number) =>{
     dashboard.value = await dashboardService.get({ alertsPage: page })
     console.log('res',dashboard.value)
   } catch (e) {
-    toastore.show({ message: 'Erreur lors du chargement du dashboard', type: 'error' ,title:'Erreur'})
+    toastore.show({ message: t('dashboard.toast.loadError'), type: 'error' ,title: t('common.error')})
   } finally {
     loading.value = false
   }
@@ -97,15 +99,15 @@ const handleAlertsPageChange =  (newPage: number) => {
 }
 const stats = computed<Stat[]>(() => [
   {
-    title: 'Total Hôtels',
+    title: t('dashboard.stats.totalHotels'),
     value: dashboard.value ? String(dashboard.value.stats.totalHotels) : '—',
-    trend: dashboard.value ? `+${dashboard.value.stats.hotelsThisMonth} ce mois` : undefined,
+    trend: dashboard.value ? t('dashboard.stats.hotelsThisMonth', { count: dashboard.value.stats.hotelsThisMonth }) : undefined,
     icon: Building2,
     iconBg: 'bg-blue-50',
     iconColor: 'text-blue-500',
   },
   {
-    title: 'Revenu Mensuel (MRR)',
+    title: t('dashboard.stats.mrr'),
     value: dashboard.value ? `${formatCurrency(dashboard.value.stats.mrr)} ` : '—',
     trend: dashboard.value?.stats.mrrTrend ?? undefined,
     icon: BadgeDollarSign,
@@ -113,9 +115,9 @@ const stats = computed<Stat[]>(() => [
     iconColor: 'text-green-500',
   },
   {
-    title: 'Taux de Renouvellement',
+    title: t('dashboard.stats.renewalRate'),
     value: dashboard.value ? dashboard.value.stats.renewalRate : '—',
-    objectif: dashboard.value ? `Objectif: ${dashboard.value.stats.renewalObjectif}` : undefined,
+    objectif: dashboard.value ? t('dashboard.stats.objective', { value: dashboard.value.stats.renewalObjectif }) : undefined,
     icon: RefreshCcw,
     iconBg: 'bg-purple-50',
     iconColor: 'text-purple-500',

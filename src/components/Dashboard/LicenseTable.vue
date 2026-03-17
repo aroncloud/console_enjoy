@@ -77,6 +77,8 @@
 <script setup lang="ts">
 import { type Component } from 'vue'
 import BaseTable, { type Column } from '../Table/BaseTable.vue'
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import {
    Building2, ChevronRight,
@@ -97,14 +99,15 @@ const emit = defineEmits<{
   (e: 'page-change', page: number): void
 }>()
 
+const { t, locale } = useI18n()
 
-const columns: Column[] = [
-  { key: 'hotel',   label: 'Hôtel' },
-  { key: 'product',  label: 'Produit' },
-  { key: 'dueDate', label: "Date d'échéance" },
-  { key: 'daysLeft', label: 'Jours restants' },
-  { key: 'action',  label: 'Action', thClass: 'text-right', tdClass: 'text-right' },
-]
+const columns = computed<Column[]>(() => [
+  { key: 'hotel', label: t('dashboard.licenseTable.columns.hotel') },
+  { key: 'product', label: t('dashboard.licenseTable.columns.product') },
+  { key: 'dueDate', label: t('dashboard.licenseTable.columns.dueDate') },
+  { key: 'daysLeft', label: t('dashboard.licenseTable.columns.daysLeft') },
+  { key: 'action', label: t('dashboard.licenseTable.columns.action'), thClass: 'text-right', tdClass: 'text-right' },
+])
 
 
 const handlePageChange = (page: number) => {
@@ -113,7 +116,8 @@ const handlePageChange = (page: number) => {
 
 const formatDate = (date: string | null): string => {
   if (!date) return '—'
-  return new Date(date).toLocaleDateString('fr-FR', {
+  const loc = locale.value === 'fr' ? 'fr-FR' : 'en-US'
+  return new Date(date).toLocaleDateString(loc, {
     day: '2-digit',
     month: 'short',
     year: 'numeric',

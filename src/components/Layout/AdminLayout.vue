@@ -21,6 +21,7 @@
 
     <div class="flex flex-col flex-1 overflow-hidden">
       <Navbar @toggle-sidebar="toggleSidebar" />
+      <MaintenanceBanner />
       <main class="flex-1 overflow-y-auto p-6 customer-scrollbar bg-gray-50 dark:bg-slate-950">
         <RouterView />
       </main>
@@ -30,17 +31,41 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import Sidebar from './Sidebar.vue'
 import Navbar from './Navbar.vue'
 import ToastContainer from '../Toast/ToastContainer.vue'
+import MaintenanceBanner from '../Announcement/MaintenanceBanner.vue'
+import { announcementService } from '../../servicesAPI/announcementService'
+import { useAnnouncementStore } from '../../composables/announcement'
 
-// track visibility for mobile
 const isSidebarOpen = ref(false)
 
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value
 }
+
+const announcementStore = useAnnouncementStore()
+
+const loadMaintenanceBanner = async () => {
+  try {
+    const res = await announcementService.getAll({ page: 1, limit: 50, type: 'maintenance', isActive: true })
+    announcementStore.maybeSetMaintenanceBanner(res.data, 5)
+  } catch {
+    announcementStore.setBanner(null)
+  }
+}
+
+let intervalId: number | undefined
+
+onMounted(() => {
+  loadMaintenanceBanner()
+  intervalId = window.setInterval(loadMaintenanceBanner, 30 * 60 * 1000)
+})
+
+onBeforeUnmount(() => {
+  if (intervalId) window.clearInterval(intervalId)
+})
 </script>
 <style scoped>
 .customer-scrollbar::-webkit-scrollbar {

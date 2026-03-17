@@ -40,6 +40,24 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config
 
+    if (error.response?.status === 503 && error.response?.data?.code === 'MAINTENANCE') {
+      const payload = error.response?.data?.data
+      if (payload?.id && payload?.title && payload?.content && payload?.type) {
+        const { useAnnouncementStore } = await import('../composables/announcement')
+        useAnnouncementStore().setActive({
+          id: payload.id,
+          title: payload.title,
+          content: payload.content,
+          type: payload.type,
+          isActive: true,
+          startsAt: payload.startsAt ?? null,
+          endsAt: payload.endsAt ?? null,
+          createdAt: payload.createdAt ?? null,
+        })
+      }
+      return Promise.reject(error)
+    }
+
     // Ne jamais intercepter les routes publiques (login, refresh)
     if (isPublicUrl(originalRequest.url)) {
       return Promise.reject(error)

@@ -2,25 +2,748 @@
 	"country": "Pays",
 	"search_country": "Rechercher un pays...",
 	"no_results": "Aucun résultat",
+	"selected_period": "Sélectionner une période",
+	"select_time": "Sélectionner une heure",
 	"common": {
+		"add": "Ajouter",
+		"all": "Tous",
+		"active": "Actif",
+		"activePlural": "Actifs",
 		"back": "Retour",
 		"cancel": "Annuler",
+		"close": "Fermer",
+		"change": "Changer",
 		"create": "Créer",
+		"edit": "Modifier",
 		"error": "Erreur",
+		"details": "Détails",
 		"genericError": "Une erreur est survenue.",
 		"loading": "Chargement...",
+		"inactive": "Inactif",
+		"inactivePlural": "Inactifs",
+		"optional": "Optionnel",
+		"apply": "Appliquer",
+		"previous": "Précédent",
+		"next": "Suivant",
+		"refresh": "Rafraîchir",
+		"retry": "Réessayer",
+		"search": "Recherche",
+		"total": "Total",
+		"toggleTheme": "Basculer le thème",
+		"status": "Statut",
 		"save": "Enregistrer",
+		"saving": "Enregistrement...",
+		"restore": "Restaurer",
+		"suspend": "Suspendre",
 		"actions": "Actions",
 		"errors": {
 			"save": "Erreur lors de la sauvegarde",
 			"delete": "Erreur lors de la suppression"
 		}
 	},
+	"table": {
+		"searchPlaceholder": "Rechercher…",
+		"empty": "Aucune donnée disponible",
+		"rows": "Lignes"
+	},
+	"pagination": {
+		"range": "Affichage de {start} à {end} sur {total}",
+		"previous": "Précédent",
+		"next": "Suivant"
+	},
+	"demos": {
+		"title": "Demandes de démo",
+		"subtitle": "Consultez et gérez les demandes de démonstration reçues.",
+		"searchPlaceholder": "Nom, société, email, téléphone…",
+		"kpis": {
+			"received": "Demandes reçues",
+			"new": "Nouveaux",
+			"toProcess": "À traiter",
+			"converted": "Convertis",
+			"convertedClients": "Clients convertis"
+		},
+		"table": {
+			"contact": "Contact",
+			"company": "Société",
+			"rooms": "Chambres",
+			"date": "Date",
+			"status": "Statut"
+		},
+		"filters": {
+			"allStatuses": "Tous les statuts"
+		},
+		"status": {
+			"new": "Nouveau",
+			"qualified": "Qualifié",
+			"demoScheduled": "Démo planifiée",
+			"demoCompleted": "Démo effectuée",
+			"trial": "En essai",
+			"negotiation": "Négociation",
+			"converted": "Converti",
+			"lost": "Perdu",
+			"junk": "Indésirable"
+		},
+		"actions": {
+			"resendEmail": "Renvoyer email",
+			"emailSent": "Email envoyé",
+			"saveChanges": "Enregistrer les modifications"
+		},
+		"edit": {
+			"title": "Modifier la demande"
+		},
+		"detail": {
+			"title": "Détail de la demande"
+		},
+		"fields": {
+			"contactName": "Nom du contact",
+			"companyName": "Société",
+			"leadSource": "Source",
+			"phoneNumber": "Téléphone",
+			"propertyType": "Type de propriété",
+			"numberOfRooms": "Nombre de chambres",
+			"preferredLanguage": "Langue préférée",
+			"competition": "Concurrent",
+			"followUpDate": "Date de suivi",
+			"assignedTo": "Assigné à",
+			"notes": "Notes"
+		},
+		"placeholders": {
+			"contactName": "Jean Dupont",
+			"companyName": "Hôtel Le Palace",
+			"leadSource": "Website, Referral…",
+			"country": "Cameroun",
+			"propertyType": "Hotel, Resort…",
+			"preferredLanguage": "fr, en…",
+			"competition": "Opera, Mews…",
+			"notes": "Notes internes sur cette demande…"
+		},
+		"toggles": {
+			"conditionsAccepted": "Conditions acceptées",
+			"conditionsAcceptedHelp": "CGU acceptées par le contact",
+			"emailSent": "Email envoyé",
+			"emailSentHelp": "Email de confirmation expédié"
+		},
+		"validation": {
+			"contactNameRequired": "Le nom est obligatoire",
+			"companyNameRequired": "La société est obligatoire",
+			"emailRequired": "L'email est obligatoire"
+		},
+		"toast": {
+			"loadError": "Erreur lors du chargement des demandes",
+			"updated": "Demande mise à jour avec succès !",
+			"emailResent": "Email de confirmation renvoyé !",
+			"emailResendError": "Erreur lors de l'envoi"
+		}
+	},
+	"billing": {
+		"invoice": "facture",
+		"invoices": "factures",
+		"kpis": {
+			"totalRevenue": "Revenu Total",
+			"pendingInvoices": "Factures en attente",
+			"urgent": "Urgent",
+			"overduePayments": "Paiements en retard"
+		},
+		"quotas": {
+			"title": "Quotas & Dépassements",
+			"empty": "Aucun quota défini",
+			"limit": "limite",
+			"billSurplus": "Facturer surplus"
+		},
+		"table": {
+			"title": "Factures",
+			"invoiceNumber": "Numero Facture",
+			"billingDate": "Date",
+			"hotel": "Établissement",
+			"description": "Description",
+			"amount": "Montant",
+			"status": "Statut"
+		},
+		"status": {
+			"paid": "Payée",
+			"pending": "En attente",
+			"due": "En retard",
+			"cancelled": "Annulée",
+			"failed": "Échouée"
+		},
+		"actions": {
+			"markAsPaid": "Marquer comme payé",
+			"alreadyPaid": "Déjà payé",
+			"sendFollowUp": "Envoyer relance",
+			"sendReminder": "Envoyer rappel"
+		},
+		"gift": {
+			"title": "Offrir un mois gratuit",
+			"subtitle": "Geste commercial sur un abonnement",
+			"apply": "Appliquer le geste commercial",
+			"applying": "Application...",
+			"toastTitle": "Mois Gratuit"
+		},
+		"calculator": {
+			"title": "Calculateur de quotas",
+			"subtitle": "Détection des dépassements à facturer",
+			"calculate": "Calculer le dépassement",
+			"generating": "Génération...",
+			"generateInvoice": "Générer la facture de surplus",
+			"overageResult": "Dépassement de {extra} — surplus à facturer : {amount}",
+			"noOverageResult": "Aucun dépassement — quota respecté."
+		},
+		"fields": {
+			"hotel": "Hôtel",
+			"subscription": "Abonnement",
+			"affectedSubscription": "Abonnement concerné",
+			"usedQuantity": "Quantité utilisée"
+		},
+		"placeholders": {
+			"chooseHotel": "Choisir un hôtel...",
+			"chooseSubscription": "Choisir un abonnement...",
+			"usedQuantity": "Ex: 70"
+		},
+		"surplus": {
+			"description": "Surplus de {extra}- {module} (limite: {limit})"
+		},
+		"toast": {
+			"loadError": "Erreur lors du chargement des données",
+			"giftApplied": "✓ +1 mois appliqué avec succès",
+			"giftError": "Echec de l'abonnement",
+			"surplusInvoiceGenerated": "Facture de surplus générée avec succès",
+			"surplusInvoiceError": "Erreur lors de la génération"
+		}
+	},
+	"auth": {
+		"fields": {
+			"email": "Adresse email",
+			"password": "Mot de passe"
+		},
+		"login": {
+			"welcomeBack": "Bon retour",
+			"pickAccount": "Sélectionnez un compte pour accéder à votre console.",
+			"useAnotherAccount": "Utiliser un autre compte",
+			"title": "Accès Console",
+			"subtitle": "Connectez-vous pour administrer votre réseau Enjoy PMS.",
+			"forgotPassword": "Mot de passe oublié ?",
+			"rememberMe": "Se souvenir de moi",
+			"signingIn": "Connexion…",
+			"signIn": "Se connecter",
+			"restricted": "Accès réservé à l'équipe Enjoy PMS."
+		},
+		"reset": {
+			"title": "Réinitialiser",
+			"subtitle": "Saisissez votre email. Vous recevrez un lien si un compte existe.",
+			"sent": "Email envoyé. Vérifiez votre boîte de réception.",
+			"sending": "Envoi…",
+			"sendLink": "Envoyer le lien",
+			"backToLogin": "Retour à la connexion",
+			"errors": {
+				"emailRequired": "Veuillez saisir votre adresse email.",
+				"sendFailed": "Impossible d'envoyer le lien."
+			}
+		},
+		"verify": {
+			"title": "Vérifiez votre email",
+			"subtitle": "Un email de vérification a été envoyé à",
+			"sending": "Envoi…",
+			"resend": "Renvoyer l'email",
+			"resent": "Email renvoyé avec succès.",
+			"checkSpam": "Vous ne trouvez pas l'email ? Vérifiez vos spams.",
+			"errors": {
+				"resendFailed": "Impossible de renvoyer l'email."
+			}
+		},
+		"errors": {
+			"emailPasswordRequired": "Email et mot de passe requis.",
+			"forbidden": "Accès interdit.",
+			"serviceUnavailable": "Service temporairement indisponible.",
+			"invalidCredentials": "Email ou mot de passe incorrect.",
+			"loginFailed": "Échec de connexion. Vérifiez vos identifiants.",
+			"badRequest": "Données de requête invalides.",
+			"validation": "Erreur de validation.",
+			"server": "Erreur serveur. Veuillez réessayer.",
+			"network": "Erreur réseau. Vérifiez votre connexion."
+		},
+		"marketing": {
+			"badge": "Back-office éditeur · Enjoy PMS",
+			"headlineLine1": "Tous les clients.",
+			"headlineLine2": "Tout sous contrôle.",
+			"description": "EnjoyConsole est l'interface d'administration centrale. Suis en temps réel l'activité de chaque établissement qui utilise la solution Enjoy PMS.",
+			"securityLine": "Connexion chiffrée · Session sécurisée 8h · Accès journalisé",
+			"features": {
+				"activity": "Surveille l'activité de chaque client en direct",
+				"subscriptions": "Active, suspend ou renouvèle les abonnements",
+				"modules": "Gère les modules POS et Channel Manager par compte",
+				"insights": "Consulte les chiffres clés du parc clients"
+			}
+		}
+	},
+	"status": {
+		"active": "Actif",
+		"inactive": "Inactif",
+		"suspended": "Suspendu",
+		"demo": "Démo"
+	},
+	"nav": {
+		"dashboard": "Tableau de bord",
+		"clients": "Parc Clients",
+		"products": "Produits",
+		"billing": "Facturation",
+		"demos": "Demos",
+		"announcements": "Annonces",
+		"security": "Sécurité",
+		"users": "Utilisateurs",
+		"online": "En ligne",
+		"myProfile": "Mon profil",
+		"logout": "Se déconnecter",
+		"defaultUserName": "Administrateur"
+	},
+	"announcements": {
+		"title": "Annonces",
+		"subtitle": "Créez et gérez les annonces de la plateforme.",
+		"window": "{start} → {end}",
+		"types": {
+			"maintenance": "Maintenance",
+			"info": "Info",
+			"update": "Mise à jour"
+		},
+		"actions": {
+			"new": "Nouvelle annonce"
+		},
+		"filters": {
+			"searchPlaceholder": "Rechercher…",
+			"type": "Type",
+			"status": "Statut"
+		},
+		"table": {
+			"title": "Titre",
+			"type": "Type",
+			"status": "Statut",
+			"startsAt": "Début",
+			"endsAt": "Fin",
+			"createdAt": "Créée le"
+		},
+		"fields": {
+			"title": "Titre",
+			"content": "Contenu",
+			"type": "Type",
+			"isActive": "Actif",
+			"startsAt": "Début",
+			"endsAt": "Fin"
+		},
+		"modal": {
+			"createTitle": "Créer une annonce",
+			"editTitle": "Modifier une annonce"
+		},
+		"toast": {
+			"loadError": "Erreur lors du chargement des annonces",
+			"created": "Annonce créée",
+			"updated": "Annonce mise à jour",
+			"saveError": "Erreur lors de la sauvegarde",
+			"validationError": "Veuillez renseigner tous les champs obligatoires"
+		}
+	},
+	"roles": {
+		"superAdmin": "Super Admin"
+	},
+	"users": {
+		"title": "Gestion des utilisateurs",
+		"subtitle": "Créer, modifier et envoyer un email de réinitialisation",
+		"searchPlaceholder": "Nom, username ou email",
+		"filters": { "status": "Statut" },
+		"table": {
+			"user": "Utilisateur",
+			"email": "Email",
+			"role": "Rôle",
+			"status": "Statut"
+		},
+		"role": { "auto": "Rôle (auto)" },
+		"actions": {
+			"profile": "Profil",
+			"resetPassword": "Réinitialiser mot de passe"
+		},
+		"fields": {
+			"firstName": "Prénom",
+			"lastName": "Nom",
+			"username": "Username",
+			"email": "Email",
+			"role": "Rôle",
+			"activeAccount": "Compte actif",
+			"activeAccountHelp": "Désactivez pour bloquer la connexion"
+		},
+		"form": {
+			"createTitle": "Ajouter un utilisateur",
+			"editTitle": "Modifier un utilisateur"
+		},
+		"profile": { "title": "Profil utilisateur" },
+		"validation": {
+			"firstNameRequired": "Le prénom est obligatoire",
+			"lastNameRequired": "Le nom est obligatoire",
+			"emailRequired": "L'email est obligatoire"
+		},
+		"toast": {
+			"loadError": "Erreur lors du chargement des utilisateurs",
+			"created": "Utilisateur créé",
+			"updated": "Utilisateur mis à jour",
+			"resetSent": "Email de réinitialisation envoyé à {email}",
+			"resetError": "Impossible d'envoyer l'email de réinitialisation"
+		}
+	},
+	"profile": {
+		"title": "Mon profil",
+		"subtitle": "Infos du compte connecté",
+		"resetPassword": "Réinitialiser mot de passe",
+		"account": "Compte",
+		"connected": "Connecté"
+	},
+	"support": {
+		"title": "Support & Technique",
+		"impersonate": {
+			"title": "Se connecter en tant que",
+			"tenantPlaceholder": "Tenant ID",
+			"openDashboard": "Ouvrir le dashboard",
+			"alert": "Ouverture du dashboard pour {tenant}"
+		},
+		"logs": { "title": "Logs d’erreurs" },
+		"versions": {
+			"title": "Gestion des versions",
+			"stable": "stable",
+			"beta": "beta",
+			"canary": "canary",
+			"alert": "Version {version} assignée"
+		}
+	},
+	"modal": {
+		"delete": {
+			"title": "Supprimer l'élément",
+			"irreversible": "Cette action est irréversible",
+			"youAreAboutTo": "Vous êtes sur le point de supprimer",
+			"cannotBeUndone": "Cette action ne peut pas être annulée.",
+			"confirm": "Confirmer",
+			"deleting": "Suppression..."
+		}
+	},
 	"products": {
 		"product": "Produit",
 		"errors": {
 			"notFound": "Produit introuvable"
+		},
+		"catalog": {
+			"title": "Catalogue Produits",
+			"subtitle": "Gérez les produits disponibles à la souscription."
+		},
+		"stats": {
+			"products": "Produits",
+			"activeProducts": "Produits actifs"
+		},
+		"table": {
+			"product": "Produit",
+			"slug": "Slug",
+			"priceMonthly": "Prix / mois",
+			"status": "Statut"
+		},
+		"searchPlaceholder": "Rechercher un produit...",
+		"actions": {
+			"new": "Nouveau Produit",
+			"create": "Créer le produit",
+			"details": "Détails",
+			"delete": "Supprimer"
+		},
+		"form": {
+			"createTitle": "Nouveau produit",
+			"createSubtitle": "Ajoutez un nouveau produit au catalogue",
+			"editTitle": "Modifier le produit",
+			"editSubtitle": "Mettez à jour les informations du produit"
+		},
+		"fields": {
+			"slug": "Slug",
+			"name": "Nom",
+			"priceMonthlyXaf": "Prix mensuel (XAF)",
+			"description": "Description",
+			"active": "Produit actif",
+			"activeHelp": "Visible et souscriptible par les hôtels"
+		},
+		"placeholders": {
+			"slug": "ex: channel-manager",
+			"name": "ex: Property Management System",
+			"priceMonthly": "ex: 49000",
+			"description": "Décrivez brièvement ce produit..."
+		},
+		"validation": {
+			"slugRequired": "Le slug est obligatoire",
+			"nameRequired": "Le nom est obligatoire",
+			"pricePositive": "Le prix doit être supérieur à 0"
+		},
+		"toast": {
+			"loadError": "Erreur lors du chargement des produits",
+			"created": "Produit créé avec succès !",
+			"updated": "Produit mis à jour avec succès !",
+			"deleted": "Produit supprimé avec succès !"
+		},
+		"delete": {
+			"title": "Supprimer le produit",
+			"description": "Toutes les souscriptions associées seront également supprimées."
 		}
+	},
+	"clients": {
+		"title": "Gestion du Parc Client",
+		"subtitle": "Gérez les abonnements et les accès des établissements hôteliers.",
+		"actions": {
+			"addHotel": "Ajouter un Hôtel",
+			"backToList": "Retour au parc client"
+		},
+		"filters": {
+			"all": "Tous ({count})",
+			"active": "Actifs ({count})",
+			"suspended": "Suspendus ({count})",
+			"inactive": "Inactifs ({count})"
+		},
+		"table": {
+			"hotel": "Hôtel",
+			"location": "Localisation",
+			"status": "Statut",
+			"activeProducts": "Produits Actifs",
+			"info": "Infos",
+			"contact": "Contact"
+		},
+		"products": {
+			"pos": "Point de vente",
+			"channelManager": "Channel Manager",
+			"mobileApp": "App mobile"
+		},
+		"toast": {
+			"loadError": "Erreur lors du chargement des hôtels",
+			"created": "Hôtel ajouté avec succès !",
+			"createError": "Erreur lors de l'ajout"
+		}
+	},
+	"clientDetail": {
+		"actions": {
+			"history": "Historique",
+			"addModule": "Ajouter un module",
+			"addProducts": "Ajouter des produits"
+		},
+		"sections": {
+			"generalInfo": "Informations Générales",
+			"activeProducts": "Produits actifs"
+		},
+		"fields": {
+			"address": "Adresse",
+			"phone": "Téléphone",
+			"currency": "Devise",
+			"timezone": "Fuseau",
+			"lastUpdate": "Dernière modification"
+		},
+		"subscriptions": {
+			"inProgress": "{count} souscription{suffix} en cours"
+		},
+		"empty": {
+			"title": "Aucun produit souscrit",
+			"subtitle": "Cet établissement n'a pas encore de produits actifs."
+		},
+		"deleteHotel": {
+			"title": "Supprimer l'établissement",
+			"description": "Toutes les données associées (réservations, abonnements, utilisateurs) seront définitivement perdues."
+		},
+		"deleteSubscription": {
+			"title": "Supprimer l'abonnement",
+			"description": "L'abonnement sera définitivement supprimé."
+		},
+		"errors": {
+			"loadHotel": "Erreur lors du chargement de l'établissement"
+		},
+		"toast": {
+			"deletedHotel": "Établissement supprimé avec succès",
+			"updatedHotel": "Établissement mis à jour avec succès",
+			"updateError": "Erreur lors de la mise à jour",
+			"subscriptionActivated": "Abonnement activé avec succès",
+			"subscriptionDeactivated": "Abonnement désactivé avec succès",
+			"subscriptionDeleted": "Abonnement supprimé"
+		}
+	},
+	"hotelForm": {
+		"header": {
+			"editTitle": "Modifier l'établissement",
+			"createTitle": "Ajouter un nouvel établissement",
+			"editSubtitle": "Mettez à jour les informations de {name}",
+			"createSubtitle": "Configurez les détails du nouveau client pour son activation."
+		},
+		"tabs": {
+			"general": "Informations Générales",
+			"contact": "Contact Principal",
+			"config": "Configuration Initiale"
+		},
+		"actions": {
+			"backToList": "Retour à la liste",
+			"saveChanges": "Enregistrer les modifications",
+			"createHotel": "Créer l'établissement"
+		},
+		"admin": {
+			"title": "Administrateur Système",
+			"editHelp": "Modifier les accès administrateur de cet établissement.",
+			"createHelp": "Cet utilisateur recevra les accès pour gérer l'établissement."
+		},
+		"config": {
+			"credentialsTitle": "Identifiants & Localisation",
+			"tenantHint": "Identifiant unique auto-généré.",
+			"scheduleTitle": "Horaires",
+			"policiesTitle": "Politiques"
+		},
+		"fields": {
+			"hotelName": "Nom de l'hôtel",
+			"chain": "Enseigne / Chaîne",
+			"postalCode": "Code Postal",
+			"country": "Pays",
+			"city": "Ville",
+			"managerEmail": "Email Professionnel",
+			"website": "Site Web",
+			"phoneNumber": "Numéro de Téléphone",
+			"totalFloors": "Nombre d'étages",
+			"starRating": "Classement (étoiles)",
+			"address": "Adresse (Rue)",
+			"tenantId": "Tenant ID",
+			"timezone": "Fuseau Horaire",
+			"currencyDefault": "Devise par défaut",
+			"checkInTime": "Heure de Check-in",
+			"checkOutTime": "Heure de Check-out",
+			"taxRate": "Taux de taxe (%)",
+			"roomsCount": "Nombre de Chambres",
+			"cancellationPolicy": "Politique d'annulation",
+			"hotelPolicy": "Politique de l'établissement"
+		},
+		"placeholders": {
+			"hotelName": "Ex: Grand Hôtel Rivage",
+			"chain": "Ex: Luxury Collection",
+			"postalCode": "Ex: 06000",
+			"city": "Ville",
+			"totalFloors": "Ex: 5",
+			"address": "Ex: 42 Avenue des Palmiers",
+			"taxRate": "Ex: 19.25",
+			"roomsCount": "Ex: 20",
+			"cancellationPolicy": "Ex: Annulation gratuite jusqu'à 48h avant l'arrivée...",
+			"hotelPolicy": "Ex: Non-fumeur. Animaux non admis. Accès PMR disponible..."
+		},
+		"starRating": {
+			"stars": "{count} étoile{suffix}",
+			"unrated": "Non classé"
+		},
+		"validation": {
+			"hotelNameRequired": "Le nom de l'hôtel est obligatoire",
+			"addressRequired": "L'adresse est obligatoire",
+			"cityRequired": "La ville est obligatoire",
+			"starRatingRequired": "Les étoiles sont obligatoires",
+			"phoneRequired": "Le numéro de téléphone est obligatoire",
+			"emailValid": "Un email valide est requis"
+		},
+		"toast": {
+			"loadError": "Impossible de charger les données de l'établissement"
+		}
+	},
+	"dashboard": {
+		"licenseAlerts": {
+			"title": "Alertes d'Expiration de Licence (30 jours)"
+		},
+		"recentActivations": {
+			"title": "Activations Récentes",
+			"empty": "Aucune activation récente",
+			"viewAllHistory": "Voir tout l'historique"
+		},
+		"revenueChart": {
+			"title": "Répartition du Chiffre d'Affaires",
+			"current": "Actuel",
+			"periods": {
+				"week": "Semaine",
+				"year": "Année"
+			},
+			"empty": {
+				"title": "Aucune donnée disponible",
+				"subtitle": "Les revenus s'afficheront ici dès qu'il y aura des abonnements actifs."
+			}
+		},
+		"licenseTable": {
+			"columns": {
+				"hotel": "Hôtel",
+				"product": "Produit",
+				"dueDate": "Date d'échéance",
+				"daysLeft": "Jours restants",
+				"action": "Action"
+			}
+		},
+		"stats": {
+			"totalHotels": "Total Hôtels",
+			"hotelsThisMonth": "+{count} ce mois",
+			"mrr": "Revenu Mensuel (MRR)",
+			"renewalRate": "Taux de Renouvellement",
+			"objective": "Objectif: {value}"
+		},
+		"toast": {
+			"loadError": "Erreur lors du chargement du dashboard"
+		}
+	},
+	"security": {
+		"kpis": {
+			"online": "En ligne",
+			"activeTenants": "Tenants actifs",
+			"suspended": "Suspendus",
+			"revokedAccess": "Accès révoqués"
+		},
+		"tenants": {
+			"title": "Statut des tenants"
+		},
+		"table": {
+			"establishment": "Établissement",
+			"tenant": "Tenant",
+			"status": "Statut"
+		},
+		"audit": {
+			"title": "Journal d'audit",
+			"columns": {
+				"action": "Action",
+				"description": "Description",
+				"establishment": "Établissement",
+				"by": "Par",
+				"date": "Date"
+			},
+			"badges": {
+				"create": "Création",
+				"update": "Mise à jour",
+				"delete": "Suppression",
+				"extend": "Extension"
+			}
+		},
+		"toast": {
+			"suspended": "Produit suspendu avec succès",
+			"restored": "Produit restauré avec succès",
+			"updateError": "Erreur lors de la mise à jour"
+		}
+	},
+	"history": {
+		"title": "Historique",
+		"subtitleHotel": "Activités de l'établissement",
+		"subtitleAll": "Toutes les activités de la plateforme",
+		"cardTitleHotel": "Historique — {name}",
+		"cardTitleAll": "Toutes les activités",
+		"eventsCount": "{count} événements",
+		"filters": {
+			"action": "Action",
+			"actionDefault": "Action",
+			"searchPlaceholder": "Rechercher..."
+		},
+		"actions": {
+			"create": "Création",
+			"subscription": "Abonnement",
+			"update": "Mise à jour",
+			"delete": "Suppression"
+		},
+		"badges": {
+			"create": "Création",
+			"update": "Mise à jour",
+			"extend": "Extension",
+			"delete": "Suppression"
+		},
+		"byUser": "par {user}",
+		"empty": {
+			"title": "Aucune activité",
+			"subtitle": "Aucun événement trouvé"
+		},
+		"pagination": "Page {current} / {last}"
 	},
 	"addons": {
 		"title": "Add-ons",
@@ -149,7 +872,9 @@
 			"activatedProducts": "Produits activés"
 		},
 		"status": {
-			"active": "Actif"
+			"active": "Actif",
+			"pastDue": "En retard",
+			"canceled": "Résilié"
 		},
 		"toast": {
 			"updatedTitle": "Abonnement mis à jour",

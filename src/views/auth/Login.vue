@@ -17,7 +17,7 @@
           type="button"
           @click="toggleTheme"
           class="relative inline-flex h-9 w-16 items-center rounded-full border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 px-1 transition-colors cursor-pointer"
-          aria-label="Basculer le thème"
+          :aria-label="t('common.toggleTheme')"
         >
           <span
             class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white dark:bg-slate-900 shadow transition-transform"
@@ -34,8 +34,8 @@
 
         <!-- ── ACCOUNT PICKER ── -->
         <div v-if="accountPickerMode && !selectedAccount && !resetMode && !emailVerificationRequired">
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-1.5">Bon retour</h1>
-          <p class="text-gray-500 dark:text-slate-400 text-sm mb-6">Sélectionnez un compte pour accéder à votre console.</p>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-1.5">{{ t('auth.login.welcomeBack') }}</h1>
+          <p class="text-gray-500 dark:text-slate-400 text-sm mb-6">{{ t('auth.login.pickAccount') }}</p>
           <div class="space-y-2.5 mb-4">
             <button
               v-for="acc in rememberedAccounts"
@@ -54,14 +54,14 @@
             </button>
           </div>
           <button type="button" @click="useAnotherAccount" class="text-sm font-medium text-purple-600 hover:text-purple-800 transition-colors">
-            Utiliser un autre compte →
+            {{ t('auth.login.useAnotherAccount') }} →
           </button>
         </div>
 
         <!-- ── LOGIN FORM ── -->
         <div v-else-if="!resetMode && !emailVerificationRequired">
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-1.5">Accès Console</h1>
-          <p class="text-gray-500 dark:text-slate-400 text-sm mb-6">Connectez-vous pour administrer votre réseau Enjoy PMS.</p>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-1.5">{{ t('auth.login.title') }}</h1>
+          <p class="text-gray-500 dark:text-slate-400 text-sm mb-6">{{ t('auth.login.subtitle') }}</p>
 
           <!-- Error -->
           <div v-if="error" class="flex items-start gap-2.5 px-4 py-3 bg-red-50 border border-red-200 rounded-xl mb-4">
@@ -81,12 +81,12 @@
               <div class="text-sm font-semibold text-gray-800 dark:text-white truncate">{{ selectedAccount.name || selectedAccount.email }}</div>
               <div class="text-xs text-gray-500 dark:text-slate-400 truncate">{{ selectedAccount.email }}</div>
             </div>
-            <button type="button" @click="useAnotherAccount" class="text-xs text-purple-600 hover:text-purple-800 shrink-0 font-medium">Changer</button>
+            <button type="button" @click="useAnotherAccount" class="text-xs text-purple-600 hover:text-purple-800 shrink-0 font-medium">{{ t('common.change') }}</button>
           </div>
 
           <!-- Email -->
           <div v-if="!selectedAccount" class="mb-3.5">
-            <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Adresse email</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{{ t('auth.fields.email') }}</label>
             <input
               v-model="email"
               type="email"
@@ -103,10 +103,10 @@
           <!-- Password -->
           <div class="mb-4">
             <div class="flex items-center justify-between mb-1.5">
-              <label class="block text-sm font-medium text-gray-700 dark:text-slate-300">Mot de passe</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-slate-300">{{ t('auth.fields.password') }}</label>
               <button type="button" :disabled="isLoading" @click="toggleResetMode"
                 class="text-sm text-purple-600 hover:text-purple-800 font-medium transition-colors disabled:opacity-50">
-                Mot de passe oublié ?
+                {{ t('auth.login.forgotPassword') }}
               </button>
             </div>
             <div class="relative">
@@ -145,7 +145,7 @@
                 </svg>
               </div>
             </div>
-            <span class="text-sm text-gray-600 dark:text-slate-300">Se souvenir de moi</span>
+            <span class="text-sm text-gray-600 dark:text-slate-300">{{ t('auth.login.rememberMe') }}</span>
           </label>
 
           <!-- Submit -->
@@ -161,10 +161,10 @@
             <svg v-if="isLoading" class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
               <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="60" stroke-dashoffset="15"/>
             </svg>
-            {{ isLoading ? 'Connexion…' : 'Se connecter' }}
+            {{ isLoading ? t('auth.login.signingIn') : t('auth.login.signIn') }}
           </button>
 
-          <p class="mt-4 text-center text-xs text-gray-400 dark:text-slate-500">Accès réservé à l'équipe Enjoy PMS.</p>
+          <p class="mt-4 text-center text-xs text-gray-400 dark:text-slate-500">{{ t('auth.login.restricted') }}</p>
         </div>
 
         <!-- ── RESET PASSWORD ── -->
@@ -173,12 +173,12 @@
             <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
             </svg>
-            Retour
+            {{ t('common.back') }}
           </button>
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-1.5">Réinitialiser</h1>
-          <p class="text-gray-500 dark:text-slate-400 text-sm mb-6">Saisissez votre email. Vous recevrez un lien si un compte existe.</p>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-1.5">{{ t('auth.reset.title') }}</h1>
+          <p class="text-gray-500 dark:text-slate-400 text-sm mb-6">{{ t('auth.reset.subtitle') }}</p>
           <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Adresse email</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{{ t('auth.fields.email') }}</label>
             <input
               v-model="resetEmail"
               type="email"
@@ -201,7 +201,7 @@
               <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
               </svg>
-              Email envoyé. Vérifiez votre boîte de réception.
+              {{ t('auth.reset.sent') }}
             </p>
           </div>
           <div class="flex gap-3">
@@ -211,10 +211,10 @@
               <svg v-if="isVerifyingReset" class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
                 <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="60" stroke-dashoffset="15"/>
               </svg>
-              {{ isVerifyingReset ? 'Envoi…' : 'Envoyer le lien' }}
+              {{ isVerifyingReset ? t('auth.reset.sending') : t('auth.reset.sendLink') }}
             </button>
             <button type="button" @click="backToLogin" class="flex-1 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-200 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-xl transition-colors">
-              {{ resetSent ? 'Retour à la connexion' : 'Annuler' }}
+              {{ resetSent ? t('auth.reset.backToLogin') : t('common.cancel') }}
             </button>
           </div>
         </div>
@@ -225,10 +225,10 @@
             <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
             </svg>
-            Retour
+            {{ t('common.back') }}
           </button>
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-1.5">Vérifiez votre email</h1>
-          <p class="text-gray-500 dark:text-slate-400 text-sm mb-1">Un email de vérification a été envoyé à</p>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-1.5">{{ t('auth.verify.title') }}</h1>
+          <p class="text-gray-500 dark:text-slate-400 text-sm mb-1">{{ t('auth.verify.subtitle') }}</p>
           <p class="text-base font-semibold text-gray-800 dark:text-white mb-6">{{ verificationEmail }}</p>
           <div class="space-y-2.5">
             <button type="button" @click="resendVerificationEmail" :disabled="isResendingVerification"
@@ -237,10 +237,10 @@
               <svg v-if="isResendingVerification" class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
                 <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="60" stroke-dashoffset="15"/>
               </svg>
-              {{ isResendingVerification ? 'Envoi…' : "Renvoyer l'email" }}
+              {{ isResendingVerification ? t('auth.verify.sending') : t('auth.verify.resend') }}
             </button>
             <button type="button" @click="backToLogin" class="w-full py-2.5 text-sm font-medium text-gray-700 dark:text-slate-200 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-xl transition-colors">
-              Retour à la connexion
+              {{ t('auth.reset.backToLogin') }}
             </button>
           </div>
           <p v-if="resendVerificationError" class="text-xs text-red-600 mt-3">{{ resendVerificationError }}</p>
@@ -249,10 +249,10 @@
               <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
               </svg>
-              Email renvoyé avec succès.
+              {{ t('auth.verify.resent') }}
             </p>
           </div>
-          <p class="text-xs text-gray-400 dark:text-slate-500 mt-3">Vous ne trouvez pas l'email ? Vérifiez vos spams.</p>
+          <p class="text-xs text-gray-400 dark:text-slate-500 mt-3">{{ t('auth.verify.checkSpam') }}</p>
         </div>
 
       </div>
@@ -284,18 +284,18 @@
         <!-- Badge -->
         <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-100 border border-purple-200 text-xs font-semibold text-purple-700 mb-8 w-fit">
           <div class="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></div>
-          Back-office éditeur · Enjoy PMS
+          {{ t('auth.marketing.badge') }}
         </div>
 
         <!-- Headline -->
         <h2 class="text-4xl font-extrabold text-gray-900 leading-tight mb-4">
-          Tous les clients.<br/>
-          <span class="text-purple-600">Tout sous contrôle.</span>
+          {{ t('auth.marketing.headlineLine1') }}<br/>
+          <span class="text-purple-600">{{ t('auth.marketing.headlineLine2') }}</span>
         </h2>
 
         <!-- Sub -->
         <p class="text-gray-500 text-base leading-relaxed mb-10 max-w-sm">
-          EnjoyConsole est l' interface d'administration centrale. Suis en temps réel l'activité de chaque établissement qui utilise la solution Enjoy PMS.
+          {{ t('auth.marketing.description') }}
         </p>
 
         <!-- Feature list -->
@@ -315,7 +315,7 @@
               <path d="M8 2L3 4.5v4C3 11.5 5.5 14 8 15c2.5-1 5-3.5 5-6.5v-4L8 2Z" stroke="currentColor" stroke-width="1.5"/>
               <path d="M5.5 8l2 2 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            Connexion chiffrée · Session sécurisée 8h · Accès journalisé
+            {{ t('auth.marketing.securityLine') }}
           </p>
         </div>
 
@@ -329,12 +329,14 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { Sun, Moon } from 'lucide-vue-next'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '../../composables/useAuth'
 import { useThemeStore } from '../../composables/theme'
 import { auth, resendEmailVerification, requestPasswordReset } from '../../servicesAPI/auth'
 import api from '../../servicesAPI/api'
 const router = useRouter()
 const authStore = useAuthStore()
+const { t } = useI18n()
 
 const theme = useThemeStore()
 const isDark = computed(() => theme.isDark)
@@ -367,24 +369,24 @@ const resendVerificationError = ref<string | null>(null)
 
 const loginAttempts = ref(0)
 
-const features = [
+const features = computed(() => [
   {
-    label: 'Surveille l\'activité de chaque client en direct',
+    label: t('auth.marketing.features.activity'),
     icon: '<polyline points="2 12 6 8 10 12 14 6 18 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
   },
   {
-    label: 'Active, suspend ou renouvèle les abonnements',
+    label: t('auth.marketing.features.subscriptions'),
     icon: '<rect x="2" y="5" width="16" height="11" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M2 9h16" stroke="currentColor" stroke-width="1.5"/><circle cx="6" cy="13" r="1" fill="currentColor"/>',
   },
   {
-    label: 'Gère les modules POS et Channel Manager par compte',
+    label: t('auth.marketing.features.modules'),
     icon: '<rect x="2" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="11" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M14.5 11v7M11 14.5h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
   },
   {
-    label: 'Consulte les chiffres clés du parc clients',
+    label: t('auth.marketing.features.insights'),
     icon: '<rect x="2" y="12" width="4" height="6" rx="1" fill="currentColor" opacity=".3"/><rect x="8" y="7" width="4" height="11" rx="1" fill="currentColor" opacity=".6"/><rect x="14" y="3" width="4" height="15" rx="1" fill="currentColor"/>',
   },
-]
+])
 
 function setCookie(name: string, value: string, options?: { days?: number; secure?: boolean; sameSite?: 'Lax' | 'Strict' | 'None'; path?: string }) {
   let expires = ''
@@ -430,7 +432,7 @@ const handleSubmit = async () => {
   loginAttempts.value++
 
   if (!email.value.trim() || !password.value.trim()) {
-    error.value = 'Email et mot de passe requis.'
+    error.value = t('auth.errors.emailPasswordRequired')
     return
   }
 
@@ -470,23 +472,23 @@ const handleSubmit = async () => {
         verificationEmail.value = data.email || email.value
         return
       }
-      error.value = 'Accès interdit.'
+      error.value = t('auth.errors.forbidden')
     } else if (err.response?.status === 503) {
-      error.value = 'Service temporairement indisponible.'
+      error.value = t('auth.errors.serviceUnavailable')
     } else if (err.response?.status === 401) {
-      error.value = 'Email ou mot de passe incorrect.'
+      error.value = t('auth.errors.invalidCredentials')
     } else if (err.response?.status === 400 && err.response.data?.message === 'Login failed') {
-      error.value = 'Échec de connexion. Vérifiez vos identifiants.'
+      error.value = t('auth.errors.loginFailed')
     } else if (err.response?.status === 400) {
-      error.value = err.response.data?.message || 'Données de requête invalides.'
+      error.value = err.response.data?.message || t('auth.errors.badRequest')
     } else if (err.response?.status === 422) {
-      error.value = 'Erreur de validation.'
+      error.value = t('auth.errors.validation')
     } else if (err.response) {
-      error.value = 'Erreur serveur. Veuillez réessayer.'
+      error.value = t('auth.errors.server')
     } else if (err.request) {
-      error.value = 'Erreur réseau. Vérifiez votre connexion.'
+      error.value = t('auth.errors.network')
     } else {
-      error.value = 'Une erreur inattendue est survenue.'
+      error.value = t('common.genericError')
     }
   } finally {
     isLoading.value = false
@@ -495,10 +497,10 @@ const handleSubmit = async () => {
 
 const sendAdminResetLink = async () => {
   resetVerifyError.value = null; resetSendError.value = null; resetSent.value = false
-  if (!resetEmail.value.trim()) { resetVerifyError.value = 'Veuillez saisir votre adresse email.'; return }
+  if (!resetEmail.value.trim()) { resetVerifyError.value = t('auth.reset.errors.emailRequired'); return }
   isVerifyingReset.value = true
   try { await requestPasswordReset({ email: resetEmail.value.trim().toLowerCase() }); resetSent.value = true
-  } catch (e: any) { resetSendError.value = e?.response?.data?.message || "Impossible d'envoyer le lien."
+  } catch (e: any) { resetSendError.value = e?.response?.data?.message || t('auth.reset.errors.sendFailed')
   } finally { isVerifyingReset.value = false }
 }
 
@@ -517,7 +519,7 @@ const backToLogin = () => {
 const resendVerificationEmail = async () => {
   resendVerificationError.value = null; verificationResent.value = false; isResendingVerification.value = true
   try { await resendEmailVerification(verificationEmail.value); verificationResent.value = true
-  } catch (err: any) { resendVerificationError.value = err?.response?.data?.message || "Impossible de renvoyer l'email."
+  } catch (err: any) { resendVerificationError.value = err?.response?.data?.message || t('auth.verify.errors.resendFailed')
   } finally { isResendingVerification.value = false }
 }
 </script>

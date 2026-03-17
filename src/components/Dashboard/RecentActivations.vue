@@ -45,12 +45,12 @@
         </div>
 
         <p v-if="enrichedActivations.length === 0" class="text-sm text-gray-400 text-center py-4">
-          Aucune activation récente
+          {{ t('dashboard.recentActivations.empty') }}
         </p>
       </div>
 
       <button @click="handleHistory" class="w-full py-2 text-xs font-bold text-gray-400 dark:text-slate-400 hover:text-blue-500 uppercase tracking-widest bg-gray-50 dark:bg-slate-800 rounded-lg transition-colors cursor-pointer">
-        Voir tout l'historique
+        {{ t('dashboard.recentActivations.viewAllHistory') }}
       </button>
     </template>
 
@@ -62,6 +62,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Smartphone, RefreshCcw, Cloud, UserPlus, Bell } from 'lucide-vue-next'
+import { useI18n } from 'vue-i18n'
 import type { RecentActivation } from '../../servicesAPI/dashboardService'
 import router from '../../router';
 
@@ -72,6 +73,7 @@ const props = withDefaults(defineProps<{
   data: () => [],
   loading: false,
 })
+const { t } = useI18n()
 
 interface IconConfig {
   icon: unknown

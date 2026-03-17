@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted, watch, computed } from 'vue'
 import { Plus, Edit, KeyRound, Eye, Users as UsersIcon ,Search} from 'lucide-vue-next'
+import { useI18n } from 'vue-i18n'
 
 import BaseTable, { type Column } from '../../components/Table/BaseTable.vue'
 import BaseModal from '../../components/Modal/BaseModal.vue'
@@ -14,6 +15,7 @@ import { requestPasswordReset } from '../../servicesAPI/auth'
 import { userService, type User, type CreateUserPayload } from '../../servicesAPI/userService'
 
 const toastStore = useToastStore()
+const { t } = useI18n()
 
 const users = ref<User[]>([])
 const loading = ref(false)
@@ -25,13 +27,13 @@ const page = ref(1)
 const limit = ref(20)
 const meta = ref<any>(null)
 
-const columns: Column[] = [
-  { key: 'user', label: 'Utilisateur' },
-  { key: 'email', label: 'Email' },
-  { key: 'role', label: 'Rôle' },
-  { key: 'isActive', label: 'Statut', sortable: false },
-  { key: 'actions', label: 'Actions', sortable: false, tdClass: 'text-right', thClass: 'text-right' },
-]
+const columns = computed<Column[]>(() => [
+  { key: 'user', label: t('users.table.user') },
+  { key: 'email', label: t('users.table.email') },
+  { key: 'role', label: t('users.table.role') },
+  { key: 'isActive', label: t('users.table.status'), sortable: false },
+  { key: 'actions', label: t('common.actions'), sortable: false, tdClass: 'text-right', thClass: 'text-right' },
+])
 
 const showForm = ref(false)
 const editingId = ref<number | null>(null)
@@ -94,7 +96,7 @@ const fetchUsers = async (targetPage = 1) => {
     meta.value = res.meta
   } catch (e) {
     console.error(e)
-    toastStore.show({ type: 'error', message: 'Erreur lors du chargement des utilisateurs' })
+    toastStore.show({ type: 'error', message: t('users.toast.loadError') })
   } finally {
     loading.value = false
   }
@@ -107,7 +109,7 @@ const fetchRole = async()=>{
     const roles = await userService.getRoleAll()
     console.log('roles',roles)
     roleOptions.value = [
-      { label: 'Rôle (auto)', value: '' },
+      { label: t('users.role.auto'), value: '' },
       ...roles.map(r => ({ label: r.roleName, value: r.id }))
     ]
   } catch (e) {
@@ -164,9 +166,9 @@ const openEdit = (row: any) => {
 }
 
 const validateForm = () => {
-  formErrors.firstName = form.firstName.trim() ? '' : 'Le prénom est obligatoire'
-  formErrors.lastName = form.lastName.trim() ? '' : 'Le nom est obligatoire'
-  formErrors.email = form.email.trim() && /\S+@\S+\.\S+/.test(form.email) ? '' : "L'email est obligatoire"
+  formErrors.firstName = form.firstName.trim() ? '' : t('users.validation.firstNameRequired')
+  formErrors.lastName = form.lastName.trim() ? '' : t('users.validation.lastNameRequired')
+  formErrors.email = form.email.trim() && /\S+@\S+\.\S+/.test(form.email) ? '' : t('users.validation.emailRequired')
   return !formErrors.firstName && !formErrors.email && !formErrors.lastName
 }
 
@@ -185,10 +187,10 @@ const handleSubmit = async () => {
     console.log('payload',payload)
     if (editingId.value) {
       await userService.update(editingId.value, payload)
-      toastStore.show({ type: 'success', message: 'Utilisateur mis à jour' })
+      toastStore.show({ type: 'success', message: t('users.toast.updated') })
     } else {
       await userService.create(payload)
-      toastStore.show({ type: 'success', message: 'Utilisateur créé' })
+      toastStore.show({ type: 'success', message: t('users.toast.created') })
     }
 
     showForm.value = false
@@ -196,7 +198,7 @@ const handleSubmit = async () => {
     await fetchUsers(page.value)
   } catch (e) {
     console.error(e)
-    toastStore.show({ type: 'error', message: 'Erreur lors de la sauvegarde' })
+    toastStore.show({ type: 'error', message: t('common.errors.save') })
   } finally {
     saving.value = false
   }
@@ -211,10 +213,10 @@ const sendResetPassword = async (row: any) => {
   saving.value = true
   try {
     await requestPasswordReset({ email: u.email })
-    toastStore.show({ type: 'success', message: `Email de réinitialisation envoyé à ${u.email}` })
+    toastStore.show({ type: 'success', message: t('users.toast.resetSent', { email: u.email }) })
   } catch (e) {
     console.error(e)
-    toastStore.show({ type: 'error', message: "Impossible d'envoyer l'email de réinitialisation" })
+    toastStore.show({ type: 'error', message: t('users.toast.resetError') })
   } finally {
     saving.value = false
   }
@@ -225,26 +227,26 @@ const sendResetPassword = async (row: any) => {
   <div class="p-4 md:p-8 bg-slate-50 dark:bg-slate-950 min-h-screen space-y-6">
     <div class="flex flex-col md:flex-row justify-between md:items-start gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Gestion des utilisateurs</h1>
-        <p class="text-sm text-slate-500 dark:text-slate-300 mt-1">Créer, modifier et envoyer un email de réinitialisation</p>
+        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">{{ t('users.title') }}</h1>
+        <p class="text-sm text-slate-500 dark:text-slate-300 mt-1">{{ t('users.subtitle') }}</p>
       </div>
 
       <div class="flex items-center gap-2">
-        <ButtonComponent variant="secondary" :iconLeft="UsersIcon" @click="fetchUsers(1)">Rafraîchir</ButtonComponent>
-        <ButtonComponent :iconLeft="Plus" @click="openCreate">Ajouter</ButtonComponent>
+        <ButtonComponent variant="secondary" :iconLeft="UsersIcon" @click="fetchUsers(1)">{{ t('common.refresh') }}</ButtonComponent>
+        <ButtonComponent :iconLeft="Plus" @click="openCreate">{{ t('common.add') }}</ButtonComponent>
       </div>
     </div>
 
     <div class="flex flex-col md:flex-row gap-3">
       <div class="flex-1 relative">
         <Search :size="15" class="absolute left-3 top-12 -translate-y-1/3 text-slate-400 dark:text-slate-500 z-10" />
-        <Input v-model="searchQuery" lb="Recherche" placeholder="Nom, username ou email" custom-class="pl-8" />
+        <Input v-model="searchQuery" :lb="t('common.search')" :placeholder="t('users.searchPlaceholder')" custom-class="pl-8" />
       </div>
       <div class="w-full md:w-64">
-        <div class="text-sm font-medium text-gray-700 dark:text-gray-400 mb-1.5">Statut</div>
+        <div class="text-sm font-medium text-gray-700 dark:text-gray-400 mb-1.5">{{ t('users.filters.status') }}</div>
         <div class="flex items-center gap-1 p-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
           <button
-            v-for="[key, label] in [['all', 'Tous'], ['active', 'Actifs'], ['inactive', 'Inactifs']]"
+            v-for="[key, label] in [['all', t('common.all')], ['active', t('common.activePlural')], ['inactive', t('common.inactivePlural')]]"
             :key="key"
             @click="filterActive = key as any"
             class="px-3 py-2 rounded-md text-xs font-semibold transition-all cursor-pointer"
@@ -301,19 +303,19 @@ const sendResetPassword = async (row: any) => {
                 : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-300',
             ]"
           >
-            {{ (row.isActive ?? true) ? 'Actif' : 'Inactif' }}
+            {{ (row.isActive ?? true) ? t('common.active') : t('common.inactive') }}
           </span>
         </template>
 
         <template #cell-actions="{ row }">
           <div class="flex items-center gap-1">
-            <ButtonComponent variant="ghost" size="sm" :iconLeft="Eye" aria-label="Profil" @click.stop="openProfile(row)" />
-            <ButtonComponent variant="ghost" size="sm" :iconLeft="Edit" aria-label="Modifier" @click.stop="openEdit(row)" />
+            <ButtonComponent variant="ghost" size="sm" :iconLeft="Eye" :aria-label="t('users.actions.profile')" @click.stop="openProfile(row)" />
+            <ButtonComponent variant="ghost" size="sm" :iconLeft="Edit" :aria-label="t('common.edit')" @click.stop="openEdit(row)" />
             <ButtonComponent
               variant="ghost"
               size="sm"
               :iconLeft="KeyRound"
-              aria-label="Réinitialiser mot de passe"
+              :aria-label="t('users.actions.resetPassword')"
               @click.stop="sendResetPassword(row)"
             />
           </div>
@@ -325,23 +327,23 @@ const sendResetPassword = async (row: any) => {
       <template #header>
         <div class="flex items-center gap-2">
           <h3 class="font-bold text-slate-900 dark:text-white">
-            {{ editingId ? 'Modifier un utilisateur' : 'Ajouter un utilisateur' }}
+            {{ editingId ? t('users.form.editTitle') : t('users.form.createTitle') }}
           </h3>
         </div>
       </template>
 
       <div class="space-y-4">
         <div class="grid md:grid-cols-2 grid-cols-1 gap-2">
-          <Input v-model="form.firstName" lb="Prénom" :error-msg="formErrors.firstName" :placeholder="'Aline'" :is-required="true" :disabled="saving" />
-          <Input v-model="form.lastName" lb="Nom" :error-msg="formErrors.lastName" :placeholder="'Mbarga'" :is-required="true" :disabled="saving"/>
+          <Input v-model="form.firstName" :lb="t('users.fields.firstName')" :error-msg="formErrors.firstName" :placeholder="'Aline'" :is-required="true" :disabled="saving" />
+          <Input v-model="form.lastName" :lb="t('users.fields.lastName')" :error-msg="formErrors.lastName" :placeholder="'Mbarga'" :is-required="true" :disabled="saving"/>
         </div>
-        <Input v-model="form.username" lb="Username" placeholder="Optionnel" :disabled="saving" />
-        <Input v-model="form.email" lb="Email" :error-msg="formErrors.email" :placeholder="'info@gmail.com'" :is-required="true" :disabled="saving" />
-        <Select v-model="form.roleId" lb="Rôle" :options="roleOptions" :isLoading="loadingRole" :disabled="saving" />
+        <Input v-model="form.username" :lb="t('users.fields.username')" :placeholder="t('common.optional')" :disabled="saving" />
+        <Input v-model="form.email" :lb="t('users.fields.email')" :error-msg="formErrors.email" :placeholder="'info@gmail.com'" :is-required="true" :disabled="saving" />
+        <Select v-model="form.roleId" :lb="t('users.fields.role')" :options="roleOptions" :isLoading="loadingRole" :disabled="saving" />
         <div class="flex items-center justify-between rounded-xl border border-slate-200 dark:border-slate-800 p-3">
           <div>
-            <p class="text-sm font-semibold text-slate-900 dark:text-white">Compte actif</p>
-            <p class="text-xs text-slate-400 dark:text-slate-400">Désactivez pour bloquer la connexion</p>
+            <p class="text-sm font-semibold text-slate-900 dark:text-white">{{ t('users.fields.activeAccount') }}</p>
+            <p class="text-xs text-slate-400 dark:text-slate-400">{{ t('users.fields.activeAccountHelp') }}</p>
           </div>
           <Toggle v-model="form.isActive"  :disabled="saving"/>
         </div>
@@ -349,8 +351,8 @@ const sendResetPassword = async (row: any) => {
 
       <template #footer>
         <div class="flex items-center justify-end gap-2">
-          <ButtonComponent variant="secondary" @click="showForm = false" :disabled="saving">Annuler</ButtonComponent>
-          <ButtonComponent :loading="saving" @click="handleSubmit">{{ editingId ? 'Enregistrer' : 'Créer' }}</ButtonComponent>
+          <ButtonComponent variant="secondary" @click="showForm = false" :disabled="saving">{{ t('common.cancel') }}</ButtonComponent>
+          <ButtonComponent :loading="saving" @click="handleSubmit">{{ editingId ? t('common.save') : t('common.create') }}</ButtonComponent>
         </div>
       </template>
     </BaseModal>

@@ -15,6 +15,7 @@ import UserProfile from '../views/users/UserProfile.vue'
 import Profile from '../views/profile/Profile.vue'
 import HistoryView from '../views/history/HistoryView.vue'
 import Demo from '../views/demo/DemoView.vue'
+import Announcements from '../views/announcements/Announcements.vue'
 import { useAuthStore } from '../composables/useAuth'
 
 const router = createRouter({
@@ -65,6 +66,7 @@ const router = createRouter({
         },
         { path: 'profile',  name: 'profile',  component: Profile },
         { path: 'demo',  name: 'demo',  component: Demo },
+        { path: 'announcements', name: 'announcements', component: Announcements, meta: { superAdmin: false } },
         {
           path: '/history',
           name: 'history',
@@ -90,6 +92,8 @@ router.beforeEach((to) => {
   }
 
   if (!authStore.isAuthenticated) return { name: 'login' }
+
+  if ((to.meta as any)?.superAdmin && !authStore.isSuperAdmin) return { name: 'dashboard' }
 
   return true
 })

@@ -2,25 +2,748 @@
 	"country": "Country",
 	"search_country": "Search country...",
 	"no_results": "No results",
+	"selected_period": "Select period",
+	"select_time": "Select time",
 	"common": {
+		"add": "Add",
+		"all": "All",
+		"active": "Active",
+		"activePlural": "Active",
 		"back": "Back",
 		"cancel": "Cancel",
+		"close": "Close",
+		"change": "Change",
 		"create": "Create",
+		"edit": "Edit",
 		"error": "Error",
+		"details": "Details",
 		"genericError": "An error occurred",
 		"loading": "Loading...",
+		"inactive": "Inactive",
+		"inactivePlural": "Inactive",
+		"optional": "Optional",
+		"apply": "Apply",
+		"previous": "Previous",
+		"next": "Next",
+		"refresh": "Refresh",
+		"retry": "Retry",
+		"search": "Search",
+		"total": "Total",
+		"toggleTheme": "Toggle theme",
+		"status": "Status",
 		"save": "Save",
+		"saving": "Saving...",
+		"restore": "Restore",
+		"suspend": "Suspend",
 		"actions": "Actions",
 		"errors": {
 			"save": "Error while saving",
 			"delete": "Error while deleting"
 		}
 	},
+	"table": {
+		"searchPlaceholder": "Search…",
+		"empty": "No data available",
+		"rows": "Rows"
+	},
+	"pagination": {
+		"range": "Showing {start} to {end} of {total}",
+		"previous": "Previous",
+		"next": "Next"
+	},
+	"demos": {
+		"title": "Demo requests",
+		"subtitle": "View and manage incoming demo requests.",
+		"searchPlaceholder": "Name, company, email, phone…",
+		"kpis": {
+			"received": "Requests received",
+			"new": "New",
+			"toProcess": "To process",
+			"converted": "Converted",
+			"convertedClients": "Converted clients"
+		},
+		"table": {
+			"contact": "Contact",
+			"company": "Company",
+			"rooms": "Rooms",
+			"date": "Date",
+			"status": "Status"
+		},
+		"filters": {
+			"allStatuses": "All statuses"
+		},
+		"status": {
+			"new": "New",
+			"qualified": "Qualified",
+			"demoScheduled": "Demo scheduled",
+			"demoCompleted": "Demo completed",
+			"trial": "Trial",
+			"negotiation": "Negotiation",
+			"converted": "Converted",
+			"lost": "Lost",
+			"junk": "Junk"
+		},
+		"actions": {
+			"resendEmail": "Resend email",
+			"emailSent": "Email sent",
+			"saveChanges": "Save changes"
+		},
+		"edit": {
+			"title": "Edit request"
+		},
+		"detail": {
+			"title": "Request details"
+		},
+		"fields": {
+			"contactName": "Contact name",
+			"companyName": "Company",
+			"leadSource": "Source",
+			"phoneNumber": "Phone",
+			"propertyType": "Property type",
+			"numberOfRooms": "Number of rooms",
+			"preferredLanguage": "Preferred language",
+			"competition": "Competitor",
+			"followUpDate": "Follow-up date",
+			"assignedTo": "Assigned to",
+			"notes": "Notes"
+		},
+		"placeholders": {
+			"contactName": "John Doe",
+			"companyName": "Hotel Le Palace",
+			"leadSource": "Website, referral…",
+			"country": "Cameroon",
+			"propertyType": "Hotel, resort…",
+			"preferredLanguage": "en, fr…",
+			"competition": "Opera, Mews…",
+			"notes": "Internal notes about this request…"
+		},
+		"toggles": {
+			"conditionsAccepted": "Terms accepted",
+			"conditionsAcceptedHelp": "Terms accepted by the contact",
+			"emailSent": "Email sent",
+			"emailSentHelp": "Confirmation email sent"
+		},
+		"validation": {
+			"contactNameRequired": "Contact name is required",
+			"companyNameRequired": "Company is required",
+			"emailRequired": "Email is required"
+		},
+		"toast": {
+			"loadError": "Error while loading requests",
+			"updated": "Request updated successfully!",
+			"emailResent": "Confirmation email resent!",
+			"emailResendError": "Error while sending"
+		}
+	},
+	"billing": {
+		"invoice": "invoice",
+		"invoices": "invoices",
+		"kpis": {
+			"totalRevenue": "Total revenue",
+			"pendingInvoices": "Pending invoices",
+			"urgent": "Urgent",
+			"overduePayments": "Overdue payments"
+		},
+		"quotas": {
+			"title": "Quotas & overages",
+			"empty": "No quotas defined",
+			"limit": "limit",
+			"billSurplus": "Bill overage"
+		},
+		"table": {
+			"title": "Invoices",
+			"invoiceNumber": "Invoice number",
+			"billingDate": "Date",
+			"hotel": "Property",
+			"description": "Description",
+			"amount": "Amount",
+			"status": "Status"
+		},
+		"status": {
+			"paid": "Paid",
+			"pending": "Pending",
+			"due": "Due",
+			"cancelled": "Cancelled",
+			"failed": "Failed"
+		},
+		"actions": {
+			"markAsPaid": "Mark as paid",
+			"alreadyPaid": "Already paid",
+			"sendFollowUp": "Send follow-up",
+			"sendReminder": "Send reminder"
+		},
+		"gift": {
+			"title": "Give one month free",
+			"subtitle": "Commercial gesture on a subscription",
+			"apply": "Apply commercial gesture",
+			"applying": "Applying...",
+			"toastTitle": "Free month"
+		},
+		"calculator": {
+			"title": "Quota calculator",
+			"subtitle": "Detect overages to bill",
+			"calculate": "Calculate overage",
+			"generating": "Generating...",
+			"generateInvoice": "Generate overage invoice",
+			"overageResult": "Overage of {extra} — amount to bill: {amount}",
+			"noOverageResult": "No overage — quota respected."
+		},
+		"fields": {
+			"hotel": "Hotel",
+			"subscription": "Subscription",
+			"affectedSubscription": "Affected subscription",
+			"usedQuantity": "Used quantity"
+		},
+		"placeholders": {
+			"chooseHotel": "Choose a hotel...",
+			"chooseSubscription": "Choose a subscription...",
+			"usedQuantity": "e.g.: 70"
+		},
+		"surplus": {
+			"description": "Overage of {extra} - {module} (limit: {limit})"
+		},
+		"toast": {
+			"loadError": "Error while loading data",
+			"giftApplied": "✓ +1 month applied successfully",
+			"giftError": "Subscription failed",
+			"surplusInvoiceGenerated": "Overage invoice generated successfully",
+			"surplusInvoiceError": "Error while generating"
+		}
+	},
+	"auth": {
+		"fields": {
+			"email": "Email address",
+			"password": "Password"
+		},
+		"login": {
+			"welcomeBack": "Welcome back",
+			"pickAccount": "Select an account to access your console.",
+			"useAnotherAccount": "Use another account",
+			"title": "Console access",
+			"subtitle": "Sign in to administer your Enjoy PMS network.",
+			"forgotPassword": "Forgot password?",
+			"rememberMe": "Remember me",
+			"signingIn": "Signing in…",
+			"signIn": "Sign in",
+			"restricted": "Access restricted to the Enjoy PMS team."
+		},
+		"reset": {
+			"title": "Reset",
+			"subtitle": "Enter your email. You will receive a link if an account exists.",
+			"sent": "Email sent. Check your inbox.",
+			"sending": "Sending…",
+			"sendLink": "Send link",
+			"backToLogin": "Back to sign in",
+			"errors": {
+				"emailRequired": "Please enter your email address.",
+				"sendFailed": "Unable to send the link."
+			}
+		},
+		"verify": {
+			"title": "Verify your email",
+			"subtitle": "A verification email has been sent to",
+			"sending": "Sending…",
+			"resend": "Resend email",
+			"resent": "Email resent successfully.",
+			"checkSpam": "Can't find the email? Check your spam folder.",
+			"errors": {
+				"resendFailed": "Unable to resend the email."
+			}
+		},
+		"errors": {
+			"emailPasswordRequired": "Email and password are required.",
+			"forbidden": "Access forbidden.",
+			"serviceUnavailable": "Service temporarily unavailable.",
+			"invalidCredentials": "Incorrect email or password.",
+			"loginFailed": "Login failed. Check your credentials.",
+			"badRequest": "Invalid request data.",
+			"validation": "Validation error.",
+			"server": "Server error. Please try again.",
+			"network": "Network error. Check your connection."
+		},
+		"marketing": {
+			"badge": "Publisher back-office · Enjoy PMS",
+			"headlineLine1": "All clients.",
+			"headlineLine2": "Everything under control.",
+			"description": "EnjoyConsole is the central admin interface. Monitor in real time the activity of each property using Enjoy PMS.",
+			"securityLine": "Encrypted connection · 8h secure session · Logged access",
+			"features": {
+				"activity": "Monitor each client's activity live",
+				"subscriptions": "Activate, suspend or renew subscriptions",
+				"modules": "Manage POS and Channel Manager modules per account",
+				"insights": "Review key metrics across the client portfolio"
+			}
+		}
+	},
+	"status": {
+		"active": "Active",
+		"inactive": "Inactive",
+		"suspended": "Suspended",
+		"demo": "Demo"
+	},
+	"nav": {
+		"dashboard": "Dashboard",
+		"clients": "Clients",
+		"products": "Products",
+		"billing": "Billing",
+		"demos": "Demos",
+		"announcements": "Announcements",
+		"security": "Security",
+		"users": "Users",
+		"online": "Online",
+		"myProfile": "My profile",
+		"logout": "Log out",
+		"defaultUserName": "Administrator"
+	},
+	"announcements": {
+		"title": "Announcements",
+		"subtitle": "Create and manage platform announcements.",
+		"window": "{start} → {end}",
+		"types": {
+			"maintenance": "Maintenance",
+			"info": "Info",
+			"update": "Update"
+		},
+		"actions": {
+			"new": "New announcement"
+		},
+		"filters": {
+			"searchPlaceholder": "Search…",
+			"type": "Type",
+			"status": "Status"
+		},
+		"table": {
+			"title": "Title",
+			"type": "Type",
+			"status": "Status",
+			"startsAt": "Starts at",
+			"endsAt": "Ends at",
+			"createdAt": "Created"
+		},
+		"fields": {
+			"title": "Title",
+			"content": "Content",
+			"type": "Type",
+			"isActive": "Active",
+			"startsAt": "Starts at",
+			"endsAt": "Ends at"
+		},
+		"modal": {
+			"createTitle": "Create announcement",
+			"editTitle": "Edit announcement"
+		},
+		"toast": {
+			"loadError": "Error loading announcements",
+			"created": "Announcement created",
+			"updated": "Announcement updated",
+			"saveError": "Error while saving",
+			"validationError": "Please fill in all required fields"
+		}
+	},
+	"roles": {
+		"superAdmin": "Super Admin"
+	},
+	"users": {
+		"title": "User management",
+		"subtitle": "Create, edit and send a password reset email",
+		"searchPlaceholder": "Name, username or email",
+		"filters": { "status": "Status" },
+		"table": {
+			"user": "User",
+			"email": "Email",
+			"role": "Role",
+			"status": "Status"
+		},
+		"role": { "auto": "Role (auto)" },
+		"actions": {
+			"profile": "Profile",
+			"resetPassword": "Reset password"
+		},
+		"fields": {
+			"firstName": "First name",
+			"lastName": "Last name",
+			"username": "Username",
+			"email": "Email",
+			"role": "Role",
+			"activeAccount": "Active account",
+			"activeAccountHelp": "Disable to block sign-in"
+		},
+		"form": {
+			"createTitle": "Add a user",
+			"editTitle": "Edit a user"
+		},
+		"profile": { "title": "User profile" },
+		"validation": {
+			"firstNameRequired": "First name is required",
+			"lastNameRequired": "Last name is required",
+			"emailRequired": "Email is required"
+		},
+		"toast": {
+			"loadError": "Error loading users",
+			"created": "User created",
+			"updated": "User updated",
+			"resetSent": "Reset email sent to {email}",
+			"resetError": "Unable to send password reset email"
+		}
+	},
+	"profile": {
+		"title": "My profile",
+		"subtitle": "Signed-in account info",
+		"resetPassword": "Reset password",
+		"account": "Account",
+		"connected": "Connected"
+	},
+	"support": {
+		"title": "Support & Technical",
+		"impersonate": {
+			"title": "Sign in as",
+			"tenantPlaceholder": "Tenant ID",
+			"openDashboard": "Open dashboard",
+			"alert": "Opening the dashboard for {tenant}"
+		},
+		"logs": { "title": "Error logs" },
+		"versions": {
+			"title": "Version management",
+			"stable": "stable",
+			"beta": "beta",
+			"canary": "canary",
+			"alert": "Version {version} assigned"
+		}
+	},
+	"modal": {
+		"delete": {
+			"title": "Delete item",
+			"irreversible": "This action is irreversible",
+			"youAreAboutTo": "You are about to delete",
+			"cannotBeUndone": "This action cannot be undone.",
+			"confirm": "Confirm",
+			"deleting": "Deleting..."
+		}
+	},
 	"products": {
 		"product": "Product",
 		"errors": {
 			"notFound": "Product not found"
+		},
+		"catalog": {
+			"title": "Product catalog",
+			"subtitle": "Manage products available for subscription."
+		},
+		"stats": {
+			"products": "Products",
+			"activeProducts": "Active products"
+		},
+		"table": {
+			"product": "Product",
+			"slug": "Slug",
+			"priceMonthly": "Price / month",
+			"status": "Status"
+		},
+		"searchPlaceholder": "Search for a product...",
+		"actions": {
+			"new": "New product",
+			"create": "Create product",
+			"details": "Details",
+			"delete": "Delete"
+		},
+		"form": {
+			"createTitle": "New product",
+			"createSubtitle": "Add a new product to the catalog",
+			"editTitle": "Edit product",
+			"editSubtitle": "Update the product information"
+		},
+		"fields": {
+			"slug": "Slug",
+			"name": "Name",
+			"priceMonthlyXaf": "Monthly price (XAF)",
+			"description": "Description",
+			"active": "Active product",
+			"activeHelp": "Visible and subscribable by hotels"
+		},
+		"placeholders": {
+			"slug": "e.g. channel-manager",
+			"name": "e.g. Property Management System",
+			"priceMonthly": "e.g. 49000",
+			"description": "Briefly describe this product..."
+		},
+		"validation": {
+			"slugRequired": "Slug is required",
+			"nameRequired": "Name is required",
+			"pricePositive": "Price must be greater than 0"
+		},
+		"toast": {
+			"loadError": "Error loading products",
+			"created": "Product created successfully!",
+			"updated": "Product updated successfully!",
+			"deleted": "Product deleted successfully!"
+		},
+		"delete": {
+			"title": "Delete product",
+			"description": "All associated subscriptions will also be deleted."
 		}
+	},
+	"clients": {
+		"title": "Client portfolio management",
+		"subtitle": "Manage subscriptions and access for hotel properties.",
+		"actions": {
+			"addHotel": "Add a hotel",
+			"backToList": "Back to clients list"
+		},
+		"filters": {
+			"all": "All ({count})",
+			"active": "Active ({count})",
+			"suspended": "Suspended ({count})",
+			"inactive": "Inactive ({count})"
+		},
+		"table": {
+			"hotel": "Hotel",
+			"location": "Location",
+			"status": "Status",
+			"activeProducts": "Active products",
+			"info": "Info",
+			"contact": "Contact"
+		},
+		"products": {
+			"pos": "Point of sale",
+			"channelManager": "Channel Manager",
+			"mobileApp": "Mobile app"
+		},
+		"toast": {
+			"loadError": "Error loading hotels",
+			"created": "Hotel added successfully!",
+			"createError": "Error while adding"
+		}
+	},
+	"clientDetail": {
+		"actions": {
+			"history": "History",
+			"addModule": "Add a module",
+			"addProducts": "Add products"
+		},
+		"sections": {
+			"generalInfo": "General information",
+			"activeProducts": "Active products"
+		},
+		"fields": {
+			"address": "Address",
+			"phone": "Phone",
+			"currency": "Currency",
+			"timezone": "Timezone",
+			"lastUpdate": "Last update"
+		},
+		"subscriptions": {
+			"inProgress": "{count} subscription{suffix} in progress"
+		},
+		"empty": {
+			"title": "No subscribed product",
+			"subtitle": "This property does not have any active products yet."
+		},
+		"deleteHotel": {
+			"title": "Delete property",
+			"description": "All associated data (reservations, subscriptions, users) will be permanently lost."
+		},
+		"deleteSubscription": {
+			"title": "Delete subscription",
+			"description": "The subscription will be permanently deleted."
+		},
+		"errors": {
+			"loadHotel": "Error while loading the property"
+		},
+		"toast": {
+			"deletedHotel": "Property deleted successfully",
+			"updatedHotel": "Property updated successfully",
+			"updateError": "Error while updating",
+			"subscriptionActivated": "Subscription activated successfully",
+			"subscriptionDeactivated": "Subscription deactivated successfully",
+			"subscriptionDeleted": "Subscription deleted"
+		}
+	},
+	"hotelForm": {
+		"header": {
+			"editTitle": "Edit property",
+			"createTitle": "Add a new property",
+			"editSubtitle": "Update information for {name}",
+			"createSubtitle": "Set up the new client details for activation."
+		},
+		"tabs": {
+			"general": "General information",
+			"contact": "Primary contact",
+			"config": "Initial configuration"
+		},
+		"actions": {
+			"backToList": "Back to list",
+			"saveChanges": "Save changes",
+			"createHotel": "Create property"
+		},
+		"admin": {
+			"title": "System administrator",
+			"editHelp": "Edit this property's administrator access.",
+			"createHelp": "This user will receive access to manage the property."
+		},
+		"config": {
+			"credentialsTitle": "Credentials & location",
+			"tenantHint": "Unique auto-generated identifier.",
+			"scheduleTitle": "Schedule",
+			"policiesTitle": "Policies"
+		},
+		"fields": {
+			"hotelName": "Hotel name",
+			"chain": "Brand / chain",
+			"postalCode": "Postal code",
+			"country": "Country",
+			"city": "City",
+			"managerEmail": "Business email",
+			"website": "Website",
+			"phoneNumber": "Phone number",
+			"totalFloors": "Number of floors",
+			"starRating": "Rating (stars)",
+			"address": "Street address",
+			"tenantId": "Tenant ID",
+			"timezone": "Timezone",
+			"currencyDefault": "Default currency",
+			"checkInTime": "Check-in time",
+			"checkOutTime": "Check-out time",
+			"taxRate": "Tax rate (%)",
+			"roomsCount": "Number of rooms",
+			"cancellationPolicy": "Cancellation policy",
+			"hotelPolicy": "Property policy"
+		},
+		"placeholders": {
+			"hotelName": "e.g. Grand Hôtel Rivage",
+			"chain": "e.g. Luxury Collection",
+			"postalCode": "e.g. 06000",
+			"city": "City",
+			"totalFloors": "e.g. 5",
+			"address": "e.g. 42 Avenue des Palmiers",
+			"taxRate": "e.g. 19.25",
+			"roomsCount": "e.g. 20",
+			"cancellationPolicy": "e.g. Free cancellation up to 48 hours before arrival...",
+			"hotelPolicy": "e.g. Non-smoking. Pets not allowed. Accessible access available..."
+		},
+		"starRating": {
+			"stars": "{count} star{suffix}",
+			"unrated": "Unrated"
+		},
+		"validation": {
+			"hotelNameRequired": "Hotel name is required",
+			"addressRequired": "Address is required",
+			"cityRequired": "City is required",
+			"starRatingRequired": "Star rating is required",
+			"phoneRequired": "Phone number is required",
+			"emailValid": "A valid email is required"
+		},
+		"toast": {
+			"loadError": "Unable to load property data"
+		}
+	},
+	"dashboard": {
+		"licenseAlerts": {
+			"title": "License expiration alerts (30 days)"
+		},
+		"recentActivations": {
+			"title": "Recent activations",
+			"empty": "No recent activation",
+			"viewAllHistory": "View full history"
+		},
+		"revenueChart": {
+			"title": "Revenue breakdown",
+			"current": "Current",
+			"periods": {
+				"week": "Week",
+				"year": "Year"
+			},
+			"empty": {
+				"title": "No data available",
+				"subtitle": "Revenue will appear here as soon as there are active subscriptions."
+			}
+		},
+		"licenseTable": {
+			"columns": {
+				"hotel": "Hotel",
+				"product": "Product",
+				"dueDate": "Due date",
+				"daysLeft": "Days left",
+				"action": "Action"
+			}
+		},
+		"stats": {
+			"totalHotels": "Total hotels",
+			"hotelsThisMonth": "+{count} this month",
+			"mrr": "Monthly revenue (MRR)",
+			"renewalRate": "Renewal rate",
+			"objective": "Objective: {value}"
+		},
+		"toast": {
+			"loadError": "Error while loading the dashboard"
+		}
+	},
+	"security": {
+		"kpis": {
+			"online": "Online",
+			"activeTenants": "Active tenants",
+			"suspended": "Suspended",
+			"revokedAccess": "Revoked access"
+		},
+		"tenants": {
+			"title": "Tenant status"
+		},
+		"table": {
+			"establishment": "Property",
+			"tenant": "Tenant",
+			"status": "Status"
+		},
+		"audit": {
+			"title": "Audit log",
+			"columns": {
+				"action": "Action",
+				"description": "Description",
+				"establishment": "Property",
+				"by": "By",
+				"date": "Date"
+			},
+			"badges": {
+				"create": "Created",
+				"update": "Updated",
+				"delete": "Deleted",
+				"extend": "Extended"
+			}
+		},
+		"toast": {
+			"suspended": "Product suspended successfully",
+			"restored": "Product restored successfully",
+			"updateError": "Error while updating"
+		}
+	},
+	"history": {
+		"title": "History",
+		"subtitleHotel": "Property activity",
+		"subtitleAll": "All platform activity",
+		"cardTitleHotel": "History — {name}",
+		"cardTitleAll": "All activity",
+		"eventsCount": "{count} events",
+		"filters": {
+			"action": "Action",
+			"actionDefault": "Action",
+			"searchPlaceholder": "Search..."
+		},
+		"actions": {
+			"create": "Created",
+			"subscription": "Subscription",
+			"update": "Updated",
+			"delete": "Deleted"
+		},
+		"badges": {
+			"create": "Created",
+			"update": "Updated",
+			"extend": "Extended",
+			"delete": "Deleted"
+		},
+		"byUser": "by {user}",
+		"empty": {
+			"title": "No activity",
+			"subtitle": "No events found"
+		},
+		"pagination": "Page {current} / {last}"
 	},
 	"addons": {
 		"title": "Add-ons",
@@ -149,7 +872,9 @@
 			"activatedProducts": "Activated products"
 		},
 		"status": {
-			"active": "Active"
+			"active": "Active",
+			"pastDue": "Past due",
+			"canceled": "Canceled"
 		},
 		"toast": {
 			"updatedTitle": "Subscription updated",

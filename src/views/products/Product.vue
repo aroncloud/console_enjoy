@@ -6,6 +6,7 @@ import {
   BedDouble, Utensils, ArrowLeftRight, Smartphone, BarChart2, Users
 } from 'lucide-vue-next'
 import { type Component } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 // components
 import Input           from '../../components/FormElements/Input.vue'
@@ -28,6 +29,7 @@ const saving       = ref(false)
 const searchQuery  = ref('')
 const filterActive = ref<'all' | 'active' | 'inactive'>('all')
 const toastStore   = useToastStore()
+const { t } = useI18n()
 
 // ── Pagination ───
 const page  = ref(1)
@@ -35,13 +37,13 @@ const limit = ref(20)
 const meta = ref<any>(null)
 
 // ── Columns ───
-const columns: Column[] = [
-  { key: 'name',         label: 'Produit' },
-  { key: 'slug',         label: 'Slug' },
-  { key: 'priceMonthly', label: 'Prix / mois' },
-  { key: 'isActive',     label: 'Statut',  sortable: false },
-  { key: 'actions',      label: 'Actions', sortable: false },
-]
+const columns = computed<Column[]>(() => [
+  { key: 'name',         label: t('products.table.product') },
+  { key: 'slug',         label: t('products.table.slug') },
+  { key: 'priceMonthly', label: t('products.table.priceMonthly') },
+  { key: 'isActive',     label: t('products.table.status'),  sortable: false },
+  { key: 'actions',      label: t('common.actions'), sortable: false },
+])
 
 // ── Modales 
 const showForm        = ref(false)
@@ -80,7 +82,7 @@ const fetchProducts = async (page=1) => {
     console.log('Fetched products:', res.data, 'Meta:', res.meta)
   } catch (e) {
     console.error(e)
-    toastStore.show({ message: 'Erreur lors du chargement des produits', type: 'error' })
+    toastStore.show({ message: t('products.toast.loadError'), type: 'error' })
   } finally {
     loading.value = false
   }
@@ -153,9 +155,9 @@ const openEdit = (row: any) => {
 }
 
 const validateForm = () => {
-  formErrors.slug         = form.slug.trim()      ? '' : 'Le slug est obligatoire'
-  formErrors.name         = form.name.trim()      ? '' : 'Le nom est obligatoire'
-  formErrors.priceMonthly = form.priceMonthly > 0 ? '' : 'Le prix doit être supérieur à 0'
+  formErrors.slug         = form.slug.trim()      ? '' : t('products.validation.slugRequired')
+  formErrors.name         = form.name.trim()      ? '' : t('products.validation.nameRequired')
+  formErrors.priceMonthly = form.priceMonthly > 0 ? '' : t('products.validation.pricePositive')
   return !formErrors.slug && !formErrors.name && !formErrors.priceMonthly
 }
 
@@ -173,10 +175,10 @@ const handleSubmit = async () => {
 
     if (editingId.value) {
       await productService.update(Number(editingId.value), payload)
-      toastStore.show({ message: 'Produit mis à jour avec succès !', type: 'success' })
+      toastStore.show({ message: t('products.toast.updated'), type: 'success' })
     } else {
       await productService.create(payload)
-      toastStore.show({ message: 'Produit créé avec succès !', type: 'success' })
+      toastStore.show({ message: t('products.toast.created'), type: 'success' })
     }
 
     showForm.value = false
@@ -184,7 +186,7 @@ const handleSubmit = async () => {
     await fetchProducts(1)
   } catch (e) {
     console.error(e)
-    toastStore.show({ message: 'Erreur lors de la sauvegarde', type: 'error' })
+    toastStore.show({ message: t('common.errors.save'), type: 'error' })
   } finally {
     saving.value = false
   }
@@ -201,7 +203,7 @@ const confirmDelete = async () => {
   saving.value = true
   try {
     await productService.delete(Number(deletingProduct.value.id))
-    toastStore.show({ message: 'Produit supprimé avec succès !', type: 'success' })
+    toastStore.show({ message: t('products.toast.deleted'), type: 'success' })
     showDelete.value      = false
     deletingProduct.value = null
     // Si on supprime le dernier élément d'une page > 1, reculer d'une page
@@ -209,7 +211,7 @@ const confirmDelete = async () => {
     else await fetchProducts(1)
   } catch (e) {
     console.error(e)
-    toastStore.show({ message: 'Erreur lors de la suppression', type: 'error' })
+    toastStore.show({ message: t('common.errors.delete'), type: 'error' })
   } finally {
     saving.value = false
   }
@@ -223,11 +225,11 @@ const confirmDelete = async () => {
     <!-- ── Header ── -->
     <div class="flex flex-col md:flex-row justify-between md:items-start gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Catalogue Produits</h1>
-        <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Gérez les produits disponibles à la souscription.</p>
+        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">{{ t('products.catalog.title') }}</h1>
+        <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">{{ t('products.catalog.subtitle') }}</p>
       </div>
       <ButtonComponent variant="primary" :iconLeft="Plus" @click="openCreate">
-        Nouveau Produit
+        {{ t('products.actions.new') }}
       </ButtonComponent>
     </div>
 
@@ -236,17 +238,17 @@ const confirmDelete = async () => {
       <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
         <div class="flex items-center justify-between mb-2">
           <div class="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg"><Package :size="18" class="text-slate-600 dark:text-slate-300" /></div>
-          <span class="text-[10px] font-bold text-slate-500 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-full">Total</span>
+            <span class="text-[10px] font-bold text-slate-500 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-full">{{ t('common.total') }}</span>
         </div>
-        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Produits</p>
+          <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">{{ t('products.stats.products') }}</p>
         <p class="text-2xl font-black mt-1 text-slate-900 dark:text-white">{{ meta?.total ?? 0 }}</p>
       </div>
       <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
         <div class="flex items-center justify-between mb-2">
           <div class="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg"><Check :size="18" class="text-emerald-600 dark:text-emerald-400" /></div>
-          <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/30 px-2 py-1 rounded-full">Actifs</span>
+            <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/30 px-2 py-1 rounded-full">{{ t('common.activePlural') }}</span>
         </div>
-        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Produits actifs</p>
+          <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">{{ t('products.stats.activeProducts') }}</p>
         <p class="text-2xl font-black mt-1 text-slate-900 dark:text-white">{{ countActive }}</p>
       </div>
       <!-- <div class="bg-white rounded-xl border border-slate-200 p-5">
@@ -263,11 +265,11 @@ const confirmDelete = async () => {
     <div class="flex flex-col sm:flex-row gap-3">
       <div class="flex-1 max-w-sm relative">
         <Search :size="15" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 z-10" />
-        <Input v-model="searchQuery" placeholder="Rechercher un produit..." customClass="pl-9" />
+        <Input v-model="searchQuery" :placeholder="t('products.searchPlaceholder')" customClass="pl-9" />
       </div>
       <div class="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
         <button
-          v-for="[key, label] in [['all', 'Tous'], ['active', 'Actifs'], ['inactive', 'Inactifs']]"
+          v-for="[key, label] in [['all', t('common.all')], ['active', t('common.activePlural')], ['inactive', t('common.inactivePlural')]]"
           :key="key"
           @click="filterActive = key as any"
           class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer"
@@ -314,15 +316,15 @@ const confirmDelete = async () => {
                 : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-300',
             ]"
           >
-            {{ row.isActive ? 'Actif' : 'Inactif' }}
+            {{ row.isActive ? t('common.active') : t('common.inactive') }}
           </span>
         </template>
 
         <template #cell-actions="{ row }">
           <div class="flex items-center gap-1">
-            <ButtonComponent variant="ghost" size="sm" :iconLeft="Eye"    aria-label="Détails"    @click.stop="$router.push({ name: 'product-detail', params: { id: row.id } })" />
-            <ButtonComponent variant="ghost" size="sm" :iconLeft="Edit"   aria-label="Modifier"   @click.stop="openEdit(row)" />
-            <ButtonComponent variant="ghost" size="sm" :iconLeft="Trash2" aria-label="Supprimer"  @click.stop="openDelete(row)" />
+            <ButtonComponent variant="ghost" size="sm" :iconLeft="Eye"    :aria-label="t('products.actions.details')"    @click.stop="$router.push({ name: 'product-detail', params: { id: row.id } })" />
+            <ButtonComponent variant="ghost" size="sm" :iconLeft="Edit"   :aria-label="t('common.edit')"   @click.stop="openEdit(row)" />
+            <ButtonComponent variant="ghost" size="sm" :iconLeft="Trash2" :aria-label="t('products.actions.delete')"  @click.stop="openDelete(row)" />
           </div>
         </template>
 
@@ -333,25 +335,25 @@ const confirmDelete = async () => {
     <BaseModal v-model="showForm">
       <template #header>
         <div>
-          <h3 class="font-black text-slate-900 dark:text-white">{{ editingId ? 'Modifier le produit' : 'Nouveau produit' }}</h3>
+          <h3 class="font-black text-slate-900 dark:text-white">{{ editingId ? t('products.form.editTitle') : t('products.form.createTitle') }}</h3>
           <p class="text-xs text-slate-400 dark:text-slate-400 mt-0.5">
-            {{ editingId ? 'Mettez à jour les informations du produit' : 'Ajoutez un nouveau produit au catalogue' }}
+            {{ editingId ? t('products.form.editSubtitle') : t('products.form.createSubtitle') }}
           </p>
         </div>
       </template>
 
       <div class="space-y-4">
-        <Input v-model="form.slug"  lb="Slug"    placeholder="ex: channel-manager"           :errorMsg="formErrors.slug"         :disabled="saving" customClass="w-full" isRequired />
-        <Input v-model="form.name"  lb="Nom"   placeholder="ex: Property Management System" :errorMsg="formErrors.name"         :disabled="saving" customClass="w-full" isRequired />
-        <Input v-model.number="form.priceMonthly" lb="Prix mensuel (XAF)" type="number" placeholder="ex: 49000" :errorMsg="formErrors.priceMonthly" :disabled="saving" customClass="w-full" isRequired />
+        <Input v-model="form.slug"  :lb="t('products.fields.slug')"    :placeholder="t('products.placeholders.slug')"           :errorMsg="formErrors.slug"         :disabled="saving" customClass="w-full" isRequired />
+        <Input v-model="form.name"  :lb="t('products.fields.name')"   :placeholder="t('products.placeholders.name')" :errorMsg="formErrors.name"         :disabled="saving" customClass="w-full" isRequired />
+        <Input v-model.number="form.priceMonthly" :lb="t('products.fields.priceMonthlyXaf')" type="number" :placeholder="t('products.placeholders.priceMonthly')" :errorMsg="formErrors.priceMonthly" :disabled="saving" customClass="w-full" isRequired />
 
         <div>
-          <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Description</label>
+          <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">{{ t('products.fields.description') }}</label>
           <textarea
             v-model="form.description"
             rows="2"
             :disabled="saving"
-            placeholder="Décrivez brièvement ce produit..."
+            :placeholder="t('products.placeholders.description')"
             class="w-full rounded-lg border px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-purple-500 focus:outline-hidden focus:ring-3 focus:ring-purple-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-purple-800 transition-colors"
             :class="saving ? 'bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-400 cursor-not-allowed border-gray-200 dark:border-slate-700' : 'bg-transparent dark:bg-slate-900 border-gray-300 dark:border-slate-700'"
           />
@@ -359,8 +361,8 @@ const confirmDelete = async () => {
 
         <div class="flex items-center justify-between p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
           <div>
-            <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">Produit actif</p>
-            <p class="text-xs text-slate-400 dark:text-slate-400">Visible et souscriptible par les hôtels</p>
+            <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">{{ t('products.fields.active') }}</p>
+            <p class="text-xs text-slate-400 dark:text-slate-400">{{ t('products.fields.activeHelp') }}</p>
           </div>
           <Toggle v-model="form.isActive" />
         </div>
@@ -368,9 +370,9 @@ const confirmDelete = async () => {
 
       <template #footer>
         <div class="flex gap-3">
-          <ButtonComponent variant="outline" :disabled="saving" @click="showForm = false">Annuler</ButtonComponent>
+          <ButtonComponent variant="outline" :disabled="saving" @click="showForm = false">{{ t('common.cancel') }}</ButtonComponent>
           <ButtonComponent variant="primary" :loading="saving" @click="handleSubmit">
-            {{ editingId ? 'Enregistrer' : 'Créer le produit' }}
+            {{ editingId ? t('common.save') : t('products.actions.create') }}
           </ButtonComponent>
         </div>
       </template>
@@ -379,9 +381,9 @@ const confirmDelete = async () => {
     <!-- ── Modal suppression ── -->
     <DeleteConfirmationModal
       v-model="showDelete"
-      title="Supprimer le produit"
+      :title="t('products.delete.title')"
       :item-name="deletingProduct?.name"
-      description="Toutes les souscriptions associées seront également supprimées."
+      :description="t('products.delete.description')"
       :loading="saving"
       @confirm="confirmDelete"
     />

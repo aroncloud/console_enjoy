@@ -5,7 +5,7 @@
   >
     <!-- Info affichage -->
     <span class="text-xs text-gray-400 dark:text-slate-400 font-medium">
-      Affichage de {{ startItem }} à {{ endItem }} sur {{ meta.total.toLocaleString() }}
+      {{ t('pagination.range', { start: startItem, end: endItem, total: meta.total.toLocaleString() }) }}
     </span>
 
     <div class="flex items-center gap-1">
@@ -13,6 +13,8 @@
       <button
         :disabled="!meta.previousPageUrl"
         @click="changePage(meta.currentPage - 1)"
+        :aria-label="t('pagination.previous')"
+        :title="t('pagination.previous')"
         class="p-1.5 border border-gray-200 dark:border-slate-700 rounded-md text-gray-400 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <ChevronLeft :size="16" />
@@ -39,6 +41,8 @@
       <button
         :disabled="!meta.nextPageUrl"
         @click="changePage(meta.currentPage + 1)"
+        :aria-label="t('pagination.next')"
+        :title="t('pagination.next')"
         class="p-1.5 border border-gray-200 dark:border-slate-700 rounded-md text-gray-400 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <ChevronRight :size="16" />
@@ -50,6 +54,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { useI18n } from 'vue-i18n'
 
 interface Meta {
   total: number
@@ -68,6 +73,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   siblingCount: 1,
 })
+const { t } = useI18n()
 
 const emit = defineEmits<{
   (e: 'page-change', page: number): void

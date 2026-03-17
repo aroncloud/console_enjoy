@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Trash2, Loader2 } from 'lucide-vue-next'
+import { useI18n } from 'vue-i18n'
 
 interface Props {
   modelValue: boolean      // v-model pour show/hide
@@ -9,8 +10,10 @@ interface Props {
   loading?: boolean        // état de chargement
 }
 
+const { t } = useI18n()
+
 const props = withDefaults(defineProps<Props>(), {
-  title: 'Supprimer l\'élément',
+  title: undefined,
   itemName: '',
   description: '',
   loading: false,
@@ -51,8 +54,8 @@ const close = () => {
               <Trash2 :size="22" class="text-red-500" />
             </div>
             <div>
-              <h3 class="text-base font-bold text-gray-900 dark:text-white">{{ title }}</h3>
-              <p class="text-sm text-gray-400 dark:text-slate-400 mt-0.5">Cette action est irréversible</p>
+              <h3 class="text-base font-bold text-gray-900 dark:text-white">{{ title ?? t('modal.delete.title') }}</h3>
+              <p class="text-sm text-gray-400 dark:text-slate-400 mt-0.5">{{ t('modal.delete.irreversible') }}</p>
             </div>
           </div>
 
@@ -61,13 +64,13 @@ const close = () => {
             <!-- Slot custom ou message par défaut -->
             <slot name="message">
               <p class="text-sm text-red-700 dark:text-red-300 leading-relaxed">
-                Vous êtes sur le point de supprimer
+                {{ t('modal.delete.youAreAboutTo') }}
                 <span class="font-bold text-red-900 dark:text-red-200">« {{ itemName }} »</span>.
                 <template v-if="description">
                   {{ description }}
                 </template>
                 <template v-else>
-                  Cette action ne peut pas être annulée.
+                  {{ t('modal.delete.cannotBeUndone') }}
                 </template>
               </p>
             </slot>
@@ -80,7 +83,7 @@ const close = () => {
               @click="close"
               class="flex-1 py-2.5 px-4 rounded-xl border border-gray-200 dark:border-slate-700 text-sm font-semibold text-gray-600 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Annuler
+              {{ t('common.cancel') }}
             </button>
             <button
               :disabled="loading"
@@ -89,7 +92,7 @@ const close = () => {
             >
               <Loader2 v-if="loading" :size="15" class="animate-spin" />
               <Trash2   v-else        :size="15" />
-              {{ loading ? 'Suppression...' : 'Confirmer' }}
+              {{ loading ? t('modal.delete.deleting') : t('modal.delete.confirm') }}
             </button>
           </div>
 

@@ -24,7 +24,7 @@
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="Rechercher…"
+            :placeholder="t('table.searchPlaceholder')"
             class="pl-8 pr-7 py-1.5 text-sm bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg outline-none
                    text-gray-800 dark:text-slate-200 placeholder-gray-400 dark:placeholder:text-slate-400 w-52
                    focus:border-purple-500 focus:ring-2 focus:ring-purple-100 focus:w-64
@@ -93,7 +93,7 @@
                       <path d="M16 10V8a2 2 0 012-2h12a2 2 0 012 2v2" stroke="currentColor" stroke-width="1.5"/>
                       <path d="M16 22h16M16 29h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                     </svg>
-                    <span class="text-sm">Aucune donnée disponible</span>
+                    <span class="text-sm">{{ t('table.empty') }}</span>
                   </div>
                 </slot>
               </td>
@@ -145,7 +145,7 @@
 
         <!-- Empty mobile -->
         <div v-else-if="paginatedData.length === 0" class="py-14 flex flex-col items-center gap-3 text-gray-400 dark:text-slate-400">
-          <slot name="empty"><span class="text-sm">Aucune donnée disponible</span></slot>
+          <slot name="empty"><span class="text-sm">{{ t('table.empty') }}</span></slot>
         </div>
 
         <!-- Cards -->
@@ -185,7 +185,7 @@
     <div class="flex items-center justify-between flex-wrap gap-3 px-5 py-3 border-t border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900">
       <!-- Page size -->
       <div class="flex items-center gap-2 text-xs text-gray-400 dark:text-slate-400">
-        <span>Lignes :</span>
+        <span>{{ t('table.rows') }} :</span>
         <select
           v-model="pageSize"
           class="text-xs text-gray-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-md px-2 py-1 outline-none
@@ -209,6 +209,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import Pagination from '../../components/Pagination/PaginationTable.vue'
+import { useI18n } from 'vue-i18n'
 
 export interface Column {
   key: string
@@ -247,6 +248,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const firstColumnKey = computed(() => props.columns[0]?.key ?? '')
+const { t } = useI18n()
 
 const emit = defineEmits<{
   (e: 'page-change', page: number): void

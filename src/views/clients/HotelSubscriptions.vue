@@ -114,44 +114,37 @@
                     </div>
                   </div>
 
-                  <!-- Module-specific inputs -->
-                  <div v-if="isSelected(mod.id)" @click.stop>
-                    <div v-if="mod.slug === 'pms'" class="mb-4 p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 space-y-2 min-h-24">
-                      <div class="flex justify-between items-center">
-                        <p class="text-xs font-medium text-slate-500 flex items-center gap-1.5">
-                          <BedDouble :size="12" class="text-slate-400" />
-                          Chambres autorisées
-                        </p>
-                        <span class="text-xs font-bold" :style="{ color: mod.color }">{{ getSel(mod.id).rooms }}</span>
-                      </div>
-                      <input type="range" min="1" max="250" v-model.number="getSel(mod.id).rooms" class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer" :style="`accent-color: ${mod.color}`" />
-                      <div class="flex justify-between text-[9px] text-slate-300 dark:text-slate-500 font-medium"><span>1</span><span>250</span></div>
+                  <!-- ── Add-on (one per module) ── -->
+                  <div v-if="isSelected(mod.id)" class="mb-4" @click.stop>
+                    <div v-if="addOnsLoadedByModule[mod.id] && (addOnsByModule[mod.id] || []).length === 0" class="p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
+                      <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Add-on</p>
+                      <p class="mt-1 text-xs text-slate-500 dark:text-slate-300">Aucun add-on disponible</p>
                     </div>
-
-                    <div v-else-if="mod.slug === 'pos'" class="mb-4 p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 space-y-2 min-h-24">
-                      <p class="text-xs font-medium text-slate-500 flex items-center gap-1.5"><Utensils :size="12" class="text-slate-400" />Terminaux</p>
-                      <div class="flex items-center gap-3">
-                        <Input v-model.number="getSel(mod.id).units" type="number" :min="1" customClass="w-full" />
-                        <span class="text-[10px] font-bold text-slate-400 whitespace-nowrap">TERMINAUX</span>
-                      </div>
-                    </div>
-
-                    <div v-else-if="mod.slug === 'channel-manager'" class="mb-4 p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 space-y-2 min-h-24">
-                      <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">OTAs connectés</p>
-                      <div v-for="ota in getSel(mod.id).otas" :key="ota.name" class="flex items-center gap-2 p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700" :class="!ota.checked ? 'opacity-50' : ''">
-                        <input type="checkbox" v-model="ota.checked" class="w-3.5 h-3.5 rounded accent-purple-600 cursor-pointer" />
-                        <span class="text-xs font-medium text-slate-700 dark:text-slate-300">{{ ota.name }}</span>
-                      </div>
-                    </div>
-
-                    <div v-else-if="mod.slug === 'mobile-app'" class="mb-4 p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 space-y-3 min-h-24">
-                      <div class="space-y-1">
-                        <p class="text-xs font-medium text-slate-500">Quota staff</p>
-                        <Input v-model.number="getSel(mod.id).staffQuota" type="number" :min="1" customClass="w-full" />
-                      </div>
-                      <div class="flex items-center justify-between p-2.5 rounded-lg border border-yellow-100 bg-yellow-50/50">
-                        <div class="flex items-center gap-2"><span class="text-sm">👤</span><span class="text-xs font-semibold text-slate-700">Guest App</span></div>
-                        <input type="checkbox" v-model="getSel(mod.id).guestApp" class="w-3.5 h-3.5 rounded accent-purple-600 cursor-pointer" />
+                    <div v-else class="p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
+                      <Select
+                        lb="Add-on"
+                        placeholder="Sélectionner un add-on"
+                        :isRequired="(addOnsByModule[mod.id] || []).length > 0"
+                        :options="addOnOptionsForModule(mod.id)"
+                        :isLoading="addOnsLoadingByModule[mod.id]"
+                        v-model="getSel(mod.id).addOnId"
+                        @change="() => handleAddOnChange(mod.id)"
+                      />
+                      <div v-if="getSelectedAddOn(mod.id)" class="mt-2 flex items-center justify-between gap-3 text-[11px] text-slate-500 dark:text-slate-300">
+                        <span class="truncate">
+                          Min {{ getSelectedAddOn(mod.id)?.min }} · Max {{ getSelectedAddOn(mod.id)?.max }}
+                        </span>
+                        <span class="shrink-0 font-bold text-slate-700 dark:text-slate-200">
+                          {{
+                            formatCurrency(
+                              getSel(mod.id).billingCycle === 'yearly'
+                                ? (getSelectedAddOn(mod.id)?.priceYear != null
+                                    ? Number(getSelectedAddOn(mod.id)?.priceYear)
+                                    : Number(getSelectedAddOn(mod.id)?.priceMonth || 0) * 12)
+                                : Number(getSelectedAddOn(mod.id)?.priceMonth || 0)
+                            )
+                          }}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -163,7 +156,7 @@
                       <button
                         v-for="[val, label] in [['monthly', 'Mensuel'], ['yearly', 'Annuel']]"
                         :key="val"
-                        @click="setSel(mod.id, 'billingCycle', val)"
+                        @click="setSel(mod.id, 'billingCycle', val); ensurePeriodMatchesCycle(mod.id)"
                         class="py-1.5 px-2 rounded-lg text-[11px] font-bold border transition-all"
                         :class="getSel(mod.id).billingCycle === val
                           ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'
@@ -172,36 +165,36 @@
                     </div>
                   </div>
 
-                  <!-- ── Période : UNIQUEMENT si mensuel ── -->
-                  <Transition name="slide-down">
-                    <div v-if="isSelected(mod.id) && getSel(mod.id).billingCycle === 'monthly'" class="mb-4" @click.stop>
-                      <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                        <CalendarRange :size="11" />
-                        Période de souscription
-                      </p>
-                     <InputDoubleDate
+                  <!-- ── Période (toujours visible) ── -->
+                  <div v-if="isSelected(mod.id)" class="mb-4" @click.stop>
+                    <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                      <CalendarRange :size="11" />
+                      Période de souscription
+                    </p>
+                    <InputDoubleDate
                       :modelValue="{ start: getSel(mod.id).startMonth, end: getSel(mod.id).endMonth }"
                       @update:modelValue="val => { 
                         setSel(mod.id, 'startMonth', val.start); 
-                        setSel(mod.id, 'endMonth', val.end); 
+                        setSel(mod.id, 'endMonth', val.end);
+                        if (getSel(mod.id).billingCycle === 'yearly') ensurePeriodMatchesCycle(mod.id);
                       }"
                     />
-                    
-                    </div>
-                  </Transition>
+                  </div>
 
-                  <!-- ── Prix catalogue + Prix appliqué modifiable ── -->
+                  <!-- ── Prix de souscription (selon add-on + mensuel/annuel) ── -->
                   <div v-if="isSelected(mod.id)" class="mb-4" @click.stop>
                     <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                       <Tag :size="11" />
                       Prix de souscription
                     </p>
-                     <Input
-                        type="number"
-                         v-model.number="getSel(mod.id).customPrice"
-                         :min="0"
-                              
-                      />
+                    <div class="p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex items-center justify-between">
+                      <span class="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                        {{ getSel(mod.id).billingCycle === 'yearly' ? 'Annuel' : 'Mensuel' }}
+                      </span>
+                      <span class="text-sm font-black text-slate-900 dark:text-white">
+                        {{ formatCurrency(getPrice(mod)) }}
+                      </span>
+                    </div>
                     <!-- <div class="p-3 rounded-xl border border-slate-100 bg-slate-50/50">
                       <div class="flex items-center gap-2">
 
@@ -287,6 +280,7 @@
                       <div class="min-w-0">
                         <p class="text-xs font-bold text-slate-700 dark:text-slate-300 truncate">{{ mod.name }}</p>
                         <p class="text-[10px] text-slate-400">{{ getSel(mod.id).billingCycle === 'yearly' ? 'Annuel' : 'Mensuel' }}</p>
+                        <p v-if="getSel(mod.id).addOnId" class="text-[10px] text-slate-400 truncate">{{ getSelectedAddOn(mod.id)?.name }}</p>
                        
                       </div>
                     </div>
@@ -294,8 +288,26 @@
                   </div>
 
                   <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                    <span class="text-sm font-black text-slate-900 dark:text-white">Total</span>
-                    <span class="text-lg font-black text-purple-600">{{ formatCurrency(totalMonthlyEquivalent) }}</span>
+                    <template v-if="isMixedBilling">
+                      <div class="w-full space-y-2">
+                        <div class="flex justify-between items-center">
+                          <span class="text-sm font-black text-slate-900 dark:text-white">Total / mois</span>
+                          <span class="text-lg font-black text-purple-600">{{ formatCurrency(totalMonthly) }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                          <span class="text-sm font-black text-slate-900 dark:text-white">Total / an</span>
+                          <span class="text-lg font-black text-purple-600">{{ formatCurrency(totalYearly) }}</span>
+                        </div>
+                      </div>
+                    </template>
+                    <template v-else>
+                      <span class="text-sm font-black text-slate-900 dark:text-white">
+                        Total {{ isYearlyOnlyBilling ? '/ an' : '/ mois' }}
+                      </span>
+                      <span class="text-lg font-black text-purple-600">
+                        {{ formatCurrency(isYearlyOnlyBilling ? totalYearly : totalMonthly) }}
+                      </span>
+                    </template>
                   </div>
                 </div>
 
@@ -306,11 +318,25 @@
                   </div>
                 </Transition>
 
+                <Transition name="slide-down">
+                  <div v-if="hasMissingAddOn" class="mt-3 flex items-start gap-2 p-3 rounded-xl bg-amber-50 border border-amber-200">
+                    <AlertTriangle :size="13" class="text-amber-500 mt-0.5 shrink-0" />
+                    <p class="text-[11px] text-amber-700 font-medium">Veuillez sélectionner un add-on pour chaque module.</p>
+                  </div>
+                </Transition>
+
+                <Transition name="slide-down">
+                  <div v-if="hasAddOnOutOfRange" class="mt-3 flex items-start gap-2 p-3 rounded-xl bg-amber-50 border border-amber-200">
+                    <AlertTriangle :size="13" class="text-amber-500 mt-0.5 shrink-0" />
+                    <p class="text-[11px] text-amber-700 font-medium">La valeur choisie dépasse la plage autorisée de l'add-on.</p>
+                  </div>
+                </Transition>
+
                 <button
                   @click="goToStep2"
-                  :disabled="selectedModules.length === 0"
+                  :disabled="selectedModules.length === 0 || hasMissingPeriod || hasMissingAddOn || hasAddOnOutOfRange"
                   class="mt-5 w-full py-3 rounded-xl text-sm font-black text-white transition-all"
-                  :class="selectedModules.length > 0
+                  :class="selectedModules.length > 0 && !hasMissingPeriod && !hasMissingAddOn && !hasAddOnOutOfRange
                     ? 'bg-purple-600 hover:bg-purple-700 shadow-lg shadow-purple-200 dark:shadow-purple-900/30'
                     : 'bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed'"
                 >Continuer →</button>
@@ -346,8 +372,24 @@
                 </div>
 
                 <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                  <span class="text-xs font-bold text-slate-500">Total / mois</span>
-                  <span class="text-sm font-black text-purple-600">{{ formatCurrency(totalMonthlyEquivalent) }}</span>
+                  <template v-if="isMixedBilling">
+                    <div class="w-full space-y-2">
+                      <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-slate-500">Total / mois</span>
+                        <span class="text-sm font-black text-purple-600">{{ formatCurrency(totalMonthly) }}</span>
+                      </div>
+                      <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-slate-500">Total / an</span>
+                        <span class="text-sm font-black text-purple-600">{{ formatCurrency(totalYearly) }}</span>
+                      </div>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <span class="text-xs font-bold text-slate-500">Total {{ isYearlyOnlyBilling ? '/ an' : '/ mois' }}</span>
+                    <span class="text-sm font-black text-purple-600">
+                      {{ formatCurrency(isYearlyOnlyBilling ? totalYearly : totalMonthly) }}
+                    </span>
+                  </template>
                 </div>
               </div>
             </div>
@@ -476,12 +518,6 @@
                     <component :is="mod.icon" :size="14" class="text-slate-400 shrink-0 mt-0.5" />
                     <div class="min-w-0">
                       <span class="font-medium">{{ mod.fullName }}</span>
-                      <div class="flex items-center gap-1 mt-0.5 flex-wrap">
-                        <span v-if="mod.slug === 'pms'" class="text-[10px] text-slate-400">({{ getSel(mod.id).rooms }} ch.)</span>
-                        <span v-else-if="mod.slug === 'pos'" class="text-[10px] text-slate-400">({{ getSel(mod.id).units }} term.)</span>
-                        <span v-else-if="mod.slug === 'mobile-app'" class="text-[10px] text-slate-400">({{ getSel(mod.id).staffQuota }} staff)</span>
-                        <span v-else-if="mod.slug === 'channel-manager'" class="text-[10px] text-slate-400">({{ getSel(mod.id).otas.filter(o => o.checked).length }} OTA)</span>
-                      </div>
                       <div v-if="getSel(mod.id).billingCycle === 'monthly' && getSel(mod.id).startMonth && getSel(mod.id).endMonth" class="flex items-center gap-1 mt-1">
                         <div class="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold" :style="{ background: mod.color + '15', color: mod.color }">
                           <CalendarRange :size="8" />
@@ -491,17 +527,40 @@
                     </div>
                   </div>
                   <div class="text-right shrink-0">
-                    <span class="font-semibold text-slate-800 dark:text-white text-sm block">{{ formatCurrency(getPrice(mod))}}</span>
+                    <span class="font-semibold text-slate-800 dark:text-white text-sm block">
+                      {{ formatCurrency(getPrice(mod)) }}
+                      <span class="text-[10px] text-slate-400 font-bold">
+                        {{ getSel(mod.id).billingCycle === 'yearly' ? '/an' : '/mois' }}
+                      </span>
+                    </span>
                    
                   </div>
                 </div>
 
                 <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                  <span class="font-black text-slate-900 dark:text-white">Montant total</span>
-                  <span class="text-2xl font-black text-purple-600">{{ formatCurrency(totalMonthlyEquivalent) }}</span>
+                  <template v-if="isMixedBilling">
+                    <div class="w-full space-y-2">
+                      <div class="flex justify-between items-center">
+                        <span class="font-black text-slate-900 dark:text-white">Total / mois</span>
+                        <span class="text-2xl font-black text-purple-600">{{ formatCurrency(totalMonthly) }}</span>
+                      </div>
+                      <div class="flex justify-between items-center">
+                        <span class="font-black text-slate-900 dark:text-white">Total / an</span>
+                        <span class="text-2xl font-black text-purple-600">{{ formatCurrency(totalYearly) }}</span>
+                      </div>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <span class="font-black text-slate-900 dark:text-white">Montant total {{ isYearlyOnlyBilling ? '/ an' : '/ mois' }}</span>
+                    <span class="text-2xl font-black text-purple-600">
+                      {{ formatCurrency(isYearlyOnlyBilling ? totalYearly : totalMonthly) }}
+                    </span>
+                  </template>
                 </div>
                 <p class="text-[10px] text-slate-400 text-right flex items-center justify-end gap-1">
-                  <RefreshCw :size="10" />Récurrent mensuel à partir d'aujourd'hui
+                  <RefreshCw :size="10" />
+                  <span v-if="isMixedBilling">Total mixte (mensuel + annuel)</span>
+                  <span v-else>{{ isYearlyOnlyBilling ? 'Récurrent annuel' : 'Récurrent mensuel' }} à partir d'aujourd'hui</span>
                 </p>
                 <button
                   @click="goToStep3"
@@ -579,10 +638,11 @@ import { ref, computed, reactive, onMounted, type Component } from 'vue'
 import { useRouter ,useRoute } from 'vue-router'
 import { productService, type Product } from '../../servicesAPI/productService'
 import { formatCurrency } from '../../components/Utilities/function'
-import Input from '../../components/FormElements/Input.vue'
 import InputDoubleDate from '../../components/FormElements/InputDoubleDate.vue'
+import Select from '../../components/FormElements/Select.vue'
 import { subscriptionService } from '../../servicesAPI/subscriptionService'
 import { useToastStore } from '../../composables/toast'
+import { addOnService, type AddOn } from '../../servicesAPI/addOnService'
 import {
   ArrowLeft, ShieldCheck, Check, Lock,
   Package, CheckCircle2, AlertTriangle, BedDouble, Utensils,
@@ -628,6 +688,7 @@ interface Selection {
   startMonth   : string
   endMonth     : string
   customPrice  : number
+  addOnId      : number | null
 }
 
 
@@ -679,7 +740,9 @@ const openEditMode = (sub: any) => {
     startMonth   : sub.startsAt?.split('T')[0] ?? '',
     endMonth     : sub.endsAt?.split('T')[0] ?? '',
     customPrice  : Number(sub.price) ?? 0,
+    addOnId      : sub.addOnId ?? sub.add_on_id ?? sub.addOn?.id ?? null,
   }
+  void ensureAddOnsLoaded(mod.id)
 }
 
 onMounted(async () => {
@@ -729,6 +792,9 @@ const currentStep        = ref(1)
 const steps              = ['Plan', 'Paiement', 'Confirmation']
 const showChannelWarning = ref(false)
 const selections         = reactive<Record<number, Selection>>({})
+const addOnsByModule     = reactive<Record<number, AddOn[]>>({})
+const addOnsLoadingByModule = reactive<Record<number, boolean>>({})
+const addOnsLoadedByModule  = reactive<Record<number, boolean>>({})
 
 // ── Computed ─────
 const selectedModules = computed(() => modules.value.filter(m => selections[m.id] !== undefined))
@@ -740,26 +806,143 @@ const isLocked   = (id: number) => {
 }
 const getSel = (id: number) => selections[id] as Selection
 
+const getSelectedAddOn = (moduleId: number) => {
+  const sel = selections[moduleId]
+  if (!sel?.addOnId) return null
+  return (addOnsByModule[moduleId] || []).find((a) => a.id === sel.addOnId) ?? null
+}
+
+const addOnOptionsForModule = (moduleId: number) =>
+  (addOnsByModule[moduleId] || []).map((a) => ({
+    value: a.id,
+    label: `${a.name} — ${formatCurrency(
+      (selections[moduleId]?.billingCycle ?? 'monthly') === 'yearly'
+        ? a.priceYear != null
+          ? Number(a.priceYear)
+          : Number(a.priceMonth) * 12
+        : Number(a.priceMonth)
+    )} (min ${a.min}, max ${a.max})`,
+  }))
+
+const handleAddOnChange = (moduleId: number) => {
+  const sel = selections[moduleId]
+  if (!sel) return
+  sel.customPrice = 0
+}
+
+const getLimitCountForModule = (mod: any, sel: Selection) =>
+  mod.slug === 'pms'
+    ? sel.rooms
+    : mod.slug === 'pos'
+      ? sel.units
+      : mod.slug === 'mobile-app'
+        ? sel.staffQuota
+        : mod.slug === 'channel-manager'
+          ? sel.otas.filter((o: any) => o.checked).length
+          : null
+
+const fmtDate = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+
+const addMonths = (ymd: string, months: number) => {
+  if (!ymd) return ''
+  const [y, m, d] = ymd.split('-').map(Number)
+  if (!y || !m || !d) return ''
+  return fmtDate(new Date(y, m - 1 + months, d))
+}
+
+const addYears = (ymd: string, years: number) => {
+  if (!ymd) return ''
+  const [y, m, d] = ymd.split('-').map(Number)
+  if (!y || !m || !d) return ''
+  return fmtDate(new Date(y + years, m - 1, d))
+}
+
+const ensurePeriodMatchesCycle = (moduleId: number) => {
+  const sel = selections[moduleId]
+  if (!sel) return
+  if (!sel.startMonth) sel.startMonth = fmtDate(new Date())
+  sel.endMonth = sel.billingCycle === 'yearly' ? addYears(sel.startMonth, 1) : addMonths(sel.startMonth, 1)
+}
+
+const ensureAddOnsLoaded = async (moduleId: number) => {
+  if (addOnsLoadedByModule[moduleId]) return
+  addOnsLoadingByModule[moduleId] = true
+  try {
+    const res = await addOnService.getByModule(moduleId, { page: 1, limit: 200 })
+    addOnsByModule[moduleId] = Array.isArray(res.data) ? res.data : []
+    addOnsLoadedByModule[moduleId] = true
+  } catch (e) {
+    console.error(e)
+    addOnsByModule[moduleId] = []
+    addOnsLoadedByModule[moduleId] = true
+  } finally {
+    addOnsLoadingByModule[moduleId] = false
+  }
+}
+
 
 const getPrice = (mod: any): number => {
   const sel = selections[mod.id]
   if (!sel) return Number(mod.priceMonthly) 
-  const base = sel.customPrice > 0 ? Number(sel.customPrice) : Number(mod.priceMonthly)  
-  return sel.billingCycle === 'yearly' ? base * 12 : base
+  if (sel.customPrice > 0) {
+    const baseMonthly = Number(sel.customPrice)
+    return sel.billingCycle === 'yearly' ? baseMonthly * 12 : baseMonthly
+  }
+
+  const selectedAddOn = getSelectedAddOn(mod.id)
+  if (selectedAddOn) {
+    if (sel.billingCycle === 'yearly') {
+      return selectedAddOn.priceYear != null ? Number(selectedAddOn.priceYear) : Number(selectedAddOn.priceMonth) * 12
+    }
+    return Number(selectedAddOn.priceMonth)
+  }
+
+  const baseMonthly = Number(mod.priceMonthly)
+  return sel.billingCycle === 'yearly' ? baseMonthly * 12 : baseMonthly
 }
 
-const totalMonthlyEquivalent = computed(() =>
+const hasMonthlyBilling = computed(() =>
+  selectedModules.value.some((mod) => getSel(mod.id).billingCycle === 'monthly')
+)
+const hasYearlyBilling = computed(() =>
+  selectedModules.value.some((mod) => getSel(mod.id).billingCycle === 'yearly')
+)
+const isMixedBilling = computed(() => hasMonthlyBilling.value && hasYearlyBilling.value)
+const isYearlyOnlyBilling = computed(() => hasYearlyBilling.value && !hasMonthlyBilling.value)
+
+const totalMonthly = computed(() =>
   selectedModules.value.reduce((acc, mod) => {
-    return acc + getPrice(mod)  
+    return acc + (getSel(mod.id).billingCycle === 'monthly' ? getPrice(mod) : 0)
+  }, 0)
+)
+const totalYearly = computed(() =>
+  selectedModules.value.reduce((acc, mod) => {
+    return acc + (getSel(mod.id).billingCycle === 'yearly' ? getPrice(mod) : 0)
   }, 0)
 )
 
 
 
 const hasMissingPeriod = computed(() =>
-  selectedModules.value.some(mod => {
+  selectedModules.value.some((mod) => {
     const sel = getSel(mod.id)
-    return sel?.billingCycle === 'monthly' && (!sel?.startMonth || !sel?.endMonth)
+    return !sel?.startMonth || !sel?.endMonth
+  })
+)
+
+const hasMissingAddOn = computed(() =>
+  selectedModules.value.some((mod) => (addOnsByModule[mod.id] || []).length > 0 && !getSel(mod.id).addOnId)
+)
+
+const hasAddOnOutOfRange = computed(() =>
+  selectedModules.value.some((mod) => {
+    const sel = getSel(mod.id)
+    const addOn = getSelectedAddOn(mod.id)
+    if (!addOn) return false
+    const limitCount = getLimitCountForModule(mod, sel)
+    if (limitCount == null) return false
+    return Number(limitCount) < Number(addOn.min) || Number(limitCount) > Number(addOn.max)
   })
 )
 
@@ -776,26 +959,24 @@ const setSel = (id: number, key: keyof Selection, val: any) => {
   const s = getSel(id); if (s) (s as any)[key] = val
 }
 
-const defaultSelection = (mod: any): Selection => {
+const defaultSelection = (): Selection => {
   const now   = new Date()
   const start = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   const end   = new Date(now.getFullYear(), now.getMonth() + 1, 6) 
-
-  const fmt = (d: Date) =>
-    `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
 
   return {
     billingCycle: 'monthly',
     rooms: 10, units: 1, staffQuota: 5, guestApp: false,
     otas: DEFAULT_OTAS.map(o => ({ ...o })),
-    startMonth : fmt(start),
-    endMonth   : fmt(end),
-    customPrice: Math.round(mod.priceMonthly),
+    startMonth : fmtDate(start),
+    endMonth   : fmtDate(end),
+    customPrice: 0,
+    addOnId: null,
   }
 }
 
 
-const toggleModule = (mod: any) => {
+const toggleModule = async (mod: any) => {
   if (isLocked(mod.id)) {
     showChannelWarning.value = true
     setTimeout(() => { showChannelWarning.value = false }, 4000)
@@ -805,23 +986,23 @@ const toggleModule = (mod: any) => {
     delete selections[mod.id]
     modules.value.forEach(m => { if (m.requires === mod.id && isSelected(m.id)) delete selections[m.id] })
   } else {
-    selections[mod.id] = defaultSelection(mod)
+    selections[mod.id] = defaultSelection()
+    ensurePeriodMatchesCycle(mod.id)
+    await ensureAddOnsLoaded(mod.id)
   }
 }
 
-const goToStep2 = () => { if (selectedModules.value.length > 0) currentStep.value = 2 }
+const goToStep2 = () => {
+  if (selectedModules.value.length === 0) return
+  if (hasMissingPeriod.value) return
+  if (hasMissingAddOn.value) return
+  if (hasAddOnOutOfRange.value) return
+  currentStep.value = 2
+}
 
 const buildSubscriptionPayload = (mod: any) => {
   const sel = getSel(mod.id)
   
-  const now = new Date()
-  const fmt = (d: Date) =>
-    `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
-
-  // Pour yearly : date début = aujourd'hui, date fin = +1 an
-  const yearlyStart = fmt(now)
-  const yearlyEnd   = fmt(new Date(now.getFullYear() + 1, now.getMonth(), now.getDate()))
-
   const limitCount = 
     mod.slug === 'pms' ? sel.rooms : 
     mod.slug == 'pos' ? sel.units : 
@@ -831,11 +1012,12 @@ const buildSubscriptionPayload = (mod: any) => {
 
   return {
     module_id    : mod.id,
+    add_on_id    : sel.addOnId,
     billing_cycle: sel.billingCycle,
     price        : getPrice(mod),  
     limit_count: limitCount,
-    starts_at: sel.billingCycle === 'yearly' ? yearlyStart : sel.startMonth,
-    ends_at  : sel.billingCycle === 'yearly' ? yearlyEnd   : sel.endMonth,
+    starts_at: sel.startMonth,
+    ends_at  : sel.endMonth,
     ...(mod.slug === 'pms'             && { rooms: sel.rooms }),
     ...(mod.slug === 'pos'             && { units: sel.units }),
     ...(mod.slug === 'mobile-app'      && { staff_quota: sel.staffQuota, guest_app: sel.guestApp }),
@@ -858,6 +1040,7 @@ const goToStep3 = async () => {
           limit_count  : payload.limit_count,
           starts_at    : payload.starts_at,
           ends_at      : payload.ends_at,
+          add_on_id    : payload.add_on_id,
         })
         toastStore.show({ type: 'success', title: 'Abonnement mis à jour', message: `${mod.name} a été modifié.` })
       } else {

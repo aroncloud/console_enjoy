@@ -187,7 +187,7 @@ const getProducts = (row: any) =>
       <template #cell-location="{ row }">
         <div class="flex flex-col">
           <span class="text-sm text-gray-800 dark:text-slate-200">{{ row.city }}</span>
-          <span class="text-xs text-gray-400 dark:text-slate-400">{{ row.country }}</span>
+          <span class="text-xs text-gray-400 dark:text-slate-400">{{ $t(`countries_lists.${row.country.toLowerCase()}`)  }}</span>
         </div>
       </template>
 
@@ -222,13 +222,15 @@ const getProducts = (row: any) =>
       </template>
 
       <template #cell-actions="{ row }">
-        <router-link
-          :to="`/clients/${row.id}`"
-          class="inline-flex items-center gap-1 text-purple-600 hover:text-purple-800 text-sm font-semibold transition-colors"
-        >
-          Détails
-          <ExternalLink class="w-3 h-3" />
-        </router-link>
+        <div class="flex items-center gap-1">
+          <router-link
+            :to="`/clients/${row.id}`"
+            class="inline-flex items-center gap-1 text-purple-600 hover:text-purple-800 text-sm font-semibold transition-colors"
+          >
+            Détails
+            <ExternalLink class="w-3 h-3" />
+          </router-link>
+        </div>
       </template>
 
     </BaseTable>

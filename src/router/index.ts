@@ -10,6 +10,7 @@ import Billing from '../views/billing/Billing.vue'
 import Security from '../views/security/Security.vue'
 import Product from '../views/products/Product.vue'
 import Users from '../views/users/Users.vue'
+import UserProfile from '../views/users/UserProfile.vue'
 import Profile from '../views/profile/Profile.vue'
 import HistoryView from '../views/history/HistoryView.vue'
 import Demo from '../views/demo/DemoView.vue'
@@ -55,6 +56,11 @@ const router = createRouter({
         { path: 'security', name: 'security', component: Security },
         { path: 'products', name: 'products', component: Product },
         { path: 'users',    name: 'users',    component: Users },
+        {
+          path: '/users/:id',
+          name: 'user-profile',
+          component: UserProfile,
+        },
         { path: 'profile',  name: 'profile',  component: Profile },
         { path: 'demo',  name: 'demo',  component: Demo },
         {

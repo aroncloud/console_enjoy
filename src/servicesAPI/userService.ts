@@ -44,7 +44,7 @@ export const userService = {
     api.get<PaginatedResponse<User>>('/console/users', { params }).then((r) => r.data),
 
   getById: (id: number) =>
-    api.get<User>(`/console/users/${id}`).then((r) => r.data),
+    api.get<any>(`/console/users/${id}`).then((r) => r.data.data),
 
   create: (payload: CreateUserPayload) =>
     api.post<User>('/console/users', payload).then((r) => r.data),

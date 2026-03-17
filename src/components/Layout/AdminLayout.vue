@@ -4,7 +4,8 @@
     <!-- mobile overlay -->
     <div
       v-if="isSidebarOpen"
-      class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+      class="fixed inset-0 z-40 md:hidden"
+      style="background-color: rgba(0, 0, 0, 0.3);"
       @click="isSidebarOpen = false"
     ></div>
 

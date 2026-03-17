@@ -29,7 +29,7 @@
             variant="ghost"
             :iconLeft="ArrowLeft"
             :disabled="loading"
-            @click="!loading && emit('back')"
+            @click="!loading && handleBack()"
           />
         </div>
 
@@ -259,7 +259,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted,toRaw ,watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 
@@ -277,10 +277,21 @@ import { useToastStore } from '../../composables/toast'
 interface Props {
   loading?: boolean
   hotelId?: number | null   
+  from?: 'demo' | 'clients' | null 
+   prefill?: {
+    contactName?: string
+    companyName?: string
+    email?: string
+    phoneNumber?: string
+    country?: string
+    numberOfRooms?: number
+  } | null
 }
 const props = withDefaults(defineProps<Props>(), {
   loading: false,
   hotelId: null,
+  prefill: null,
+  from: null,
 })
 
 // ── Emits ────────────────
@@ -342,9 +353,27 @@ const form = reactive({
 const regenerateTenantId = () => { form.tenantId = generateTenantId() }
 
 // ── Chargement des données en mode édition ──────────
+watchEffect(() => {
+  
+  if (props.prefill && !isEditMode.value) {
+    const p = toRaw(props.prefill)
+
+    form.hotelName        = p.companyName   ?? ''
+    form.managerEmail     = p.email         ?? ''
+    form.phone            = p.phoneNumber   ?? ''
+    form.country          = p.country       ?? 'CM'
+    form.pmsRooms         = p.numberOfRooms ?? 1
+    const parts           = (p.contactName  ?? '').split(' ')
+    form.adminFirstName   = parts[0]        ?? ''
+    form.adminLastName    = parts.slice(1).join(' ') ?? ''
+    form.adminEmail       = p.email         ?? ''
+    form.adminPhoneNumber = p.phoneNumber   ?? ''
+  }
+})
+
+
 onMounted(async () => {
   if (!isEditMode.value || !props.hotelId) return
-
   loadingHotel.value = true
   try {
     const response = await hotelService.getById(props.hotelId)
@@ -376,6 +405,7 @@ onMounted(async () => {
     form.pmsRooms          = h.totalRooms        ?? 1
     form.cancellationPolicy = h.cancellationPolicy ?? ''
     form.policies          = h.hotelPolicy          ?? ''
+
   } catch (e) {
     console.error(e)
     toastStore.show({ type: 'error', message: 'Impossible de charger les données de l\'établissement' })
@@ -477,5 +507,13 @@ const handleSubmit = () => {
   }
 
   emit('submit', payload)
+}
+
+const handleBack = () => {
+  if (props.prefill) {
+    router.push('/demo')
+  } else {
+    emit('back')
+  }
 }
 </script>

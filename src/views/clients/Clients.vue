@@ -6,6 +6,11 @@ import BaseTable, { type Column } from '../../components/Table/BaseTable.vue'
 import { Plus, BedDouble, Utensils, RefreshCcw, Smartphone, ExternalLink } from 'lucide-vue-next'
 import { hotelService } from '../../servicesAPI/clientService'
 import { useToastStore } from '../../composables/toast'
+import { demoService } from '../../servicesAPI/demoService'
+import { useRouter } from 'vue-router'
+
+
+
 
 interface Hotel {
   id: number
@@ -30,7 +35,9 @@ const loading    = ref(false)
 const showForm   = ref(false)
 const editHotelId = ref<number | null>(null)  
 const toastStore = useToastStore()
-
+const prefillData   = ref<any>(null)
+const pendingDemoId = ref<number | null>(null)
+const router = useRouter()
 const columns: Column[] = [
   { key: 'hotel',    label: 'Hôtel' },
   { key: 'location', label: 'Localisation' },
@@ -41,7 +48,19 @@ const columns: Column[] = [
   { key: 'actions',  label: 'Actions', tdClass: 'text-right' },
 ]
 
-onMounted(() => { fetchHotels() })
+onMounted(() => {
+  fetchHotels()
+
+  const state = window.history.state
+  if (state?.openHotelForm && state?.prefill) {
+    prefillData.value   = state.prefill
+    pendingDemoId.value = state.demoId ?? null
+    showForm.value      = true
+    
+   
+    router.replace({ path: '/clients', state: { openHotelForm: false } })
+  }
+})
 
 const fetchHotels = async () => {
   loading.value = true
@@ -57,23 +76,18 @@ const fetchHotels = async () => {
 }
 
 // ── Ouvrir formulaire ────
-const openCreate = () => {
-  editHotelId.value = null  
-  showForm.value = true
-}
-
-
-
-const closeForm = () => {
-  showForm.value = false
-  editHotelId.value = null
-}
+const openCreate = () => { editHotelId.value = null; prefillData.value = null; showForm.value = true }
+const closeForm  = () => { showForm.value = false; editHotelId.value = null; prefillData.value = null; pendingDemoId.value = null }
 
 // ── Submit 
 const handleSubmit = async (data: any) => {
   loading.value = true
   try {
     await hotelService.create(data)
+    if (pendingDemoId.value) {
+      await demoService.update(pendingDemoId.value, { status: 'Converted' })
+      pendingDemoId.value = null
+    }
     toastStore.show({ message: 'Hôtel ajouté avec succès !', type: 'success' })
     closeForm()
     await fetchHotels()
@@ -134,10 +148,11 @@ const getProducts = (row: any) =>
   <AddHotelForm
     v-if="showForm"
     :hotel-id="editHotelId"
-    :loading="loading"
     @submit="handleSubmit"
     @cancel="closeForm"
     @back="closeForm"
+    :prefill="prefillData"
+    from="clients" 
   />
 
   <!-- ── Vue Liste ── -->

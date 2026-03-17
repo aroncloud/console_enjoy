@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, reactive, onMounted, watch } from 'vue'
 import {
-  Plus, Edit, Trash2,
+  Plus, Edit, Trash2, Eye,
   Package, Search, Check,
   BedDouble, Utensils, ArrowLeftRight, Smartphone, BarChart2, Users
 } from 'lucide-vue-next'
@@ -320,6 +320,7 @@ const confirmDelete = async () => {
 
         <template #cell-actions="{ row }">
           <div class="flex items-center gap-1">
+            <ButtonComponent variant="ghost" size="sm" :iconLeft="Eye"    aria-label="Détails"    @click.stop="$router.push({ name: 'product-detail', params: { id: row.id } })" />
             <ButtonComponent variant="ghost" size="sm" :iconLeft="Edit"   aria-label="Modifier"   @click.stop="openEdit(row)" />
             <ButtonComponent variant="ghost" size="sm" :iconLeft="Trash2" aria-label="Supprimer"  @click.stop="openDelete(row)" />
           </div>

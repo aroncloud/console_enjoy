@@ -2,6 +2,53 @@
 	"country": "Country",
 	"search_country": "Search country...",
 	"no_results": "No results",
+	"common": {
+		"cancel": "Cancel",
+		"create": "Create",
+		"save": "Save",
+		"actions": "Actions",
+		"errors": {
+			"save": "Error while saving",
+			"delete": "Error while deleting"
+		}
+	},
+	"products": {
+		"product": "Product",
+		"errors": {
+			"notFound": "Product not found"
+		}
+	},
+	"addons": {
+		"title": "Add-ons",
+		"actions": {
+			"add": "Add add-on"
+		},
+		"delete": {
+			"title": "Delete add-on"
+		},
+		"modal": {
+			"createTitle": "Add an add-on",
+			"editTitle": "Edit add-on"
+		},
+		"fields": {
+			"name": "Name",
+			"min": "Min",
+			"max": "Max",
+			"priceMonth": "Price / month",
+			"priceYear": "Price / year"
+		},
+		"errors": {
+			"load": "Error while loading add-ons"
+		},
+		"success": {
+			"created": "Add-on created",
+			"updated": "Add-on updated",
+			"deleted": "Add-on deleted"
+		}
+	},
+	"validation": {
+		"required": "{field} is required"
+	},
 	"countries_lists": {
 		"af": "Afghanistan",
 		"al": "Albania",

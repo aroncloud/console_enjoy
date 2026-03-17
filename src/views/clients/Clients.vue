@@ -38,7 +38,8 @@ const editHotelId = ref<number | null>(null)
 const toastStore = useToastStore()
 const prefillData   = ref<any>(null)
 const pendingDemoId = ref<number | null>(null)
-const router = useRouter()const { t } = useI18n()
+const router = useRouter()
+const { t } = useI18n()
 
 const columns = computed<Column[]>(() => [
   { key: 'hotel',    label: t('clients.table.hotel') },

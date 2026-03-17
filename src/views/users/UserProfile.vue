@@ -9,7 +9,7 @@ import {
   Activity,
 } from "lucide-vue-next";
 import { userService, type User } from "../../servicesAPI/userService";
-import ButtonComponent from "../../components/Button/ButtonComponent.vue";
+
 
 const route = useRoute();
 const router = useRouter();
@@ -305,7 +305,7 @@ const totalPages = computed(() =>
                       :class="['w-2.5 h-2.5 rounded-full shrink-0 mt-1', getActionDotColor(item.action)]"
                     />
                     <div
-                      v-if="index < paginatedHistory.length - 1"
+                      v-if="(index as number) < paginatedHistory.length - 1"
                       class="w-px flex-1 bg-slate-200 dark:bg-slate-700 mt-1"
                     />
                   </div>

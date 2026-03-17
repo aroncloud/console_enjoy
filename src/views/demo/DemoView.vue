@@ -2,9 +2,7 @@
 import { ref, computed, watch, onMounted, reactive } from "vue";
 import { useI18n } from 'vue-i18n'
 import {
-  MonitorPlay,
   Search,
-  Clock,
   CheckCircle,
   Calendar,
   Mail,
@@ -14,10 +12,7 @@ import {
   Phone,
   Globe,
   BedDouble,
-  Edit,
   ArrowRight,
-  XCircle,
-  Trash2,
   UserCheck,
   ChevronRight,
 } from "lucide-vue-next";
@@ -28,7 +23,6 @@ import BaseTable from "../../components/Table/BaseTable.vue";
 import type { Column } from "../../components/Table/BaseTable.vue";
 import BaseModal from "../../components/Modal/BaseModal.vue";
 import Select from "../../components/FormElements/Select.vue";
-import Toggle from "../../components/FormElements/Toggle.vue";
 import { useToastStore } from "../../composables/toast";
 import { demoService } from "../../servicesAPI/demoService";
 import type {
@@ -37,7 +31,6 @@ import type {
   UpdateDemoPayload,
 } from "../../servicesAPI/demoService";
 import { userService } from "../../servicesAPI/userService";
-import { hotelService } from "../../servicesAPI/clientService";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
@@ -49,7 +42,7 @@ const saving = ref(false);
 const searchQuery = ref("");
 const filterStatus = ref<DemoStatus | "all">("all");
 const toastStore = useToastStore();
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const page = ref(1);
 const limit = ref(20);
 const meta = ref<any>(null);
@@ -58,7 +51,6 @@ const users = ref<any[]>([]);
 // --- ÉTATS DES MODALES ---
 const showWorkflowModal = ref(false);
 const showDetailModal = ref(false);
-const showEditModal = ref(false);
 const currentDemo = ref<Demo | null>(null);
 const currentStep = ref<
   "qualify" | "schedule" | "complete" | "negotiate" | "lost" | "convert" | null
@@ -262,7 +254,7 @@ const formatDate = (iso: string) =>
     : "—";
 
 // --- GESTION DU WORKFLOW ---
-const openModal = (demo: Demo, step: StepType) => {
+const openModal = (demo: any, step: StepType) => {
   currentDemo.value = demo;
   currentStep.value = step || null;
   workflowForm.status = "Qualified";
@@ -367,23 +359,7 @@ const handleSubmit = async () => {
   }
 };
 
-const handleGeneralUpdate = async () => {
-  if (!currentDemo.value) return;
-  saving.value = true;
-  try {
-    await demoService.update(currentDemo.value.id, workflowForm);
-    toastStore.show({ message: "Modifications enregistrées", type: "success" });
-    showEditModal.value = false;
-    fetchDemos(page.value);
-  } catch (e) {
-    toastStore.show({
-      message: "Erreur lors de la mise à jour",
-      type: "error",
-    });
-  } finally {
-    saving.value = false;
-  }
-};
+
 
 const handleResendEmail = async (id: number) => {
   try {
@@ -397,6 +373,11 @@ const handleResendEmail = async (id: number) => {
     });
   }
 };
+
+const handleDetail =(row:any) =>{
+  currentDemo.value = row;
+  showDetailModal.value = true;
+}
 </script>
 
 <template>
@@ -568,8 +549,7 @@ const handleResendEmail = async (id: number) => {
               size="sm"
               :iconLeft="Eye"
               @click.stop="
-                currentDemo = row;
-                showDetailModal = true;
+                handleDetail
               "
               title="Détails"
             />

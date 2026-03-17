@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import {
   ArrowLeft, Edit, Info,
   ListChecks, Layers, Trash2,
@@ -17,6 +18,7 @@ import Toggle from '../../components/FormElements/Toggle.vue'
 const route      = useRoute()
 const router     = useRouter()
 const toastStore = useToastStore()
+const { t, locale } = useI18n()
 
 // ── State ────
 const hotel        = ref<any>(null)
@@ -38,12 +40,12 @@ const handleDeleteConfirm = async () => {
   deleteLoading.value = true
   try {
     await hotelService.delete(Number(id))
-    toastStore.show({ type: 'success', message: 'Établissement supprimé avec succès' })
+    toastStore.show({ type: 'success', message: t('clientDetail.toast.deletedHotel') })
     showDeleteModal.value = false
     router.push('/clients')
   } catch (e: any) {
     console.error(e)
-    toastStore.show({ type: 'error', message: 'Erreur lors de la suppression' })
+    toastStore.show({ type: 'error', message: t('common.errors.delete') })
   } finally {
     deleteLoading.value = false
   }
@@ -55,11 +57,11 @@ const handleUpdate = async (data: any) => {
   try {
     await hotelService.update(Number(route.params.id), data)
     await fetchHotel()
-    toastStore.show({ type: 'success', message: 'Établissement mis à jour avec succès' })
+    toastStore.show({ type: 'success', message: t('clientDetail.toast.updatedHotel') })
     showEditForm.value = false
   } catch (e: any) {
     console.error(e)
-    toastStore.show({ type: 'error', message: 'Erreur lors de la mise à jour' })
+    toastStore.show({ type: 'error', message: t('clientDetail.toast.updateError') })
   } finally {
     loading.value = false
   }
@@ -114,10 +116,10 @@ const toggleSubStatus = async (sub: any) => {
     await fetchHotel()
     toastStore.show({
       type: 'success',
-      message: `Abonnement ${newStatus === 'active' ? 'activé' : 'désactivé'} avec succès`,
+      message: newStatus === 'active' ? t('clientDetail.toast.subscriptionActivated') : t('clientDetail.toast.subscriptionDeactivated'),
     })
   } catch {
-    toastStore.show({ type: 'error', message: 'Erreur lors de la mise à jour' })
+    toastStore.show({ type: 'error', message: t('clientDetail.toast.updateError') })
   } finally {
     subActionLoading.value = null
   }
@@ -136,17 +138,24 @@ const handleDeleteSubConfirm = async () => {
   try {
     await subscriptionService.delete(selectedSub.value.id)
     await fetchHotel()
-    toastStore.show({ type: 'success', message: 'Abonnement supprimé' })
+    toastStore.show({ type: 'success', message: t('clientDetail.toast.subscriptionDeleted') })
     showDeleteSubModal.value = false
   } catch {
-    toastStore.show({ type: 'error', message: 'Erreur lors de la suppression' })
+    toastStore.show({ type: 'error', message: t('common.errors.delete') })
   } finally {
     deleteSubLoading.value = false
   }
 }
 
-const formatDate  = (d: string) => d ? new Date(d).toLocaleDateString('fr-FR') : '—'
-const formatPrice = (p: string | number) => Number(p).toLocaleString('fr-FR') + ' XAF'
+const formatDate  = (d: string) => {
+  if (!d) return '—'
+  const loc = locale.value === 'fr' ? 'fr-FR' : 'en-US'
+  return new Date(d).toLocaleDateString(loc)
+}
+const formatPrice = (p: string | number) => {
+  const loc = locale.value === 'fr' ? 'fr-FR' : 'en-US'
+  return Number(p).toLocaleString(loc) + ' XAF'
+}
 
 // ── Chargement ─────
 onMounted(() => { fetchHotel() })
@@ -158,7 +167,7 @@ const fetchHotel = async () => {
     hotel.value = response.data?.data ?? response.data
   } catch (e: any) {
     console.error(e)
-    error.value = 'Erreur lors du chargement de l\'établissement'
+    error.value = t('clientDetail.errors.loadHotel')
   } finally {
     loading.value = false
   }
@@ -194,17 +203,17 @@ const statusStyles = computed (()=> {
 
 const statusLabel = computed(() => {
   const map: Record<string, string> = {
-    active:    'Actif',
-    inactive: 'Inactif',
+    active:    t('status.active'),
+    inactive:  t('status.inactive'),
   }
   return map[hotelStatus.value] ?? hotelStatus.value
 })
 
 const getSubStatusConfig = (status: string) => {
   const config: Record<string, { label: string; dot: string; text: string }> = {
-    active  : { label: 'Actif',      dot: 'bg-emerald-400', text: 'text-emerald-500' },
-    past_due: { label: 'En retard',  dot: 'bg-amber-400',   text: 'text-amber-500'   },
-    canceled: { label: 'Résilié',    dot: 'bg-red-400',     text: 'text-red-400'     },
+    active  : { label: t('subscriptions.status.active'),    dot: 'bg-emerald-400', text: 'text-emerald-500' },
+    past_due: { label: t('subscriptions.status.pastDue'),   dot: 'bg-amber-400',   text: 'text-amber-500'   },
+    canceled: { label: t('subscriptions.status.canceled'),  dot: 'bg-red-400',     text: 'text-red-400'     },
   }
   return config[status] ?? { label: status, dot: 'bg-slate-300', text: 'text-slate-400' }
 }
@@ -259,7 +268,7 @@ const updateSub = (sub: any) => {
     <!-- Erreur -->
     <div v-else-if="error" class="flex flex-col items-center justify-center min-h-screen bg-slate-50 dark:bg-slate-950 gap-4">
       <button @click="router.push('/clients')" class="text-sm text-purple-600 hover:underline">
-        ← Retour au parc client
+        ← {{ t('clients.actions.backToList') }}
       </button>
     </div>
 
@@ -280,7 +289,7 @@ const updateSub = (sub: any) => {
             </div>
             <div>
             <button @click="handleHistory" class="px-4 py-2 text-sm font-bold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer">
-              Historique
+              {{ t('clientDetail.actions.history') }}
             </button>
             </div>
          
@@ -297,20 +306,20 @@ const updateSub = (sub: any) => {
             <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden h-full">
               <div class="p-4 md:p-5 border-b border-slate-100 flex justify-between items-center">
                 <h3 class="font-bold text-slate-900 dark:text-white flex items-center gap-2 text-sm">
-                  <Info class="w-5 h-5 text-yellow-600" /> Informations Générales
+                  <Info class="w-5 h-5 text-yellow-600" /> {{ t('clientDetail.sections.generalInfo') }}
                 </h3>
                 <div class="flex items-center gap-2">
                   <button
                     @click="showEditForm = true"
                     class="text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 p-1.5 rounded-lg transition-colors cursor-pointer"
-                    title="Modifier"
+                    :title="t('common.edit')"
                   >
                     <Edit class="w-4 h-4" />
                   </button>
                   <button
                     @click="showDeleteModal = true"
                     class="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 p-1.5 rounded-lg transition-colors cursor-pointer"
-                    title="Supprimer"
+                    :title="t('products.actions.delete')"
                   >
                     <Trash2 class="w-4 h-4" />
                   </button>
@@ -327,28 +336,28 @@ const updateSub = (sub: any) => {
                   </div>
                 </div>
                 <div class="space-y-1">
-                  <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Adresse</p>
+                  <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ t('clientDetail.fields.address') }}</p>
                   <p class="text-sm text-slate-700 dark:text-slate-200">{{ hotelAddress }}</p>
                 </div>
                 <div class="space-y-1">
-                  <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Email</p>
+                  <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ t('users.fields.email') }}</p>
                   <p class="text-sm text-slate-700 dark:text-slate-200">{{ hotelEmail }}</p>
                 </div>
                 <div class="space-y-1">
-                  <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Téléphone</p>
+                  <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ t('clientDetail.fields.phone') }}</p>
                   <p class="text-sm text-slate-700 dark:text-slate-200">{{ hotelPhone }}</p>
                 </div>
                 <div class="grid grid-cols-3 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
                   <div class="space-y-1">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Devise</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ t('clientDetail.fields.currency') }}</p>
                     <p class="text-sm font-semibold text-slate-900 dark:text-white">{{ currency }}</p>
                   </div>
                   <div class="space-y-1">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Fuseau</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ t('clientDetail.fields.timezone') }}</p>
                     <p class="text-xs text-slate-600 dark:text-slate-300">{{ timezone }}</p>
                   </div>
                   <div class="space-y-1">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Dernière modification </p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ t('clientDetail.fields.lastUpdate') }}</p>
                     <p class="text-xs text-slate-600 dark:text-slate-300">{{ hotel?.updatedAt ? new Date(hotel.updatedAt).toLocaleString('fr-FR') : '—' }}</p>
                   </div>
                 </div>
@@ -403,9 +412,9 @@ const updateSub = (sub: any) => {
                     <Layers class="text-purple-600 w-4 h-4" />
                   </div>
                   <div>
-                    <h3 class="font-bold text-sm text-slate-900 dark:text-white">Produits actifs</h3>
+                    <h3 class="font-bold text-sm text-slate-900 dark:text-white">{{ t('clientDetail.sections.activeProducts') }}</h3>
                     <p class="text-xs text-slate-400">
-                      {{ activeModules.length }} souscription{{ activeModules.length > 1 ? 's' : '' }} en cours
+                      {{ t('clientDetail.subscriptions.inProgress', { count: activeModules.length, suffix: activeModules.length > 1 ? 's' : '' }) }}
                     </p>
                   </div>
                 </div>
@@ -414,7 +423,7 @@ const updateSub = (sub: any) => {
                   class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-purple-200 dark:border-purple-800/40 text-purple-600 dark:text-purple-300 text-xs font-bold hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
                 >
                   <ListChecks class="w-3.5 h-3.5" />
-                  Ajouter un module
+                  {{ t('clientDetail.actions.addModule') }}
                 </RouterLink>
               </div>
 
@@ -462,7 +471,7 @@ const updateSub = (sub: any) => {
                         </span>
                         <span class="text-slate-200 dark:text-slate-700">·</span>
                         <!-- Prix -->
-                        <span class="text-[10px] text-slate-400 font-medium">{{ formatPrice(item.price) }}/mois</span>
+                        <span class="text-[10px] text-slate-400 font-medium">{{ formatPrice(item.price) }}{{ t('subscriptions.billing.suffixMonth') }}</span>
                         <span class="text-slate-200 dark:text-slate-700">·</span>
                         <!-- Période -->
                         <span class="text-[10px] text-slate-400">
@@ -475,7 +484,7 @@ const updateSub = (sub: any) => {
                             ? 'bg-purple-100 text-purple-600'
                             : 'bg-slate-100 text-slate-500'"
                         >
-                          {{ item.billingCycle === 'yearly' ? 'Annuel' : 'Mensuel' }}
+                          {{ item.billingCycle === 'yearly' ? t('subscriptions.billing.yearly') : t('subscriptions.billing.monthly') }}
                         </span>
                       </div>
                     </div>
@@ -493,7 +502,7 @@ const updateSub = (sub: any) => {
                         @click="updateSub(item)"
                         :disabled="subActionLoading === item.id"
                         class="p-1.5 rounded-lg text-yellow-600 cursor-pointer hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-colors disabled:opacity-40"
-                        title="Modifier"
+                        :title="t('common.edit')"
                       >
                         <Edit :size="18" />
                       </button>
@@ -503,7 +512,7 @@ const updateSub = (sub: any) => {
                         @click="deleteSub(item)"
                         :disabled="subActionLoading === item.id"
                         class="p-1.5 rounded-lg text-red-400 cursor-pointer hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-40"
-                        title="Supprimer"
+                        :title="t('products.actions.delete')"
                       >
                         <Trash2 :size="18" />
                       </button>
@@ -516,14 +525,14 @@ const updateSub = (sub: any) => {
                   <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3">
                     <Layers :size="22" class="opacity-40" />
                   </div>
-                  <p class="text-sm font-semibold">Aucun produit souscrit</p>
-                  <p class="text-xs mt-1 mb-4">Cet établissement n'a pas encore de produits actifs.</p>
+                  <p class="text-sm font-semibold">{{ t('clientDetail.empty.title') }}</p>
+                  <p class="text-xs mt-1 mb-4">{{ t('clientDetail.empty.subtitle') }}</p>
                   <RouterLink
                     :to="`/clients/${route.params.id}/subscriptions`"
                     class="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-purple-600 text-white text-xs font-bold hover:bg-purple-700 transition-colors"
                   >
                     <ListChecks :size="13" />
-                    Ajouter des produits
+                    {{ t('clientDetail.actions.addProducts') }}
                   </RouterLink>
                 </div>
               </div>
@@ -555,9 +564,9 @@ const updateSub = (sub: any) => {
     <!-- ── Modale de suppression ── -->
     <DeleteModal
       v-model="showDeleteModal"
-      title="Supprimer l'établissement"
+      :title="t('clientDetail.deleteHotel.title')"
       :item-name="hotelName"
-      description="Toutes les données associées (réservations, abonnements, utilisateurs) seront définitivement perdues."
+      :description="t('clientDetail.deleteHotel.description')"
       :loading="deleteLoading"
       @confirm="handleDeleteConfirm"
     />
@@ -565,9 +574,9 @@ const updateSub = (sub: any) => {
     <!-- Modale de suppression  abonnement-->
     <DeleteModal
       v-model="showDeleteSubModal"
-      title="Supprimer l'abonnement"
+      :title="t('clientDetail.deleteSubscription.title')"
       :item-name="selectedSub?.name"
-      description="L'abonnement sera définitivement supprimé."
+      :description="t('clientDetail.deleteSubscription.description')"
       :loading="deleteSubLoading"
       @confirm="handleDeleteSubConfirm"
     />

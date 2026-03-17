@@ -26,7 +26,7 @@
         type="button"
         @click="toggleTheme"
         class="relative inline-flex h-8 w-16 items-center rounded-full border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 px-1 transition-colors cursor-pointer"
-        aria-label="Basculer le thème"
+        :aria-label="t('common.toggleTheme')"
       >
         <span
           class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white dark:bg-slate-900 shadow transition-transform"
@@ -41,7 +41,7 @@
         <div class="flex items-center gap-3 cursor-pointer" @click="toggleDropdown">
           <div class="text-right">
             <p class="text-sm font-semibold text-gray-800 dark:text-white">{{ displayName }}</p>
-            <p class="text-xs text-green-500">En ligne</p>
+            <p class="text-xs text-green-500">{{ t('nav.online') }}</p>
           </div>
           <div class="w-9 h-9 bg-amber-200 rounded-full flex items-center justify-center font-bold text-sm text-amber-700">
             {{ initials }}
@@ -66,7 +66,7 @@
               @click="goProfile"
             >
               <User class="w-4 h-4" />
-              Mon profil
+              {{ t('nav.myProfile') }}
             </button>
           </div>
 
@@ -76,7 +76,7 @@
               class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
             >
               <LogOut class="w-4 h-4" />
-              Se déconnecter
+              {{ t('nav.logout') }}
             </button>
           </div>
         </div>
@@ -90,6 +90,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { onClickOutside } from '@vueuse/core'
 import {  Bell, LogOut, User, Menu, Sun, Moon } from 'lucide-vue-next'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '../../composables/useAuth'
 import { useThemeStore } from '../../composables/theme'
 import { signOut } from '../../servicesAPI/auth'
@@ -98,6 +99,7 @@ defineEmits(['toggle-sidebar'])
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { t } = useI18n()
 
 // const search = ref('')
 const isOpen = ref(false)
@@ -107,9 +109,9 @@ const theme = useThemeStore()
 const isDark = computed(() => theme.isDark)
 
 // Champs exacts selon la réponse backend
-const displayName = computed(() => authStore.user?.fullName ?? authStore.user?.username ?? 'Administrateur')
+const displayName = computed(() => authStore.user?.fullName ?? authStore.user?.username ?? t('nav.defaultUserName'))
 const userEmail   = computed(() => authStore.user?.email ?? '')
-const roleName    = computed(() => authStore.user?.role?.roleName ?? 'Super Admin')
+const roleName    = computed(() => authStore.user?.role?.roleName ?? t('roles.superAdmin'))
 
 const initials = computed(() =>
   displayName.value

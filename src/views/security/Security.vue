@@ -22,11 +22,11 @@
           </div>
           <span
             class="text-[10px] font-bold text-blue-500 bg-blue-100 px-2 py-1 rounded-full"
-            >En ligne</span
+            >{{ t('security.kpis.online') }}</span
           >
         </div>
         <p class="text-slate-500 dark:text-slate-400 text-xs font-medium">
-          Tenants actifs
+          {{ t('security.kpis.activeTenants') }}
         </p>
         <h3 class="text-2xl font-black mt-1">
           {{ activeCount }} / {{ totalCount }}
@@ -42,11 +42,11 @@
           </div>
           <span
             class="text-[10px] font-bold text-red-500 bg-red-100 px-2 py-1 rounded-full"
-            >Suspendus</span
+            >{{ t('security.kpis.suspended') }}</span
           >
         </div>
         <p class="text-slate-500 dark:text-slate-400 text-xs font-medium">
-          Accès révoqués
+          {{ t('security.kpis.revokedAccess') }}
         </p>
         <h3 class="text-2xl font-black mt-1">{{ suspendedCount }}</h3>
       </div>
@@ -139,7 +139,7 @@
         <BaseTable
           :columns="tenantColumns"
           :data="tenantStatuses"
-          :title="'Statut des tenants'"
+          :title="t('security.tenants.title')"
           :meta="metaData"
           @page-change="handlePageChange"
           :loading="isLoading"
@@ -176,7 +176,7 @@
                 class="w-1.5 h-1.5 rounded-full"
                 :class="value === 'canceled' ? 'bg-red-500' : 'bg-emerald-500 animate-pulse'"
               />
-              {{ value === 'canceled' ? "Suspendu" : "Actif" }}
+              {{ value === 'canceled' ? t('subscriptions.status.canceled') : t('subscriptions.status.active') }}
             </span>
           </template>
 
@@ -193,7 +193,7 @@
                 @click="toggleTenant(row)"
               >
                 <Power :size="12" />
-                {{ row.status === 'canceled' ? "Restaurer" : "Suspendre" }}
+                {{ row.status === 'canceled' ? t('common.restore') : t('common.suspend') }}
               </button>
             </div>
           </template>
@@ -213,7 +213,7 @@
           :columns="auditColumns"
           :data="auditLogs"
           :meta="meta"
-          :title="'Journal d\'audit'"
+          :title="t('security.audit.title')"
           :loading="loading"
           @page-change="handlePageAudit"
         >
@@ -258,6 +258,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import { Wifi, Power } from "lucide-vue-next";
+import { useI18n } from "vue-i18n";
 import BaseTable from "../../components/Table/BaseTable.vue";
 import { subscriptionService } from "../../servicesAPI/subscriptionService";
 import { historyService } from "../../servicesAPI/historyService";
@@ -279,13 +280,13 @@ const fetchAllTenants = async () => {
 };
 
 // ── Table tenants paginée ──
-const tenantColumns = [
-  { key: "hotel", label: "Établissement" },
-  { key: "module", label: "Tenant" },
-  { key: "status", label: "Statut" },
+const { t } = useI18n()
+const tenantColumns = computed(() => [
+  { key: "hotel", label: t('security.table.establishment') },
+  { key: "module", label: t('security.table.tenant') },
+  { key: "status", label: t('security.table.status') },
   { key: "actions", label: "", thClass: "text-right" },
-  
-];
+]);
 
 const tenantStatuses = ref<any[]>([]);
 const metaData = ref<any>(null);
@@ -320,13 +321,15 @@ const toggleTenant = async (row: any) => {
     const found = allTenants.value.find((t) => t.id === row.id)
     if (found) found.status = newStatus
     toastStore.show({
-      message:newStatus === 'canceled'? 'Produit Suspendu avec succès ' : 'Produit restauré avec succès',type:'success'
+      message: newStatus === 'canceled' ? t('security.toast.suspended') : t('security.toast.restored'),
+      type: 'success',
     })
     await fetchAudit(1)
   } catch (e) {
     console.error(e)
     toastStore.show({
-      message:'Erreur lors de la mise à jour',type:'error'
+      message: t('security.toast.updateError'),
+      type: 'error',
     })
   }finally{
      loadingStatus.value = false
@@ -334,13 +337,13 @@ const toggleTenant = async (row: any) => {
 }
 
 // ── Audit  ──
-const auditColumns = [
-  { key: "action", label: "Action" },
-  { key: "description", label: "Description" },
-  { key: "hotel", label: "Établissement" },
-  { key: "user", label: "Par" },
-  { key: "createdAt", label: "Date" },
-];
+const auditColumns = computed(() => [
+  { key: "action", label: t('security.audit.columns.action') },
+  { key: "description", label: t('security.audit.columns.description') },
+  { key: "hotel", label: t('security.audit.columns.establishment') },
+  { key: "user", label: t('security.audit.columns.by') },
+  { key: "createdAt", label: t('security.audit.columns.date') },
+]);
 
 const auditLogs = ref<any[]>([]);
 const meta = ref<any>(null);
@@ -366,10 +369,10 @@ const fetchAudit = async (page = 1) => {
 const handlePageAudit = (newPage: number) => fetchAudit(newPage);
 
 const getActionBadge = (action: string) => {
-  if (action.endsWith('.create')) return { label: 'Création',     class: 'bg-blue-100 text-blue-600' }
-  if (action.endsWith('.toggleStatus')) return { label: 'Mise à jour',  class: 'bg-amber-100 text-amber-600' }
-  if (action.endsWith('.delete')) return { label: 'Suppression',  class: 'bg-red-100 text-red-600' }
-  if (action.endsWith('.extend')) return { label: 'Extension',    class: 'bg-purple-100 text-purple-600' }
+  if (action.endsWith('.create')) return { label: t('security.audit.badges.create'), class: 'bg-blue-100 text-blue-600' }
+  if (action.endsWith('.toggleStatus')) return { label: t('security.audit.badges.update'), class: 'bg-amber-100 text-amber-600' }
+  if (action.endsWith('.delete')) return { label: t('security.audit.badges.delete'), class: 'bg-red-100 text-red-600' }
+  if (action.endsWith('.extend')) return { label: t('security.audit.badges.extend'), class: 'bg-purple-100 text-purple-600' }
   return { label: action, class: 'bg-slate-100 text-slate-500' }
 }
 

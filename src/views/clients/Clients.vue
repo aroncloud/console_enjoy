@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import AddHotelForm from '../../components/Clients/AddHotelForm.vue'
 import ButtonComponent from '../../components/Button/ButtonComponent.vue'
 import BaseTable, { type Column } from '../../components/Table/BaseTable.vue'
@@ -30,16 +31,17 @@ const loading    = ref(false)
 const showForm   = ref(false)
 const editHotelId = ref<number | null>(null)  
 const toastStore = useToastStore()
+const { t } = useI18n()
 
-const columns: Column[] = [
-  { key: 'hotel',    label: 'Hôtel' },
-  { key: 'location', label: 'Localisation' },
-  { key: 'status',   label: 'Statut' },
-  { key: 'products', label: 'Produits Actifs' },
-  { key: 'infos',    label: 'Infos' },
-  { key: 'contact',  label: 'Contact' },
-  { key: 'actions',  label: 'Actions', tdClass: 'text-right' },
-]
+const columns = computed<Column[]>(() => [
+  { key: 'hotel',    label: t('clients.table.hotel') },
+  { key: 'location', label: t('clients.table.location') },
+  { key: 'status',   label: t('clients.table.status') },
+  { key: 'products', label: t('clients.table.activeProducts') },
+  { key: 'infos',    label: t('clients.table.info') },
+  { key: 'contact',  label: t('clients.table.contact') },
+  { key: 'actions',  label: t('common.actions'), tdClass: 'text-right' },
+])
 
 onMounted(() => { fetchHotels() })
 
@@ -50,7 +52,7 @@ const fetchHotels = async () => {
     console.log('Hotels API response:', response)
     hotels.value = response.data?.data || response.data || []
   } catch (e: any) {
-    toastStore.show({ message: 'Erreur lors du chargement des hôtels', type: 'error' })
+    toastStore.show({ message: t('clients.toast.loadError'), type: 'error' })
   } finally {
     loading.value = false
   }
@@ -74,14 +76,14 @@ const handleSubmit = async (data: any) => {
   loading.value = true
   try {
     await hotelService.create(data)
-    toastStore.show({ message: 'Hôtel ajouté avec succès !', type: 'success' })
+    toastStore.show({ message: t('clients.toast.created'), type: 'success' })
     closeForm()
     await fetchHotels()
   } catch (e: any) {
     
      console.error('Status:', e.response)
   console.error('Data:', JSON.stringify(e.response?.data, null, 2))
-    toastStore.show({ message: "Erreur lors de l'ajout", type: 'error' })
+    toastStore.show({ message: t('clients.toast.createError'), type: 'error' })
   } finally {
     loading.value = false
   }
@@ -108,6 +110,13 @@ const countSuspended = computed(() => hotels.value.filter(h => h.status === 'sus
 
 const setFilter = (key: string) => { activeFilter.value = key; currentPage.value = 1 }
 
+const filters = computed(() => [
+  { key: 'all',       label: t('clients.filters.all', { count: hotels.value.length }) },
+  { key: 'active',    label: t('clients.filters.active', { count: countActive.value }) },
+  { key: 'suspended', label: t('clients.filters.suspended', { count: countSuspended.value }) },
+  { key: 'inactive',  label: t('clients.filters.inactive', { count: countInactive.value }) },
+])
+
 const getStatusStyles = (status: string) => ({
   active:    'bg-green-100 text-green-700 dark:bg-emerald-900/30 dark:text-emerald-300',
   inactive:  'bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-slate-300',
@@ -116,10 +125,10 @@ const getStatusStyles = (status: string) => ({
 }[status] ?? 'bg-gray-100 text-gray-500 dark:bg-slate-800 dark:text-slate-300')
 
 const getStatusLabel = (status: string) => ({
-  active:    'Actif',
-  inactive:  'Inactif',
-  suspended: 'Suspendu',
-  demo:      'Démo',
+  active:    t('status.active'),
+  inactive:  t('status.inactive'),
+  suspended: t('status.suspended'),
+  demo:      t('status.demo'),
 }[status] ?? status)
 
 const renderStars = (grade: number) => '★'.repeat(grade) + '☆'.repeat(5 - grade)
@@ -145,20 +154,15 @@ const getProducts = (row: any) =>
 
     <div class="flex flex-col md:flex-row justify-between md:items-start mb-8 gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Gestion du Parc Client</h1>
-        <p class="text-gray-500 dark:text-slate-400 text-sm mt-1">Gérez les abonnements et les accès des établissements hôteliers.</p>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ t('clients.title') }}</h1>
+        <p class="text-gray-500 dark:text-slate-400 text-sm mt-1">{{ t('clients.subtitle') }}</p>
       </div>
-      <ButtonComponent label="Ajouter un Hôtel" variant="primary" :iconLeft="Plus" @click="openCreate" />
+      <ButtonComponent :label="t('clients.actions.addHotel')" variant="primary" :iconLeft="Plus" @click="openCreate" />
     </div>
 
     <div class="flex gap-3 mb-6 overflow-x-auto pb-2">
       <button
-        v-for="filter in [
-          { key: 'all',       label: `Tous (${hotels.length})` },
-          { key: 'active',    label: `Actifs (${countActive})` },
-          { key: 'suspended', label: `Suspendus (${countSuspended})` },
-          { key: 'inactive',  label: `Inactifs (${countInactive})` },
-        ]"
+        v-for="filter in filters"
         :key="filter.key"
         @click="setFilter(filter.key)"
         :class="[
@@ -194,9 +198,9 @@ const getProducts = (row: any) =>
       <template #cell-products="{ row }">
         <div class="flex items-center gap-2.5 text-gray-300 dark:text-slate-600">
           <BedDouble  :size="17" :class="getProducts(row).includes('pms') ? 'text-purple-500' : 'text-gray-200 dark:text-slate-700'" title="PMS" />
-          <Utensils   :size="17" :class="getProducts(row).includes('pos') ? 'text-orange-400' : 'text-gray-200 dark:text-slate-700'" title="Point de vente" />
-          <RefreshCcw :size="17" :class="getProducts(row).includes('channel-manager')? 'text-green-500' : 'text-gray-200 dark:text-slate-700'" title="Channel Manager" />
-          <Smartphone :size="17" :class="getProducts(row).includes('mobile-app') ? 'text-blue-400'   : 'text-gray-200 dark:text-slate-700'" title="App mobile" />
+          <Utensils   :size="17" :class="getProducts(row).includes('pos') ? 'text-orange-400' : 'text-gray-200 dark:text-slate-700'" :title="t('clients.products.pos')" />
+          <RefreshCcw :size="17" :class="getProducts(row).includes('channel-manager')? 'text-green-500' : 'text-gray-200 dark:text-slate-700'" :title="t('clients.products.channelManager')" />
+          <Smartphone :size="17" :class="getProducts(row).includes('mobile-app') ? 'text-blue-400'   : 'text-gray-200 dark:text-slate-700'" :title="t('clients.products.mobileApp')" />
         </div>
       </template>
 
@@ -226,7 +230,7 @@ const getProducts = (row: any) =>
           :to="`/clients/${row.id}`"
           class="inline-flex items-center gap-1 text-purple-600 hover:text-purple-800 text-sm font-semibold transition-colors"
         >
-          Détails
+          {{ t('common.details') }}
           <ExternalLink class="w-3 h-3" />
         </router-link>
       </template>

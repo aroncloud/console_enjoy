@@ -9,9 +9,9 @@
         <ArrowLeft class="w-5 h-5 text-slate-500 dark:text-slate-400" />
       </button>
       <div>
-        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Historique</h1>
+        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">{{ t('history.title') }}</h1>
         <p class="text-sm text-slate-500 dark:text-slate-300 mt-1">
-          {{ hotelId ? `Activités de l'établissement` : 'Toutes les activités de la plateforme' }}
+          {{ hotelId ? t('history.subtitleHotel') : t('history.subtitleAll') }}
         </p>
       </div>
     </div>
@@ -19,8 +19,8 @@
     <HistoryComponent
       :logs="logs"
       :loading="loading"
-      :title="hotelId ? `Historique — ${hotelName}` : 'Toutes les activités'"
-      :subtitle="meta ? `${meta.total} événements` : ''"
+      :title="hotelId ? t('history.cardTitleHotel', { name: hotelName }) : t('history.cardTitleAll')"
+      :subtitle="meta ? t('history.eventsCount', { count: meta.total }) : ''"
       :show-filters="true"
       :show-hotel-name="!hotelId"
       :meta="meta"
@@ -33,11 +33,13 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ArrowLeft } from 'lucide-vue-next'
+import { useI18n } from 'vue-i18n'
 import HistoryComponent from '../../components/History/HistoryComponent.vue'
 import { historyService, type ActivityLog } from '../../servicesAPI/historyService'
 
 const route  = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 
 const logs    = ref<ActivityLog[]>([])
 const meta    = ref<any>(null)

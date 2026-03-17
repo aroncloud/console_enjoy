@@ -10,7 +10,7 @@
           </div>
           <!-- <span class="text-[10px] font-bold text-emerald-600 bg-emerald-100 px-2 py-1 rounded-full">+12.5%</span> -->
         </div>
-        <p class="text-slate-500 text-xs font-medium">Revenu Total</p>
+        <p class="text-slate-500 text-xs font-medium">{{ t('billing.kpis.totalRevenue') }}</p>
         <h3 class="text-2xl font-black mt-1">{{ formatCurrency(totalRevenue) }}</h3>
       </div>
       <div class="p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 ">
@@ -18,9 +18,9 @@
           <div class="p-2 bg-orange-100 text-orange-500 rounded-lg">
             <Clock :size="20" />
           </div>
-          <span class="text-[10px] font-bold text-orange-500 bg-orange-100 px-2 py-1 rounded-full">{{ pendingCount }} facture{{ pendingCount>1 ? 's' : '' }}</span>
+          <span class="text-[10px] font-bold text-orange-500 bg-orange-100 px-2 py-1 rounded-full">{{ pendingCount }} {{ pendingCountLabel }}</span>
         </div>
-        <p class="text-slate-500 text-xs font-medium">Factures en attente</p>
+        <p class="text-slate-500 text-xs font-medium">{{ t('billing.kpis.pendingInvoices') }}</p>
         <h3 class="text-2xl font-black mt-1">{{ formatCurrency(pendingAmount) }}</h3>
       </div>
       <div class="p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 ">
@@ -28,9 +28,9 @@
           <div class="p-2 bg-red-100 text-red-500 rounded-lg">
             <TriangleAlert :size="20" />
           </div>
-          <span class="text-[10px] font-bold text-red-500 bg-red-100 px-2 py-1 rounded-full">Urgent</span>
+          <span class="text-[10px] font-bold text-red-500 bg-red-100 px-2 py-1 rounded-full">{{ t('billing.kpis.urgent') }}</span>
         </div>
-        <p class="text-slate-500 text-xs font-medium">Paiements en retard</p>
+        <p class="text-slate-500 text-xs font-medium">{{ t('billing.kpis.overduePayments') }}</p>
         <h3 class="text-2xl font-black mt-1">{{ formatCurrency(overdueAmount) }}</h3>
       </div>
     </div>
@@ -41,7 +41,7 @@
       <!-- Quotas & Dépassements -->
       <div class="lg:col-span-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
         <div class="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-          <h3 class="font-bold text-xs uppercase tracking-wider text-slate-500">Quotas & Dépassements</h3>
+          <h3 class="font-bold text-xs uppercase tracking-wider text-slate-500">{{ t('billing.quotas.title') }}</h3>
           <ChartLine :size="16" class="text-slate-400" />
         </div>
 
@@ -51,7 +51,7 @@
           </div>
 
           <div v-else-if="quotaItems.length === 0" class="text-center py-6 text-sm text-slate-400">
-            Aucun quota défini
+            {{ t('billing.quotas.empty') }}
           </div>
 
           <div
@@ -64,7 +64,7 @@
               <div>
                 <p class="font-bold text-sm text-gray-800 dark:text-white">{{ quota.hotel }}</p>
                 <p class="text-xs font-medium mt-0.5 text-slate-500">
-                  {{ quota.module }} — limite : {{ quota.limitCount }}
+                  {{ quota.module }} — {{ t('billing.quotas.limit') }} : {{ quota.limitCount }}
                 </p>
               </div>
               <span class="text-xs font-bold text-purple-500 bg-purple-50 px-2 py-1 rounded-full">
@@ -75,7 +75,7 @@
               @click="openSurplusModal(quota)"
               class="w-full py-2 text-xs font-bold rounded-lg transition-all bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-purple-500 hover:text-white cursor-pointer"
             >
-              Facturer surplus
+              {{ t('billing.quotas.billSurplus') }}
             </button>
           </div>
         </div>
@@ -83,7 +83,7 @@
 
       <!-- Table des factures -->
       <div class="lg:col-span-2  dark:border-slate-800  overflow-hidden flex flex-col">
-        <BaseTable :columns="columns" :data="invoiceData" :searchable="true" :sortable="false" :title="'Factures'" :showSearch="true" :loading="loading" :meta="metaData" @page-change="handlePage">
+        <BaseTable :columns="columns" :data="invoiceData" :searchable="true" :sortable="false" :title="t('billing.table.title')" :showSearch="true" :loading="loading" :meta="metaData" @page-change="handlePage">
           <template #cell-amount="{ value }">
             <span class="font-bold text-green-500">
               {{ formatCurrency(Number(value) )}}
@@ -100,7 +100,7 @@
                 'bg-slate-200 text-slate-500':      value === 'cancelled',
               }"
             >
-              {{ value }}
+              {{ getInvoiceStatusLabel(value) }}
             </span>
           </template>
 
@@ -121,7 +121,7 @@
                 v-if="row.status === 'pending' || row.status === 'failed'"
                 @click="handleMarkAsPaid(row)"
                 class="p-1.5 text-emerald-400 hover:text-emerald-600 transition-colors cursor-pointer"
-                title="Marquer comme payé"
+                :title="t('billing.actions.markAsPaid')"
               >
                 <CheckCircle :size="16" />
               </button>
@@ -129,7 +129,7 @@
               <span
                 v-else-if="row.status === 'paid'"
                 class="p-1.5 text-emerald-300 cursor-default"
-                title="Déjà payé"
+                :title="t('billing.actions.alreadyPaid')"
               >
                 <CheckCircle :size="16" />
               </span>
@@ -140,7 +140,7 @@
                 :class="row.status === 'failed'
                   ? 'text-red-400 hover:text-red-600'
                   : 'text-slate-400 hover:text-purple-500'"
-                :title="row.status === 'failed' ? 'Envoyer relance' : 'Envoyer rappel'"
+                :title="row.status === 'failed' ? t('billing.actions.sendFollowUp') : t('billing.actions.sendReminder')"
               >
                 <Megaphone v-if="row.status === 'failed'" :size="16" />
                 <Mail v-else :size="16" />
@@ -165,23 +165,23 @@
             <Gift :size="18" />
           </div>
           <div>
-            <h3 class="font-bold text-sm">Offrir un mois gratuit</h3>
-            <p class="text-xs text-slate-500">Geste commercial sur un abonnement</p>
+            <h3 class="font-bold text-sm">{{ t('billing.gift.title') }}</h3>
+            <p class="text-xs text-slate-500">{{ t('billing.gift.subtitle') }}</p>
           </div>
         </div>
         <div class="p-5 space-y-4">
           <BaseSelect
-            lb="Hôtel"
+            :lb="t('billing.fields.hotel')"
             v-model="selectedHotelId"
             :options="hotelOptions"
-            placeholder="Choisir un hôtel..."
+            :placeholder="t('billing.placeholders.chooseHotel')"
             @update:modelValue="loadHotelSubscriptions"
           />
           <BaseSelect
-            lb="Abonnement"
+            :lb="t('billing.fields.subscription')"
             v-model="selectedSubscriptionId"
             :options="subscriptionOptions"
-            placeholder="Choisir un abonnement..."
+            :placeholder="t('billing.placeholders.chooseSubscription')"
             :disabled="!selectedHotelId"
           />
           <button
@@ -190,7 +190,7 @@
             class="w-full py-2.5 bg-purple-500 text-white font-bold rounded-lg text-sm hover:bg-purple-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             <PlusCircle :size="16" />
-            {{ loadingExtend ? 'Application...' : 'Appliquer le geste commercial' }}
+            {{ loadingExtend ? t('billing.gift.applying') : t('billing.gift.apply') }}
           </button>
         </div>
       </div>
@@ -202,22 +202,22 @@
             <ChartLine :size="18" />
           </div>
           <div>
-            <h3 class="font-bold text-sm">Calculateur de quotas</h3>
-            <p class="text-xs text-slate-500">Détection des dépassements à facturer</p>
+            <h3 class="font-bold text-sm">{{ t('billing.calculator.title') }}</h3>
+            <p class="text-xs text-slate-500">{{ t('billing.calculator.subtitle') }}</p>
           </div>
         </div>
         <div class="p-5 space-y-4">
           <BaseSelect
-            lb="Abonnement concerné"
+            :lb="t('billing.fields.affectedSubscription')"
             v-model="calcSubscriptionId"
             :options="quotaItems.map(q => ({ label: `${q.hotel} — ${q.module}`, value: q.id }))"
-            placeholder="Choisir un abonnement..."
+            :placeholder="t('billing.placeholders.chooseSubscription')"
           />
           <BaseInput
-            lb="Quantité utilisée"
+            :lb="t('billing.fields.usedQuantity')"
             type="number"
             v-model="usedQuantity"
-            placeholder="Ex: 70"
+            :placeholder="t('billing.placeholders.usedQuantity')"
             :min="0"
           />
           <button
@@ -225,7 +225,7 @@
             @click="calc"
             :disabled="!calcSubscriptionId"
           >
-            Calculer le dépassement
+            {{ t('billing.calculator.calculate') }}
           </button>
 
           <Transition name="fade">
@@ -247,7 +247,7 @@
                 :disabled="loadingFacture"
                 class="w-full py-2 bg-orange-500 text-white font-bold rounded-lg text-xs hover:bg-orange-600 transition-all disabled:opacity-50 cursor-pointer"
               >
-                {{ loadingFacture ? 'Génération...' : 'Générer la facture de surplus' }}
+                {{ loadingFacture ? t('billing.calculator.generating') : t('billing.calculator.generateInvoice') }}
               </button>
             </div>
           </Transition>
@@ -260,6 +260,7 @@
 
 <script setup lang="ts">
 import { ref, computed,onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useToastStore } from '../../composables/toast'
 import {
   Banknote, Clock, TriangleAlert, ChartLine,
@@ -274,17 +275,18 @@ import BaseSelect     from '../../components/FormElements/Select.vue'
 import { invoiceService } from '../../servicesAPI/invoiceService'
 import { formatCurrency } from '../../components/Utilities/function'
 
+const { t } = useI18n()
 
 // ── Colonnes table ─
-const columns = [
-  { key: 'invoiceNumber',      label: 'Numero Facture' },
-  { key: 'billingDate',    label: 'Date' },
-  { key: 'hotel',   label: 'Établissement' },
-  { key:'description' , label:'Description'},
-  { key: 'amount',  label: 'Montant' },
-  { key: 'status',  label: 'Statut' },
+const columns = computed(() => [
+  { key: 'invoiceNumber', label: t('billing.table.invoiceNumber') },
+  { key: 'billingDate', label: t('billing.table.billingDate') },
+  { key: 'hotel', label: t('billing.table.hotel') },
+  { key: 'description', label: t('billing.table.description') },
+  { key: 'amount', label: t('billing.table.amount') },
+  { key: 'status', label: t('billing.table.status') },
   { key: 'actions', label: '', thClass: 'text-right' },
-]
+])
 
 const toastore = useToastStore()
 const searchQuery = ref('')
@@ -335,7 +337,7 @@ const fetchData = async ( currentPage=1) => {
   } catch(e:any){
     console.error('error',e)
     toastore.show({
-      title : 'Erreur',message:'Erreur lors du chargement des données',type:'error'
+      title: t('common.error'), message: t('billing.toast.loadError'), type:'error'
     })
   }
   finally {
@@ -352,6 +354,16 @@ const totalRevenue  = computed(() => statsData.value?.totalRevenue  ?? 0)
 const pendingAmount = computed(() => statsData.value?.pendingAmount ?? 0)
 const pendingCount  = computed(() => statsData.value?.pendingCount  ?? 0)
 const overdueAmount = computed(() => statsData.value?.overdueAmount ?? 0)
+const pendingCountLabel = computed(() => pendingCount.value > 1 ? t('billing.invoices') : t('billing.invoice'))
+
+const getInvoiceStatusLabel = (status: string) => {
+  if (status === 'paid') return t('billing.status.paid')
+  if (status === 'pending') return t('billing.status.pending')
+  if (status === 'due') return t('billing.status.due')
+  if (status === 'cancelled') return t('billing.status.cancelled')
+  if (status === 'failed') return t('billing.status.failed')
+  return status
+}
 
 const handleMarkAsPaid = async (row: any) => {
   try {
@@ -398,12 +410,12 @@ const handleExtend = async () => {
   try {
     await subscriptionService.extend(selectedSubscriptionId.value)
     toastore.show({
-      title:'Mois Gratuit',message:'✓ +1 mois appliqué avec succès',type:'success'
+      title: t('billing.gift.toastTitle'), message: t('billing.toast.giftApplied'), type:'success'
     })
   }catch(e:any){
     console.error(e)
     toastore.show({
-      title:'Mois Gratuit',message:'Echec de l\'abonnement',type:'error'
+      title: t('billing.gift.toastTitle'), message: t('billing.toast.giftError'), type:'error'
     })
   } finally {
     loadingExtend.value = false
@@ -421,8 +433,8 @@ const calc = () => {
   surplusAmount.value = Math.round(extra * pricePerUnit)
   hasOverage.value = extra > 0
   result.value = extra
-    ? `Dépassement de ${extra}  — surplus à facturer : ${formatCurrency(surplusAmount.value)}`
-    : 'Aucun dépassement — quota respecté.'
+    ? t('billing.calculator.overageResult', { extra, amount: formatCurrency(surplusAmount.value) })
+    : t('billing.calculator.noOverageResult')
 }
 
 const handleFactureSurplus = async () => {
@@ -434,17 +446,17 @@ const handleFactureSurplus = async () => {
       subscriptionId: sub.id,
       quantity: usedQuantity.value - sub.limitCount,
       amount: surplusAmount.value,
-      description: `Surplus de ${usedQuantity.value - sub.limitCount}- ${sub.module} (limite: ${sub.limitCount})`
+      description: t('billing.surplus.description', { extra: usedQuantity.value - sub.limitCount, module: sub.module, limit: sub.limitCount })
     })
     toastore.show({
-      title:'Facture',message:'Facture de surplus générée avec succès',type:'success'
+      title: t('billing.table.title'), message: t('billing.toast.surplusInvoiceGenerated'), type:'success'
     })
     hasOverage.value = false
     await fetchData()
   }catch(e:any){
     console.error(e)
     toastore.show({
-      title : 'Erreur',message:'Erreur lors de la génération',type:'error'
+      title: t('common.error'), message: t('billing.toast.surplusInvoiceError'), type:'error'
     })
   } finally {
     loadingFacture.value = false

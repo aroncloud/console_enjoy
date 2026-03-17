@@ -33,7 +33,7 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '../../composables/useAuth'
-import { LayoutDashboard, Building2, Receipt, Shield, Package, Users as UsersIcon ,MonitorPlay} from 'lucide-vue-next'
+import { LayoutDashboard, Building2, Receipt, Shield, Package, Users as UsersIcon, MonitorPlay, Megaphone } from 'lucide-vue-next'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -43,15 +43,16 @@ const emit = defineEmits(['close'])
 // user.role.roleName selon la réponse backend
 const roleName = computed(() => authStore.user?.role?.roleName ?? t('roles.superAdmin'))
 
-const menuItems = [
-  { label: t('nav.dashboard'),   path: '/',         icon: LayoutDashboard },
-  { label: t('nav.clients'),     path: '/clients',  icon: Building2 },
-  { label: t('nav.products'),    path: '/products', icon: Package },
-  { label: t('nav.billing'),     path: '/billing',  icon: Receipt },
-  { label: t('nav.demos'),       path: '/demo',     icon: MonitorPlay },
-  { label: t('nav.security'),    path: '/security', icon: Shield },
-  { label: t('nav.users'),       path: '/users',    icon: UsersIcon },
-]
+const menuItems = computed(() => [
+  { label: t('nav.dashboard'), path: '/', icon: LayoutDashboard },
+  { label: t('nav.clients'), path: '/clients', icon: Building2 },
+  { label: t('nav.products'), path: '/products', icon: Package },
+  { label: t('nav.billing'), path: '/billing', icon: Receipt },
+  { label: t('nav.demos'), path: '/demo', icon: MonitorPlay },
+  { label: t('nav.announcements'), path: '/announcements', icon: Megaphone },
+  { label: t('nav.security'), path: '/security', icon: Shield },
+  { label: t('nav.users'), path: '/users', icon: UsersIcon },
+])
 
 // Gestion manuelle de l'actif pour éviter le bug de "/" qui matche tout
 const isActive = (path: string) => {

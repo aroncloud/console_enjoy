@@ -26,11 +26,13 @@
 		"previous": "Précédent",
 		"next": "Suivant",
 		"refresh": "Rafraîchir",
+		"retry": "Réessayer",
 		"search": "Recherche",
 		"total": "Total",
 		"toggleTheme": "Basculer le thème",
 		"status": "Statut",
 		"save": "Enregistrer",
+		"saving": "Enregistrement...",
 		"restore": "Restaurer",
 		"suspend": "Suspendre",
 		"actions": "Actions",
@@ -285,12 +287,58 @@
 		"products": "Produits",
 		"billing": "Facturation",
 		"demos": "Demos",
+		"announcements": "Annonces",
 		"security": "Sécurité",
 		"users": "Utilisateurs",
 		"online": "En ligne",
 		"myProfile": "Mon profil",
 		"logout": "Se déconnecter",
 		"defaultUserName": "Administrateur"
+	},
+	"announcements": {
+		"title": "Annonces",
+		"subtitle": "Créez et gérez les annonces de la plateforme.",
+		"window": "{start} → {end}",
+		"types": {
+			"maintenance": "Maintenance",
+			"info": "Info",
+			"update": "Mise à jour"
+		},
+		"actions": {
+			"new": "Nouvelle annonce"
+		},
+		"filters": {
+			"searchPlaceholder": "Rechercher…",
+			"type": "Type",
+			"status": "Statut"
+		},
+		"table": {
+			"title": "Titre",
+			"type": "Type",
+			"status": "Statut",
+			"startsAt": "Début",
+			"endsAt": "Fin",
+			"createdAt": "Créée le"
+		},
+		"fields": {
+			"title": "Titre",
+			"content": "Contenu",
+			"type": "Type",
+			"isActive": "Actif",
+			"startsAt": "Début",
+			"endsAt": "Fin"
+		},
+		"modal": {
+			"createTitle": "Créer une annonce",
+			"editTitle": "Modifier une annonce"
+		},
+		"toast": {
+			"loadError": "Erreur lors du chargement des annonces",
+			"created": "Annonce créée",
+			"updated": "Annonce mise à jour",
+			"saveError": "Erreur lors de la sauvegarde",
+			"validationError": "Veuillez renseigner tous les champs obligatoires"
+		}
 	},
 	"roles": {
 		"superAdmin": "Super Admin"

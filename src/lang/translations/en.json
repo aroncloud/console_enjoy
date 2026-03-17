@@ -26,11 +26,13 @@
 		"previous": "Previous",
 		"next": "Next",
 		"refresh": "Refresh",
+		"retry": "Retry",
 		"search": "Search",
 		"total": "Total",
 		"toggleTheme": "Toggle theme",
 		"status": "Status",
 		"save": "Save",
+		"saving": "Saving...",
 		"restore": "Restore",
 		"suspend": "Suspend",
 		"actions": "Actions",
@@ -285,12 +287,58 @@
 		"products": "Products",
 		"billing": "Billing",
 		"demos": "Demos",
+		"announcements": "Announcements",
 		"security": "Security",
 		"users": "Users",
 		"online": "Online",
 		"myProfile": "My profile",
 		"logout": "Log out",
 		"defaultUserName": "Administrator"
+	},
+	"announcements": {
+		"title": "Announcements",
+		"subtitle": "Create and manage platform announcements.",
+		"window": "{start} → {end}",
+		"types": {
+			"maintenance": "Maintenance",
+			"info": "Info",
+			"update": "Update"
+		},
+		"actions": {
+			"new": "New announcement"
+		},
+		"filters": {
+			"searchPlaceholder": "Search…",
+			"type": "Type",
+			"status": "Status"
+		},
+		"table": {
+			"title": "Title",
+			"type": "Type",
+			"status": "Status",
+			"startsAt": "Starts at",
+			"endsAt": "Ends at",
+			"createdAt": "Created"
+		},
+		"fields": {
+			"title": "Title",
+			"content": "Content",
+			"type": "Type",
+			"isActive": "Active",
+			"startsAt": "Starts at",
+			"endsAt": "Ends at"
+		},
+		"modal": {
+			"createTitle": "Create announcement",
+			"editTitle": "Edit announcement"
+		},
+		"toast": {
+			"loadError": "Error loading announcements",
+			"created": "Announcement created",
+			"updated": "Announcement updated",
+			"saveError": "Error while saving",
+			"validationError": "Please fill in all required fields"
+		}
 	},
 	"roles": {
 		"superAdmin": "Super Admin"

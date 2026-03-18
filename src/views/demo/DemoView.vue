@@ -15,6 +15,7 @@ import {
   ArrowRight,
   UserCheck,
   ChevronRight,
+  MonitorPlay
 } from "lucide-vue-next";
 
 import Input from "../../components/FormElements/Input.vue";
@@ -83,94 +84,67 @@ type StepType =
   | "convert"
   | undefined;
 
-const statusConfig: Record<
-  DemoStatus,
-  { label: string; classes: string; nextLabel?: string; nextStep?: StepType }
-> = {
+const statusConfig = computed<Record<DemoStatus, { label: string; classes: string; nextLabel?: string; nextStep?: StepType }>>(() => ({
   New: {
-    label: "Nouveau",
+    label: t('demos.status.new'),
     classes: "bg-blue-100 text-blue-800",
-    nextLabel: "Contacter",
+    nextLabel: t('demos.status.contacted'),
     nextStep: "qualify",
   },
   Qualified: {
-    label: "Qualifié",
+    label: t('demos.status.qualified'),
     classes: "bg-purple-100 text-purple-800",
-    nextLabel: "Planifier Démo",
+    nextLabel: t('demos.status.demoScheduled'),
     nextStep: "schedule",
   },
   "Demo Scheduled": {
-    label: "Démo planifiée",
+    label: t('demos.status.demoScheduled'),
     classes: "bg-amber-100 text-amber-800",
-    nextLabel: "Terminer Démo",
+    nextLabel: t('demos.status.demoCompleted'),
     nextStep: "complete",
   },
   "Demo Completed": {
-    label: "Démo effectuée",
+    label: t('demos.status.demoCompleted'),
     classes: "bg-cyan-100 text-cyan-800",
-    nextLabel: "Passer en Négoc.",
+    nextLabel: t('demos.status.negotiation'),
     nextStep: "negotiate",
   },
   Trial: {
-    label: "En essai",
+    label: t('demos.status.inTesting'),
     classes: "bg-indigo-100 text-indigo-800",
-    nextLabel: "Convertir",
+    nextLabel: t('demos.status.converted'),
     nextStep: "convert",
   },
   Negotiation: {
-    label: "Négociation",
+    label: t('demos.status.negotiation'),
     classes: "bg-orange-100 text-orange-800",
-    nextLabel: "Convertir",
+    nextLabel: t('demos.status.converted'),
     nextStep: "convert",
   },
-  Converted: { label: "Converti ", classes: "bg-emerald-100 text-emerald-800" },
-  Lost: { label: "Perdu ", classes: "bg-rose-100 text-rose-800" },
-  Junk: { label: "Indésirable", classes: "bg-slate-100 text-slate-500" },
-};
+  Converted: { label: t('demos.status.converted'), classes: "bg-emerald-100 text-emerald-800" },
+  Lost: { label: t('demos.status.lost'), classes: "bg-rose-100 text-rose-800" },
+  Junk: { label: t('demos.status.junk'), classes: "bg-slate-100 text-slate-500" },
+}))
 
 const workflowConfig = computed(() => {
   const map = {
-    qualify: {
-      title: "Étape 2 : Qualification",
-      btn: "Confirmer la Qualification",
-      color: "primary",
-    },
-    schedule: {
-      title: "Étape 3 : Planification",
-      btn: "Programmer le RDV",
-      color: "primary",
-    },
-    complete: {
-      title: "Étape 4 : Compte-rendu",
-      btn: "Clôturer la Démo",
-      color: "primary",
-    },
-    negotiate: {
-      title: "Étape 6 : Négociation",
-      btn: "Lancer la Négociation",
-      color: "primary",
-    },
-    convert: {
-      title: "Étape 7 : Conversion",
-      btn: "Finaliser la Vente",
-      color: "success",
-    },
-    lost: {
-      title: "Marquer comme Perdu",
-      btn: "Confirmer la Perte",
-      color: "danger",
-    },
-  };
-  return currentStep.value ? map[currentStep.value] : map.qualify;
-});
+    qualify:  { title: t('demos.workflow.qualify.title'),  btn: t('demos.workflow.qualify.btn'),  color: 'primary' },
+    schedule: { title: t('demos.workflow.schedule.title'), btn: t('demos.workflow.schedule.btn'), color: 'primary' },
+    complete: { title: t('demos.workflow.complete.title'), btn: t('demos.workflow.complete.btn'), color: 'primary' },
+    negotiate:{ title: t('demos.workflow.negotiate.title'),btn: t('demos.workflow.negotiate.btn'),color: 'primary' },
+    convert:  { title: t('demos.workflow.convert.title'), btn: t('demos.workflow.convert.btn'),  color: 'success' },
+    lost:     { title: t('demos.workflow.lost.title'),    btn: t('demos.workflow.lost.btn'),     color: 'danger'  },
+  }
+  return currentStep.value ? map[currentStep.value] : map.qualify
+})
 
-const columns: Column[] = [
-  { key: "contact", label: "Contact" },
-  { key: "company", label: "Société / Chambres" },
-  { key: "status", label: "Statut Actuel" },
-  { key: "next", label: "Action Suivante" },
-  { key: "actions", label: "Actions", sortable: false },
-];
+const columns = computed<Column[]>(() => [
+  { key: 'contact', label: t('demos.table.contact') },
+  { key: 'company', label: t('demos.table.company') },
+  { key: 'status',  label: t('demos.table.currentStatus') },
+  { key: 'next',    label: t('demos.table.nextAction') },
+  { key: 'actions', label: t('common.actions'), sortable: false },
+])
 
 // --- LOGIQUE API ---
 const fetchDemos = async (p = 1) => {
@@ -193,7 +167,7 @@ const fetchDemos = async (p = 1) => {
   } catch (e) {
     toastStore.show({
       type: "error",
-      message: "Erreur chargement des demandes",
+      message: t('demos.toast.loadError'),
     });
   } finally {
     loading.value = false;
@@ -224,10 +198,6 @@ const fetchUsers = async () => {
     }));
   } catch (e) {
     console.error(e);
-    toastStore.show({
-      type: "error",
-      message: "Erreur lors du chargement des utilisateurs",
-    });
   }
 };
 
@@ -275,14 +245,14 @@ const openModal = (demo: any, step: StepType) => {
 };
 
 const handleSubmit = async () => {
-  if (!currentDemo.value || !currentStep.value) return;
-  saving.value = true;
-  let payload: Partial<UpdateDemoPayload> = {};
+  if (!currentDemo.value || !currentStep.value) return
+  saving.value = true
+  let payload: Partial<UpdateDemoPayload> = {}
 
   try {
-    if (currentStep.value === "qualify") {
+    if (currentStep.value === 'qualify') {
       payload = {
-        status: workflowForm.status === "Lost" ? "Lost" : "Qualified",
+        status: workflowForm.status === 'Lost' ? 'Lost' : 'Qualified',
         contactName: workflowForm.contactName,
         companyName: workflowForm.companyName,
         email: workflowForm.email,
@@ -290,34 +260,34 @@ const handleSubmit = async () => {
         country: workflowForm.country,
         numberOfRooms: workflowForm.numberOfRooms,
         propertyType: workflowForm.propertyType,
-        ...(workflowForm.status === "Lost" && workflowForm.notesMessage
-          ? { notesMessage: `RAISON PERTE: ${workflowForm.notesMessage}` }
+        ...(workflowForm.status === 'Lost' && workflowForm.notesMessage
+          ? { notesMessage: `${t('demos.workflow.lostPrefix')}${workflowForm.notesMessage}` }
           : {}),
-      };
-    } else if (currentStep.value === "schedule") {
+      }
+    } else if (currentStep.value === 'schedule') {
       if (!workflowForm.followUpDate)
-        throw new Error("La date du rendez-vous est requise");
+        throw new Error(t('demos.workflow.errors.dateRequired'))
       if (!workflowForm.ownerId)
-        throw new Error("Veuillez sélectionner un commercial");
+        throw new Error(t('demos.workflow.errors.ownerRequired'))
       payload = {
-        status: "Demo Scheduled",
+        status: 'Demo Scheduled',
         followUpDate: workflowForm.followUpDate,
         ownerId: workflowForm.ownerId,
-      };
-    } else if (currentStep.value === "complete") {
+      }
+    } else if (currentStep.value === 'complete') {
       if (!workflowForm.notesMessage)
-        throw new Error("Veuillez saisir les retours de la démo");
+        throw new Error(t('demos.workflow.errors.demoNotesRequired'))
       payload = {
-        status: "Demo Completed",
+        status: 'Demo Completed',
         notesMessage: workflowForm.notesMessage,
         competition: workflowForm.competition,
-      };
-    } else if (currentStep.value === "negotiate") {
-      payload = { status: "Negotiation" };
-    } else if (currentStep.value === "convert") {
-      showWorkflowModal.value = false;
+      }
+    } else if (currentStep.value === 'negotiate') {
+      payload = { status: 'Negotiation' }
+    } else if (currentStep.value === 'convert') {
+      showWorkflowModal.value = false
       router.push({
-        path: "/clients",
+        path: '/clients',
         state: {
           openHotelForm: true,
           demoId: currentDemo.value.id,
@@ -330,45 +300,38 @@ const handleSubmit = async () => {
             contactName: currentDemo.value.contactName,
           },
         },
-      });
-      return;
-    } else if (currentStep.value === "lost") {
+      })
+      return
+    } else if (currentStep.value === 'lost') {
       if (!workflowForm.notesMessage)
-        throw new Error("Veuillez indiquer la raison de la perte");
+        throw new Error(t('demos.workflow.errors.lostReasonRequired'))
       payload = {
-        status: "Lost",
-        notesMessage: `RAISON PERTE: ${workflowForm.notesMessage}`,
-      };
+        status: 'Lost',
+        notesMessage: `${t('demos.workflow.lostPrefix')}${workflowForm.notesMessage}`,
+      }
     }
 
-    await demoService.update(currentDemo.value.id, payload);
-    toastStore.show({
-      message: "Étape mise à jour avec succès",
-      type: "success",
-    });
-    showWorkflowModal.value = false;
-    fetchDemos(page.value);
-    fetchAllDemos();
+    await demoService.update(currentDemo.value.id, payload)
+    toastStore.show({ message: t('demos.toast.success'), type: 'success' })
+    showWorkflowModal.value = false
+    fetchDemos(page.value)
+    fetchAllDemos()
   } catch (e: any) {
-    toastStore.show({
-      message: e.message || "Erreur de mise à jour",
-      type: "error",
-    });
+    toastStore.show({ message: e.message || t('demos.toast.error'), type: 'error' })
   } finally {
-    saving.value = false;
+    saving.value = false
   }
-};
-
+}
 
 
 const handleResendEmail = async (id: number) => {
   try {
     await demoService.resendEmail(id);
-    toastStore.show({ message: "Email renvoyé", type: "success" });
+    toastStore.show({ message: t('demos.toast.emailResent'), type: "success" });
     fetchDemos(page.value);
   } catch (e) {
     toastStore.show({
-      message: "Erreur lors de l'envoi de l'email",
+      message: t('demos.toast.emailResendError'),
       type: "error",
     });
   }
@@ -390,10 +353,11 @@ const handleDetail =(row:any) =>{
         <h1
           class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2"
         >
-          Démo
+          <MonitorPlay :size="20" class="text-slate-700 dark:text-slate-200" />
+          {{ $t('nav.demos') }}
         </h1>
         <p class="text-slate-500 text-sm mt-1">
-          Transformez vos prospects en clients PMS étape par étape.
+          {{ $t('demos.subtitle') }}
         </p>
       </div>
       <div class="flex gap-3">
@@ -403,7 +367,7 @@ const handleDetail =(row:any) =>{
           <p
             class="text-[10px] uppercase font-bold text-slate-400 tracking-widest"
           >
-            Total
+            {{ $t('demos.kpis.received') }}
           </p>
           <p class="text-2xl font-black text-slate-900 dark:text-white">
             {{ allDemos.length }}
@@ -415,7 +379,7 @@ const handleDetail =(row:any) =>{
           <p
             class="text-[10px] uppercase font-bold text-blue-500 tracking-widest"
           >
-            Nouveaux
+            {{ $t('demos.kpis.new') }}
           </p>
           <p class="text-2xl font-black text-blue-600">
             {{ allDemos.filter((d) => d.status === "New").length }}
@@ -427,7 +391,7 @@ const handleDetail =(row:any) =>{
           <p
             class="text-[10px] uppercase font-bold text-emerald-500 tracking-widest"
           >
-            Convertis
+             {{ $t('demos.kpis.converted') }}
           </p>
           <p class="text-2xl font-black text-emerald-600">
             {{ allDemos.filter((d) => d.status === "Converted").length }}
@@ -447,20 +411,20 @@ const handleDetail =(row:any) =>{
         />
         <Input
           v-model="searchQuery"
-          placeholder="Rechercher nom, email ou société..."
+          :placeholder="$t('demos.placeholders.search')"
           customClass="pl-10 w-full !bg-slate-50 dark:!bg-slate-950"
         />
       </div>
       <Select
         v-model="filterStatus"
         :options="[
-          { label: 'Tous les statuts', value: 'all' },
+          { label: t('demos.filters.allStatuses'), value: 'all' },
           ...Object.keys(statusConfig).map((k) => ({
             label: statusConfig[k as DemoStatus].label,
             value: k,
           })),
         ]"
-        class="w-full sm:w-56"
+        class="w-full sm:w-56 -translate-y-1.5"
       />
     </div>
 
@@ -535,10 +499,10 @@ const handleDetail =(row:any) =>{
             v-else-if="row.status === 'Converted'"
             class="text-[11px] text-emerald-600 font-bold flex items-center gap-1"
           >
-            <CheckCircle :size="14" /> Dossier Finalisé
+            <CheckCircle :size="14" /> {{ $t('fileFinalized') }}
           </span>
           <span v-else class="text-[11px] text-slate-400 font-medium"
-            >Aucune action</span
+            >{{ $t('noAction') }}</span
           >
         </template>
 
@@ -549,9 +513,9 @@ const handleDetail =(row:any) =>{
               size="sm"
               :iconLeft="Eye"
               @click.stop="
-                handleDetail
+                handleDetail(row)
               "
-              title="Détails"
+              :title="$t('demos.detail.title')"
             />
             <ButtonComponent
               variant="ghost"
@@ -566,7 +530,7 @@ const handleDetail =(row:any) =>{
       </BaseTable>
     </div>
 
-    <!-- ── MODALE UNIQUE DE WORKFLOW (DYNAMIQUE) ── -->
+    <!-- ── MODALE  ── -->
     <BaseModal v-model="showWorkflowModal" customClass="max-w-lg">
       <template #header>
         <div class="flex items-center gap-3">
@@ -593,27 +557,27 @@ const handleDetail =(row:any) =>{
           class="space-y-4 animate-in fade-in duration-300"
         >
           <div class="grid grid-cols-2 gap-4">
-            <Input v-model="workflowForm.contactName" lb="Nom du contact" />
-            <Input v-model="workflowForm.companyName" lb="Société" />
-            <Input v-model="workflowForm.email" lb="Email" type="email" />
-            <Input v-model="workflowForm.phoneNumber" lb="Téléphone" />
-            <Input v-model="workflowForm.country" lb="Pays" />
+            <Input v-model="workflowForm.contactName" :lb="$t('demos.fields.contactName')" />
+            <Input v-model="workflowForm.companyName" :lb="$t('demos.fields.companyName')" />
+            <Input v-model="workflowForm.email" :lb="$t('demos.fields.companyName')" type="email" />
+            <Input v-model="workflowForm.phoneNumber" :lb="$t('demos.fields.phoneNumber')" />
+            <Input v-model="workflowForm.country" :lb="$t('demos.fields.country')" />
             <Input
               v-model.number="workflowForm.numberOfRooms"
               type="number"
-              lb="Nombre de chambres"
+              :lb="$t('demos.fields.numberOfRooms')"
               placeholder="Ex: 24"
             />
             <Input
               v-model="workflowForm.propertyType"
-              lb="Type de propriété"
-              placeholder="Hôtel, Resort, Villa..."
+              :lb="$t('demos.fields.propertyType')"
+              :placeholder="$t('demos.placeholders.propertyType')"
               class="col-span-2"
             />
           </div>
           <Select
             v-model="workflowForm.status"
-            lb="Statut"
+            :lb="$t('common.status')"
             :options="[
               { label: statusConfig['Qualified'].label, value: 'Qualified' },
               { label: statusConfig['Lost'].label, value: 'Lost' },
@@ -621,14 +585,14 @@ const handleDetail =(row:any) =>{
           />
           <div v-if="workflowForm.status === 'Lost'">
             <label
-              class="block text-sm font-bold mb-1.5 text-slate-700 dark:text-slate-300"
-              >Raison de la perte</label
+              class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 truncate"
+              >{{ $t('demos.fields.reason') }}</label
             >
             <textarea
               v-model="workflowForm.notesMessage"
               rows="3"
-              class="w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 p-3 text-sm focus:ring-1 focus:ring-rose-400 outline-none"
-              placeholder="Pourquoi le prospect a refusé ?"
+              class="w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 p-3 text-sm focus:ring-1 focus:ring-purple-400 outline-none"
+              :placeholder="$t('demos.placeholders.reason')"
             ></textarea>
           </div>
         </div>
@@ -641,14 +605,15 @@ const handleDetail =(row:any) =>{
           <Input
             v-model="workflowForm.followUpDate"
             type="datetime-local"
-            lb="Date et heure du rendez-vous"
+            :lb="$t('demos.fields.followUpDate')"
             isRequired
           />
-          <!-- CORRECTION : utilisation de users pour les options, avec le bon format -->
+         
           <Select
             v-model="workflowForm.ownerId"
             :options="users"
-            lb="Commercial responsable"
+            :lb="$t('demos.fields.assignedTo')"
+            :placeholder="$t('demos.placeholders.select')"
             isRequired
           />
         </div>
@@ -664,8 +629,8 @@ const handleDetail =(row:any) =>{
             >
               {{
                 currentStep === "lost"
-                  ? "Raison de la perte"
-                  : "Notes & retours de la démo"
+                  ? $t('demos.fields.reason')
+                  : $t('demos.fields.notes')
               }}
             </label>
             <textarea
@@ -674,16 +639,16 @@ const handleDetail =(row:any) =>{
               class="w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 p-3 text-sm focus:ring-1 focus:ring-purple-400 outline-none"
               :placeholder="
                 currentStep === 'lost'
-                  ? 'Pourquoi le prospect a refusé ? (Prix, Manque de fonctions...)'
-                  : 'Points de douleur, modules préférés...'
+                  ? $t('demos.placeholders.reason')
+                  : $t('demos.placeholders.notes')
               "
             ></textarea>
           </div>
           <Input
             v-if="currentStep === 'complete'"
             v-model="workflowForm.competition"
-            lb="Concurrent mentionné ?"
-            placeholder="Opera, Mews, D-edge..."
+            :lb="$t('demos.fields.competition')"
+            :placeholder="$t('demos.placeholders.competition')"
           />
         </div>
 
@@ -698,13 +663,12 @@ const handleDetail =(row:any) =>{
             <UserCheck :size="40" />
           </div>
           <h4 class="text-lg font-black text-slate-900 dark:text-white">
-            Passage à l'étape finale
+            {{ $t('demos.text.final') }}
           </h4>
           <p class="text-sm text-slate-500 mt-2 px-6">
-            Le contrat est-il prêt ? Cette action changera le statut du prospect
-            en
+           {{ $t('demos.text.converted') }}
             <strong>{{
-              currentStep === "convert" ? "Converti" : "Négociation"
+              currentStep === "convert" ? $t('demos.status.converted') : $t('demos.status.negotiation')
             }}</strong
             >.
           </p>
@@ -718,7 +682,7 @@ const handleDetail =(row:any) =>{
             class="flex-1"
             :disabled="saving"
             @click="showWorkflowModal = false"
-            >Annuler</ButtonComponent
+            >{{ $t('common.cancel') }}</ButtonComponent
           >
           <ButtonComponent
             variant="primary"
@@ -749,7 +713,7 @@ const handleDetail =(row:any) =>{
           <span
             :class="[
               'px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest',
-              statusConfig[currentDemo.status].classes,
+              statusConfig[currentDemo.status]?.classes ,
             ]"
           >
             {{ statusConfig[currentDemo.status].label }}
@@ -774,11 +738,11 @@ const handleDetail =(row:any) =>{
           <div class="space-y-4">
             <div class="flex items-center gap-3 text-sm">
               <BedDouble :size="16" class="text-slate-400" />
-              <span>{{ currentDemo.numberOfRooms }} chambres</span>
+              <span>{{ currentDemo.numberOfRooms }} {{ $t('demos.table.rooms') }}</span>
             </div>
             <div class="flex items-center gap-3 text-sm">
               <Building2 :size="16" class="text-slate-400" />
-              <span>{{ currentDemo.propertyType || "Type non spécifié" }}</span>
+              <span>{{ currentDemo.propertyType || $t('demos.fields.typeNotSpecified') }}</span>
             </div>
             <div class="flex items-center gap-3 text-sm">
               <Calendar :size="16" class="text-slate-400" />
@@ -794,7 +758,7 @@ const handleDetail =(row:any) =>{
           <h5
             class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-2"
           >
-            Historique / Notes
+            {{ $t('demos.fields.notes') }}
           </h5>
           <p
             class="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-line leading-relaxed"

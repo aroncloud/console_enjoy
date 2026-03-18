@@ -14,6 +14,8 @@
         </button>
       </div>
 
+       <ButtonLanguage />
+
     <button
         type="button"
         @click="toggleTheme"
@@ -97,6 +99,7 @@ import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '../../composables/useAuth'
 import { useThemeStore } from '../../composables/theme'
 import { signOut } from '../../servicesAPI/auth'
+import ButtonLanguage from '../Button/ButtonLanguage.vue'
 
 defineEmits(['toggle-sidebar'])
 

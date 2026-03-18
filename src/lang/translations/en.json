@@ -64,10 +64,12 @@
 		},
 		"table": {
 			"contact": "Contact",
-			"company": "Company",
+			"company": "Company / Rooms",
 			"rooms": "Rooms",
 			"date": "Date",
-			"status": "Status"
+			"status": "Status",
+			"currentStatus": "Current Status",
+      		"nextAction": "Next Action"
 		},
 		"filters": {
 			"allStatuses": "All statuses"
@@ -81,7 +83,9 @@
 			"negotiation": "Negotiation",
 			"converted": "Converted",
 			"lost": "Lost",
-			"junk": "Junk"
+			"junk": "Junk",
+			"contacted": "Contact",
+			"inTesting" : "In testing"
 		},
 		"actions": {
 			"resendEmail": "Resend email",
@@ -105,7 +109,11 @@
 			"competition": "Competitor",
 			"followUpDate": "Follow-up date",
 			"assignedTo": "Assigned to",
-			"notes": "Notes"
+			"notes": "Notes",
+			"email" : "Email",
+			"country" : "Country",
+			"reason" : "Reason for the loss",
+			"typeNotSpecified" : "Type not specified"
 		},
 		"placeholders": {
 			"contactName": "John Doe",
@@ -115,7 +123,10 @@
 			"propertyType": "Hotel, resort…",
 			"preferredLanguage": "en, fr…",
 			"competition": "Opera, Mews…",
-			"notes": "Internal notes about this request…"
+			"notes": "Internal notes about this request…",
+			"search": "Search for name, email or company...",
+			"reason" : "Why did the prospect refuse?",
+			"select" : "Select "
 		},
 		"toggles": {
 			"conditionsAccepted": "Terms accepted",
@@ -132,8 +143,47 @@
 			"loadError": "Error while loading requests",
 			"updated": "Request updated successfully!",
 			"emailResent": "Confirmation email resent!",
-			"emailResendError": "Error while sending"
-		}
+			"emailResendError": "Error while sending",
+			"success": "Step updated successfully",
+        	"error": "Update error"
+		},
+		"text": {
+			"converted": "Is the contract ready? This action will change the prospect status to",
+			"final": "Moving to the final stage"
+		},
+		 "workflow": {
+			"qualify": {
+				"title": "Step 2: Qualification",
+				"btn": "Confirm Qualification"
+			},
+			"schedule": {
+				"title": "Step 3: Scheduling",
+				"btn": "Schedule Appointment"
+			},
+			"complete": {
+				"title": "Step 4: Summary",
+				"btn": "Close Demo"
+			},
+			"negotiate": {
+				"title": "Step 6: Negotiation",
+				"btn": "Start Negotiation"
+			},
+			"convert": {
+				"title": "Step 7: Conversion",
+				"btn": "Finalize Sale"
+			},
+			"lost": {
+				"title": "Mark as Lost",
+				"btn": "Confirm Loss"
+			},
+			"errors": {
+				"dateRequired": "Appointment date is required",
+				"ownerRequired": "Please select a sales representative",
+				"demoNotesRequired": "Please enter the demo feedback",
+				"lostReasonRequired": "Please indicate the reason for the loss"
+			},
+			"lostPrefix": "LOST REASON: "
+    }
 	},
 	"billing": {
 		"invoice": "invoice",
@@ -618,7 +668,9 @@
 			"taxRate": "e.g. 19.25",
 			"roomsCount": "e.g. 20",
 			"cancellationPolicy": "e.g. Free cancellation up to 48 hours before arrival...",
-			"hotelPolicy": "e.g. Non-smoking. Pets not allowed. Accessible access available..."
+			"hotelPolicy": "e.g. Non-smoking. Pets not allowed. Accessible access available...",
+			"firstName" : "First Name",
+			"lastName" : "Last Name"
 		},
 		"starRating": {
 			"stars": "{count} star{suffix}",
@@ -1092,5 +1144,7 @@
 		"zm": "Zambia",
 		"zw": "Zimbabwe"
 	},
-	"phoneNumberPlaceholder" : "Enter phone number"
+	"phoneNumberPlaceholder" : "Enter phone number",
+	"fileFinalized" : "File Finalized", 
+	"noAction" : "No Action"
 }

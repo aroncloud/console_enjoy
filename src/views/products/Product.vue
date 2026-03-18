@@ -225,7 +225,7 @@ const confirmDelete = async () => {
     <!-- ── Header ── -->
     <div class="flex flex-col md:flex-row justify-between md:items-start gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">{{ t('products.catalog.title') }}</h1>
+        <h1 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2"><Package :size="20" class="text-slate-700 dark:text-slate-200" />{{ t('products.catalog.title') }}</h1>
         <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">{{ t('products.catalog.subtitle') }}</p>
       </div>
       <ButtonComponent variant="primary" :iconLeft="Plus" @click="openCreate">

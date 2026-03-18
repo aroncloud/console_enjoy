@@ -92,7 +92,7 @@
 
           <template #cell-status="{ value }">
             <span
-              class="px-2 py-1 text-[10px] font-bold rounded-full uppercase"
+              class="px-2 inline-flex py-1 text-[10px] font-bold rounded-full whitespace-nowrap uppercase"
               :class="{
                 'bg-emerald-100 text-emerald-600': value === 'paid',
                 'bg-purple-100 text-purple-600':   value === 'pending',

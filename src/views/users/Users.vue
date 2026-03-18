@@ -227,7 +227,7 @@ const sendResetPassword = async (row: any) => {
   <div class="p-4 md:p-8 bg-slate-50 dark:bg-slate-950 min-h-screen space-y-6">
     <div class="flex flex-col md:flex-row justify-between md:items-start gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">{{ t('users.title') }}</h1>
+        <h1 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2"> <UsersIcon :size="20" class="text-slate-700 dark:text-slate-200" />{{ t('users.title') }}</h1>
         <p class="text-sm text-slate-500 dark:text-slate-300 mt-1">{{ t('users.subtitle') }}</p>
       </div>
 

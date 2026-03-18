@@ -61,7 +61,7 @@
           
           <div class="flex flex-col gap-1.5">
             <Input :lb="t('hotelForm.fields.hotelName')" v-model="form.hotelName" :placeholder="t('hotelForm.placeholders.hotelName')" :is-required="true" />
-            <p v-if="errors.hotelName" class="text-sm font-light italic text-red-500">{{ errors.hotelName }}</p>
+            <p v-if="errors.hotelName" class="text-sm font-light italic text-red-500">{{ t('hotelForm.validation.hotelNameRequired') }}</p>
           </div>
 
           <Input :lb="t('hotelForm.fields.chain')" v-model="form.chain" :placeholder="t('hotelForm.placeholders.chain')" />
@@ -72,7 +72,7 @@
 
           <div class="flex flex-col gap-1.5">
             <InputSelectCity :lb="t('hotelForm.fields.city')" v-model="form.city" :placeholder="t('hotelForm.placeholders.city')" :country="form.country" :is-required="true" />
-            <p v-if="errors.city" class="text-sm font-light italic text-red-500">{{ errors.city }}</p>
+            <p v-if="errors.city" class="text-sm font-light italic text-red-500">{{ t('hotelForm.validation.cityRequired') }}</p>
           </div>
 
           <Input :lb="t('hotelForm.fields.managerEmail')" v-model="form.managerEmail" type="email" placeholder="j.dupont@hotel.com" />
@@ -118,12 +118,12 @@
                   : t('hotelForm.starRating.unrated') }}
               </span>
             </div>
-            <p v-if="errors.starRating" class="text-sm font-light italic text-red-500">{{ errors.starRating }}</p>
+            <p v-if="errors.starRating" class="text-sm font-light italic text-red-500">{{ t('hotelForm.validation.starRatingRequired') }}</p>
           </div>
 
           <div class="col-span-1 sm:col-span-2 flex flex-col gap-1.5">
             <Input :lb="t('hotelForm.fields.address')" v-model="form.address" :placeholder="t('hotelForm.placeholders.address')" :is-required="true" />
-            <p v-if="errors.address" class="text-sm font-light italic text-red-500">{{ errors.address }}</p>
+            <p v-if="errors.address" class="text-sm font-light italic text-red-500">{{ t('hotelForm.validation.addressRequired') }}</p>
           </div>
 
         </div>
@@ -132,14 +132,7 @@
           <!-- ── Contact Principal ── -->
           <section v-show="activeTab === 'contact'">
             <div class="space-y-6">
-              <!-- <div>
-                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Contact Gestionnaire</h3>
-                <div class="grid grid-cols-2 gap-5">
-                  <Input lb="Nom du Gestionnaire / Directeur" v-model="form.managerName" placeholder="Jean Dupont" />
-                  <Input lb="Email Professionnel" v-model="form.managerEmail" type="email" placeholder="j.dupont@hotel.com" />
-                  <InputPhone :title="'Numéro de Téléphone'" v-model="form.phone" :isRequired="false" />
-                </div>
-              </div> -->
+             
 
               <div class=" ">
                 <h3 class="text-sm font-semibold text-gray-500 dark:text-slate-300 uppercase tracking-wider mb-4">{{ t('hotelForm.admin.title') }}</h3>
@@ -149,19 +142,19 @@
                 <div class="grid md:grid-cols-2 grid-cols-1 gap-5">
                   <div class="flex flex-col gap-1.5">
                     <Input :lb="t('users.fields.firstName')" v-model="form.adminFirstName" :placeholder="t('hotelForm.placeholders.firstName')" :is-required="true" />
-                    <p v-if="errors.adminFirstName" class="text-sm font-light italic text-red-500">{{ errors.adminFirstName }}</p>
+                    <p v-if="errors.adminFirstName" class="text-sm font-light italic text-red-500">{{ t('users.validation.firstNameRequired') }}</p>
                   </div>
                   <div class="flex flex-col gap-1.5">
                     <Input :lb="t('users.fields.lastName')" v-model="form.adminLastName" :placeholder="t('hotelForm.placeholders.lastName')" :is-required="true" />
-                    <p v-if="errors.adminLastName" class="text-red-500 text-sm font-light italic">{{ errors.adminLastName }}</p>
+                    <p v-if="errors.adminLastName" class="text-red-500 text-sm font-light italic">{{ t('users.validation.lastNameRequired') }}</p>
                   </div>
                   <div class="flex flex-col gap-1.5">
                     <Input :lb="t('users.fields.email')" v-model="form.adminEmail" type="email" placeholder="admin@hotel.com" :is-required="true" />
-                    <p v-if="errors.adminEmail" class="text-red-500 text-sm font-light italic">{{ errors.adminEmail }}</p>
+                    <p v-if="errors.adminEmail" class="text-red-500 text-sm font-light italic">{{ t('hotelForm.validation.emailValid') }}</p>
                   </div>
                   <div class="flex flex-col gap-1.5">
                   <InputPhone :title="t('hotelForm.fields.phoneNumber')" v-model="form.adminPhoneNumber" :isRequired="true" />
-                  <p v-if="errors.adminPhoneNumber" class="text-sm font-light italic text-red-500">{{ errors.adminPhoneNumber }}</p>
+                  <p v-if="errors.adminPhoneNumber" class="text-sm font-light italic text-red-500">{{ t('hotelForm.validation.phoneRequired') }}</p>
                   </div>
                 </div>
               </div>

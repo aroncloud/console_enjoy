@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 import AddHotelForm from '../../components/Clients/AddHotelForm.vue'
 import ButtonComponent from '../../components/Button/ButtonComponent.vue'
 import BaseTable, { type Column } from '../../components/Table/BaseTable.vue'
-import { Plus, BedDouble, Utensils, RefreshCcw, Smartphone, ExternalLink } from 'lucide-vue-next'
+import { Plus, BedDouble, Utensils, RefreshCcw, Smartphone, ExternalLink ,Building2} from 'lucide-vue-next'
 import { hotelService } from '../../servicesAPI/clientService'
 import { useToastStore } from '../../composables/toast'
 import { demoService } from '../../servicesAPI/demoService'
@@ -163,6 +163,7 @@ const getProducts = (row: any) =>
     @back="closeForm"
     :prefill="prefillData"
     from="clients" 
+    :loading="loading" 
   />
 
   <!-- ── Vue Liste ── -->
@@ -170,7 +171,7 @@ const getProducts = (row: any) =>
 
     <div class="flex flex-col md:flex-row justify-between md:items-start mb-8 gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ t('clients.title') }}</h1>
+        <h1 class="flex items-center gap-2 text-2xl font-bold text-gray-900 dark:text-white"><Building2 :size="20" class="text-slate-700 dark:text-slate-200" />{{ t('clients.title') }}</h1>
         <p class="text-gray-500 dark:text-slate-400 text-sm mt-1">{{ t('clients.subtitle') }}</p>
       </div>
       <ButtonComponent :label="t('clients.actions.addHotel')" variant="primary" :iconLeft="Plus" @click="openCreate" />

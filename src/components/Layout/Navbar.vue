@@ -1,12 +1,20 @@
 <template>
-  <header class="bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 px-6 py-3 flex items-center justify-between">
-    <button class="md:hidden p-2 " @click="$emit('toggle-sidebar')">
+  <header class="bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 px-6 py-3 flex items-center justify-end">
+    <button class="md:hidden p-2 mr-10" @click="$emit('toggle-sidebar')">
       <Menu class="w-6 h-6 text-gray-600 dark:text-slate-300" />
     </button>
 
-    <div class="hidden md:block" />
+    <!-- <div class="flex items-center gap-2 bg-gray-50 dark:bg-slate-800 rounded-lg px-4 py-2 max-w-full md:w-96">
+      <Search class="w-4 h-4 text-gray-400 dark:text-slate-400" />
+      <input
+        v-model="search"
+        type="text"
+        placeholder="Rechercher un hôtel, une facture ou un ticket..."
+        class="bg-transparent outline-none text-sm text-gray-600 dark:text-slate-200 placeholder:text-gray-400 dark:placeholder:text-slate-400 w-full"
+      />
+    </div> -->
 
-    <div class="flex  gap-4 ">
+    <div class="flex  gap-4">
       <div class="border-r border-gray-200 pr-4">
         <button class="relative p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition cursor-pointer">
           <Bell class="w-5 h-5 text-gray-500 dark:text-slate-300" />
@@ -14,10 +22,10 @@
         </button>
       </div>
 
-    <button
+      <button
         type="button"
         @click="toggleTheme"
-        class="hidden  relative h-8 w-16 items-center rounded-full border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 px-1 transition-colors cursor-pointer"
+        class="relative inline-flex h-8 w-16 items-center rounded-full border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 px-1 transition-colors cursor-pointer"
         :aria-label="t('common.toggleTheme')"
       >
         <span
@@ -27,7 +35,7 @@
           <Moon v-if="isDark" class="w-4 h-4 text-slate-300" />
           <Sun v-else class="w-4 h-4 text-amber-500" />
         </span>
-    </button>
+      </button>
 
       <div class="relative" ref="dropdownRef">
         <div class="flex items-center gap-3 cursor-pointer" @click="toggleDropdown">
@@ -50,17 +58,6 @@
             <span class="inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300">
               {{ roleName }}
             </span>
-          </div>
-
-          <div class="py-1 md:hidden border-b border-gray-100 dark:border-slate-800">
-            <button
-              class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-              @click="toggleTheme"
-            >
-              <Moon v-if="isDark" class="w-4 h-4" />
-              <Sun v-else class="w-4 h-4 text-amber-500" />
-              {{ isDark ? 'Mode clair' : 'Mode sombre' }}
-            </button>
           </div>
 
           <div class="py-1">

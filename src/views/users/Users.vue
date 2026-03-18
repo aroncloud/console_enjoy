@@ -9,7 +9,7 @@ import Input from '../../components/FormElements/Input.vue'
 import Toggle from '../../components/FormElements/Toggle.vue'
 import Select from '../../components/FormElements/Select.vue'
 import ButtonComponent from '../../components/Button/ButtonComponent.vue'
-import router from '../../router'
+
 import { useToastStore } from '../../composables/toast'
 import { requestPasswordReset } from '../../servicesAPI/auth'
 import { userService, type User, type CreateUserPayload } from '../../servicesAPI/userService'
@@ -38,7 +38,8 @@ const columns = computed<Column[]>(() => [
 const showForm = ref(false)
 const editingId = ref<number | null>(null)
 const loadingRole = ref(false)
-
+const showProfile = ref(false)
+const viewingUser = ref<User | null>(null)
 
 const form = reactive({
   firstName:'',
@@ -55,7 +56,12 @@ const formErrors = reactive({
   email: '',
 })
 
-
+// const roleOptions = [
+//   { label: 'Rôle (auto)', value: '' },
+//   { label: 'Super Admin', value: 1 },
+//   { label: 'Admin', value: 2 },
+//   { label: 'Manager', value: 3 },
+// ]
 const roleOptions = ref<any[]>([])
 
 const initials = (name: string) =>
@@ -205,7 +211,8 @@ const handleSubmit = async () => {
 }
 
 const openProfile = (row: any) => {
-  router.push({ name: 'user-profile', params: { id: (row as User).id } })
+  viewingUser.value = row as User
+  showProfile.value = true
 }
 
 const sendResetPassword = async (row: any) => {
@@ -308,7 +315,7 @@ const sendResetPassword = async (row: any) => {
         </template>
 
         <template #cell-actions="{ row }">
-          <div class="flex items-center gap-1">
+          <div class="flex items-center justify-end gap-1">
             <ButtonComponent variant="ghost" size="sm" :iconLeft="Eye" :aria-label="t('users.actions.profile')" @click.stop="openProfile(row)" />
             <ButtonComponent variant="ghost" size="sm" :iconLeft="Edit" :aria-label="t('common.edit')" @click.stop="openEdit(row)" />
             <ButtonComponent
@@ -357,5 +364,41 @@ const sendResetPassword = async (row: any) => {
       </template>
     </BaseModal>
 
+    <BaseModal v-model="showProfile" customClass="max-w-xl">
+      <template #header>
+        <div class="flex items-center gap-2">
+          <h3 class="font-bold text-slate-900 dark:text-white">{{ t('users.profile.title') }}</h3>
+        </div>
+      </template>
+
+      <div v-if="viewingUser" class="space-y-4">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+            <span class="text-base font-bold text-purple-700 dark:text-purple-200">{{ initials(displayName(viewingUser)) }}</span>
+          </div>
+          <div class="min-w-0">
+            <p class="text-lg font-bold text-slate-900 dark:text-white truncate">{{ displayName(viewingUser) }}</p>
+            <p class="text-sm text-slate-500 dark:text-slate-300 truncate">{{ viewingUser.email }}</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="rounded-xl border border-slate-200 dark:border-slate-800 p-4 bg-white dark:bg-slate-900">
+            <p class="text-xs text-slate-400 dark:text-slate-400">Username</p>
+            <p class="text-sm font-semibold text-slate-900 dark:text-white mt-1">{{ viewingUser.username ?? '—' }}</p>
+          </div>
+          <div class="rounded-xl border border-slate-200 dark:border-slate-800 p-4 bg-white dark:bg-slate-900">
+            <p class="text-xs text-slate-400 dark:text-slate-400">{{ t('users.fields.role') }}</p>
+            <p class="text-sm font-semibold text-slate-900 dark:text-white mt-1">{{ displayRole(viewingUser) }}</p>
+          </div>
+        </div>
+      </div>
+
+      <template #footer>
+        <div class="flex items-center justify-end gap-2">
+          <ButtonComponent variant="secondary" @click="showProfile = false" >{{ t('common.close') }}</ButtonComponent>
+        </div>
+      </template>
+    </BaseModal>
   </div>
 </template>

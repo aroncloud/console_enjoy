@@ -222,19 +222,23 @@ onMounted(() => {
       @page-change="fetchAnnouncements"
     >
       <template #filters>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div class="flex md:flex-row flex-col  gap-3">
+          <div class="w-50">
           <Select
             :lb="t('announcements.filters.type')"
             :options="[{ label: t('common.all'), value: '' }, ...typeOptions]"
             v-model="filters.type"
-            customClass="h-10"
+            customClass="h-10 "
           />
+          </div>
+          <div class="w-50">
           <Select
             :lb="t('announcements.filters.status')"
             :options="activeOptions"
             v-model="filters.isActive"
             customClass="h-10"
           />
+          </div>
         </div>
       </template>
 

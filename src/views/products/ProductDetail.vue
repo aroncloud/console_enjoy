@@ -217,7 +217,7 @@ onMounted(async () => {
           <span class="text-sm text-slate-700 dark:text-slate-200">{{ value == null ? '—' : formatCurrency(value) }}</span>
         </template>
         <template #cell-actions="{ row }">
-          <div class="flex items-center justify-end gap-1">
+          <div class="flex items-center  gap-1">
             <ButtonComponent variant="ghost" size="sm" :iconLeft="Edit" @click.stop="openEdit(row)" />
             <ButtonComponent
               variant="ghost"

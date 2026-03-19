@@ -42,7 +42,7 @@ export interface InvoiceData {
 }
 
 export const invoiceService = {
-  get: (params?: { page?: number; search?: string; status?: string }) =>
+  get: (params?: { page?: number; search?: string; status?: string ;limit?:any}) =>
     api.get<InvoiceData>('console/billing', { params }).then((r) => r.data),
 
   markAsPaid: (id: number) =>

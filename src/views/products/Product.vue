@@ -24,6 +24,7 @@ import type { Product }   from '../../servicesAPI/productService'
 
 // ── State 
 const products     = ref<Product[]>([])
+const productsAll = ref<Product[]>([])
 const loading      = ref(false)
 const saving       = ref(false)
 const searchQuery  = ref('')
@@ -88,7 +89,21 @@ const fetchProducts = async (page=1) => {
   }
 }
 
-onMounted(() => fetchProducts(1))
+const fetchProductsAll = async() =>{
+  try{
+    const res = await productService.getAllProducts({
+      all:true
+    })
+
+     productsAll.value = res
+    console.log('resAll',productsAll.value)
+
+  }catch(e:any){
+    console.error(e)
+  }
+}
+
+onMounted(() => {fetchProducts(1),fetchProductsAll()})
 
 const handlePageChange = (newPage: number) => {
   fetchProducts(newPage);
@@ -104,7 +119,7 @@ watch([searchQuery, filterActive], () => {
 watch(page, () => fetchProducts(1))
 
 // ── Computed KPIs 
-const countActive = computed(() => products.value.filter(m => m.isActive).length)
+const countActive = computed(() => productsAll.value.filter(m => m.isActive).length)
 
 // ── Helpers icônes / couleurs 
 const slugIconComponents: Record<string, Component> = {

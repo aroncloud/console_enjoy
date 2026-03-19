@@ -266,6 +266,7 @@ const sendResetPassword = async (row: any) => {
         :show-search="false"
         :meta="meta"
         @page-change="handlePageChange"
+        @limit-change="(l)=>{ limit = l ;fetchUsers(1)} "
       >
         <template #cell-user="{ row }">
           <div class="flex items-center gap-3">

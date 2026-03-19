@@ -156,14 +156,9 @@ const fetchDemos = async (p = 1) => {
       search: searchQuery.value || undefined,
       status: filterStatus.value === "all" ? undefined : filterStatus.value,
     });
-    console.log("res", res);
+    console.log('meta:', res.meta)
     demos.value = res.data;
-    meta.value = {
-      total: res.meta.total,
-      page: res.meta.currentPage,
-      limit: res.meta.perPage,
-      totalPages: res.meta.lastPage,
-    };
+    meta.value = res.meta
   } catch (e) {
     toastStore.show({
       type: "error",
@@ -438,6 +433,7 @@ const handleDetail =(row:any) =>{
         :loading="loading"
         :meta="meta"
         @page-change="(p) => fetchDemos(p)"
+        @limit-change="(l) => { limit = l; fetchDemos(1) }" 
       >
         <template #cell-contact="{ row }">
           <div class="flex flex-col min-w-[150px]">

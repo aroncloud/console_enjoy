@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted,reactive } from 'vue'
+import { ref, computed, watch, onMounted, reactive } from "vue";
 import { useI18n } from 'vue-i18n'
 import {
   Search,
@@ -15,29 +15,36 @@ import {
   MonitorPlay
 } from "lucide-vue-next";
 
-import Input              from '../../components/FormElements/Input.vue'
-import ButtonComponent    from '../../components/Button/ButtonComponent.vue'
-import BaseTable          from '../../components/Table/BaseTable.vue'
-import type { Column }    from '../../components/Table/BaseTable.vue'
-import BaseModal          from '../../components/Modal/BaseModal.vue'
-import Select from '../../components/FormElements/Select.vue'
-import Toggle from '../../components/FormElements/Toggle.vue'
-import { useToastStore }  from '../../composables/toast'
-import { demoService }    from '../../servicesAPI/demoService'
-import type { Demo, DemoStatus, UpdateDemoPayload } from '../../servicesAPI/demoService'
+import Input from "../../components/FormElements/Input.vue";
+import ButtonComponent from "../../components/Button/ButtonComponent.vue";
+import BaseTable from "../../components/Table/BaseTable.vue";
+import type { Column } from "../../components/Table/BaseTable.vue";
+import BaseModal from "../../components/Modal/BaseModal.vue";
+import Select from "../../components/FormElements/Select.vue";
+import { useToastStore } from "../../composables/toast";
+import { demoService } from "../../servicesAPI/demoService";
+import type {
+  Demo,
+  DemoStatus,
+  UpdateDemoPayload,
+} from "../../servicesAPI/demoService";
+import { userService } from "../../servicesAPI/userService";
+import { useRouter } from "vue-router";
 
-
-const demos        = ref<Demo[]>([])
-const allDemos        = ref<Demo[]>([])
-const loading      = ref(false)
-const saving       = ref(false)
-const searchQuery  = ref('')
-const filterStatus = ref<DemoStatus | 'all'>('all')
-const toastStore   = useToastStore()
-const { t, locale } = useI18n()
-const page  = ref(1)
-const limit = ref(20)
-const meta  = ref<any>(null)
+const router = useRouter();
+// --- ÉTATS GLOBAUX ---
+const demos = ref<Demo[]>([]);
+const allDemos = ref<Demo[]>([]);
+const loading = ref(false);
+const saving = ref(false);
+const searchQuery = ref("");
+const filterStatus = ref<DemoStatus | "all">("all");
+const toastStore = useToastStore();
+const { t } = useI18n()
+const page = ref(1);
+const limit = ref(20);
+const meta = ref<any>(null);
+const users = ref<any[]>([]);
 
 // --- ÉTATS DES MODALES ---
 const showWorkflowModal = ref(false);
@@ -137,11 +144,11 @@ const columns = computed<Column[]>(() => [
 
 // --- LOGIQUE API ---
 const fetchDemos = async (p = 1) => {
-  loading.value = true
+  loading.value = true;
   try {
     const res = await demoService.getAll({
-      page:   p,
-      limit:  limit.value,
+      page: p,
+      limit: limit.value,
       search: searchQuery.value || undefined,
       status: filterStatus.value === "all" ? undefined : filterStatus.value,
     });
@@ -154,7 +161,7 @@ const fetchDemos = async (p = 1) => {
       message: t('demos.toast.loadError'),
     });
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 };
 
@@ -163,12 +170,9 @@ const handleDetail = (row: any) => {
 }
 
 const fetchAllDemos = async () => {
-  loading.value = true
   try {
-    const res = await demoService.getAll({
-    all: true 
-    })
-    allDemos.value = res.data
+    const res = await demoService.getAll({ all: true });
+    allDemos.value = res.data;
   } catch (e) {
     console.error(e);
   }
@@ -193,10 +197,10 @@ const fetchUsers = async () => {
 };
 
 onMounted(() => {
-    fetchDemos(1)
-    fetchAllDemos()
-
-})
+  fetchDemos(1);
+  fetchAllDemos();
+  fetchUsers();
+});
 
 watch([searchQuery, filterStatus], () => {
   page.value = 1;
@@ -307,8 +311,7 @@ const handleSubmit = async () => {
 }
 
 
-//  Renvoi email 
-const handleResendEmail = async (row: any) => {
+const handleResendEmail = async (id: number) => {
   try {
     await demoService.resendEmail(id);
     toastStore.show({ message: t('demos.toast.emailResent'), type: "success" });
@@ -427,8 +430,6 @@ const handleAddDemo = async () => {
             {{ allDemos.filter((d) => d.status === "Converted").length }}
           </p>
         </div>
-        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">{{ t('demos.kpis.convertedClients') }}</p>
-        <p class="text-2xl font-black mt-1 text-slate-900 dark:text-white">{{ countConverted }}</p>
       </div>
       
     </div>
@@ -462,60 +463,76 @@ const handleAddDemo = async () => {
     </div>
 
     <!-- Table -->
-    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+    <div
+      class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden"
+    >
       <BaseTable
         :columns="columns"
         :data="demos"
         :loading="loading"
-        :show-search="false"
         :meta="meta"
         @page-change="(p) => fetchDemos(p)"
         @limit-change="(l) => { limit = l; fetchDemos(1) }" 
       >
-        <!-- Contact -->
         <template #cell-contact="{ row }">
-          <div class="min-w-0">
-            <p class="font-bold text-sm text-slate-900 dark:text-white truncate">{{ row.contactName }}</p>
-            <p class="text-xs text-slate-400 truncate mt-0.5">{{ row.email }}</p>
+          <div class="flex flex-col min-w-[150px]">
+            <span class="font-bold text-slate-900 dark:text-white truncate">{{
+              row.contactName
+            }}</span>
+            <span class="text-xs text-slate-400 truncate">{{ row.email }}</span>
           </div>
         </template>
 
-        <!-- Société -->
         <template #cell-company="{ row }">
-          <div class="min-w-0">
-            <p class="text-sm text-slate-700 dark:text-slate-200 truncate">{{ row.companyName }}</p>
-            <p v-if="row.country" class="text-xs text-slate-400 truncate mt-0.5">{{ row.country }}</p>
+          <div class="flex flex-col">
+            <span
+              class="text-sm font-semibold text-slate-700 dark:text-slate-200"
+              >{{ row.companyName }}</span
+            >
+            <div
+              class="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5"
+            >
+              <span
+                class="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded flex items-center gap-1"
+              >
+                <BedDouble :size="10" /> {{ row.numberOfRooms || 0 }}
+              </span>
+              <span v-if="row.country" class="truncate max-w-[100px]">{{
+                row.country
+              }}</span>
+            </div>
           </div>
         </template>
 
-        <!-- Chambres -->
-        <template #cell-rooms="{ row }">
-          <span class="text-sm text-slate-600 dark:text-slate-300">
-            {{ row.numberOfRooms != null ? row.numberOfRooms : '—' }}
+        <template #cell-status="{ row }">
+          <span
+            :class="[
+              'text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-tighter',
+              statusConfig[row.status as DemoStatus].classes,
+            ]"
+          >
+            {{ statusConfig[row.status as DemoStatus].label }}
           </span>
         </template>
 
-        <!-- Date -->
-        <template #cell-createdAt="{ row }">
-          <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
-            <Calendar :size="13" />
-            <span class="text-xs">{{ formatDate(row.createdAt) }}</span>
-          </div>
-        </template>
-
-        <!-- Statut cliquable -->
-        <!-- <template #cell-status="{ row }">
+        <!-- ACTION LOGIQUE WORKFLOW -->
+        <template #cell-next="{ row }">
           <button
-            @click.stop="openStatusModal(row)"
-            :class="['text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1 transition-opacity hover:opacity-75 whitespace-nowrap', getStatus(row.status).classes]"
+            v-if="statusConfig[row.status as DemoStatus].nextStep"
+            @click.stop="
+              openModal(row, statusConfig[row.status as DemoStatus].nextStep)
+            "
+            class="group flex items-center gap-2 text-[11px] font-black text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-xl transition-all shadow-md shadow-blue-200 dark:shadow-none"
           >
-            {{ getStatus(row.status).label }}
-            <ChevronDown :size="11" />
+            {{ statusConfig[row.status as DemoStatus].nextLabel }}
+            <ChevronRight
+              :size="14"
+              class="group-hover:translate-x-1 transition-transform"
+            />
           </button>
-        </template> -->
-        <template #cell-status="{ row }">
           <span
-            :class="[' text-xs font-semibold px-2 py-1 rounded-full inline-flex items-center gap-1 transition-opacity hover:opacity-75 whitespace-nowrap', getStatus(row.status).classes]"
+            v-else-if="row.status === 'Converted'"
+            class="text-[11px] text-emerald-600 font-bold flex items-center gap-1"
           >
             <CheckCircle :size="14" /> {{ $t('fileFinalized') }}
           </span>
@@ -524,14 +541,8 @@ const handleAddDemo = async () => {
           >
         </template>
 
-        <!-- Actions -->
         <template #cell-actions="{ row }">
           <div class="flex items-center gap-1">
-            <!-- Voir le détail -->
-            <ButtonComponent variant="ghost" size="sm" :iconLeft="Eye"
-              :aria-label="t('common.details')" @click.stop="openDetail(row)" />
-            <ButtonComponent variant="ghost" size="sm" :iconLeft="Edit"
-                :aria-label="t('common.edit')" @click.stop="openEditModal(row)" />
             <ButtonComponent
               variant="ghost"
               size="sm"
@@ -547,9 +558,8 @@ const handleAddDemo = async () => {
               :iconLeft="row.emailSend ? MailCheck : Mail"
               :aria-label="row.emailSend ? t('demos.actions.emailSent') : t('demos.actions.resendEmail')"
               :class="row.emailSend ? 'text-emerald-500' : ''"
-              @click.stop="handleResendEmail(row)"
+              @click.stop="handleResendEmail(row.id)"
             />
-           
           </div>
         </template>
       </BaseTable>
@@ -571,8 +581,9 @@ const handleAddDemo = async () => {
             <p class="text-xs text-slate-400">
               {{ currentDemo?.contactName }} — {{ currentDemo?.companyName }}
             </p>
-            </div>
-        </template>
+          </div>
+        </div>
+      </template>
 
       <div class="space-y-5 py-2">
         <!-- CHAMPS ÉTAPE : QUALIFY -->
@@ -795,5 +806,8 @@ const handleAddDemo = async () => {
     </template>
 
 <style scoped>
-
+.animate-in {
+  animation-duration: 0.3s;
+}
 </style>
+

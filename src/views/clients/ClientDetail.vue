@@ -273,7 +273,7 @@ const updateSub = (sub: any) => {
     </div>
 
     <!-- Contenu -->
-    <div v-else class="flex flex-1 flex-col bg-slate-50 dark:bg-slate-950 min-h-screen">
+    <div v-else class="flex flex-1 flex-col bg-slate-50 dark:bg-slate-950">
       <div class="p-4 md:p-8 flex flex-col gap-6 md:gap-8 w-full ">
 
         <!-- ── Header ── -->

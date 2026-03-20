@@ -91,6 +91,8 @@ const getIconConfig = (action: string): IconConfig => {
       return { icon: Smartphone, iconBg: 'bg-blue-100', iconColor: 'text-blue-500' }
     case 'subscription.update':
       return { icon: RefreshCcw, iconBg: 'bg-emerald-100', iconColor: 'text-emerald-600' }
+    case 'subscription.toggleStatus':
+      return { icon: RefreshCcw, iconBg: 'bg-pink-100', iconColor: 'text-pink-600' }
     case 'hotel.create':
       return { icon: UserPlus, iconBg: 'bg-blue-100', iconColor: 'text-blue-500' }
     case 'subscription.delete':

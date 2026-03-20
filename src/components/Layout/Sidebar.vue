@@ -33,28 +33,33 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '../../composables/useAuth'
+import { usePermissionsStore } from '../../composables/usePermission'
 import { LayoutDashboard, Building2, Receipt, Shield, Package, Users as UsersIcon, MonitorPlay, Megaphone } from 'lucide-vue-next'
 
-const route = useRoute()
-const authStore = useAuthStore()
-const { t } = useI18n()
-const emit = defineEmits(['close'])
+const route            = useRoute()
+const authStore        = useAuthStore()
+const permissionsStore = usePermissionsStore()
+const { t }            = useI18n()
+const emit             = defineEmits(['close'])
 
-// user.role.roleName selon la réponse backend
 const roleName = computed(() => authStore.user?.role?.roleName ?? t('roles.superAdmin'))
 
-const menuItems = computed(() => [
-  { label: t('nav.dashboard'), path: '/', icon: LayoutDashboard },
-  { label: t('nav.clients'), path: '/clients', icon: Building2 },
-  { label: t('nav.products'), path: '/products', icon: Package },
-  { label: t('nav.billing'), path: '/billing', icon: Receipt },
-  { label: t('nav.demos'), path: '/demo', icon: MonitorPlay },
-  { label: t('nav.announcements'), path: '/announcements', icon: Megaphone },
-  { label: t('nav.security'), path: '/security', icon: Shield },
-  { label: t('nav.users'), path: '/users', icon: UsersIcon },
+const allMenuItems = computed(() => [
+  { label: t('nav.dashboard'),     path: '/',             icon: LayoutDashboard, permission: 'console_dashboard_view'     },
+  { label: t('nav.clients'),       path: '/clients',      icon: Building2,       permission: 'console_clients_view'       },
+  { label: t('nav.products'),      path: '/products',     icon: Package,         permission: 'console_products_view'      },
+  { label: t('nav.billing'),       path: '/billing',      icon: Receipt,         permission: 'console_billing_view'       },
+  { label: t('nav.demos'),         path: '/demo',         icon: MonitorPlay,     permission: 'console_demos_view'         },
+  { label: t('nav.announcements'), path: '/announcements',icon: Megaphone,       permission: 'console_announcements_view' },
+  { label: t('nav.security'),      path: '/security',     icon: Shield,          permission: 'console_security_view'      },
+  { label: t('nav.users'),         path: '/users',        icon: UsersIcon,       permission: 'console_users_view'         },
 ])
 
-// Gestion manuelle de l'actif pour éviter le bug de "/" qui matche tout
+
+const menuItems = computed(() =>
+  allMenuItems.value.filter(item => permissionsStore.can(item.permission))
+)
+
 const isActive = (path: string) => {
   if (path === '/') return route.path === '/'
   return route.path.startsWith(path)

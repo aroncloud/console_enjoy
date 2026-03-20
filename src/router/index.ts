@@ -17,6 +17,9 @@ import HistoryView from '../views/history/HistoryView.vue'
 import Demo from '../views/demo/DemoView.vue'
 import Announcements from '../views/announcements/Announcements.vue'
 import { useAuthStore } from '../composables/useAuth'
+import { usePermissionsStore } from '../composables/usePermission'
+import Forbidden from '../views/errors/Forbidden.vue'
+import DemoDetail from '../views/demo/DemoDetail.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -31,69 +34,163 @@ const router = createRouter({
       path: '/',
       component: AdminLayout,
       children: [
-        { path: '',        name: 'dashboard', component: Dashboard },
-        { path: 'clients', name: 'clients',   component: Clients },
-
-    
+        {
+          path: '',
+          name: 'dashboard',
+          component: Dashboard,
+          meta: { permission: 'console_dashboard_view' },
+        },
+        {
+          path: 'clients',
+          name: 'clients',
+          component: Clients,
+          meta: { permission: 'console_clients_view' },
+        },
         {
           path: 'clients/:id',
-          
           children: [
             {
               path: '',
               name: 'client-detail',
               component: ClientDetail,
+              meta: { permission: 'console_clients_view' },
             },
             {
               path: 'subscriptions',
               name: 'client-subscriptions',
               component: HotelSubscriptions,
+              meta: { permission: 'console_clients_view' },
             },
           ],
         },
-     
-
-        { path: 'support',  name: 'support',  component: Support },
-        { path: 'billing',  name: 'billing',  component: Billing },
-        { path: 'security', name: 'security', component: Security },
-        { path: 'products', name: 'products', component: Product },
-        { path: 'products/:id', name: 'product-detail', component: ProductDetail },
-        { path: 'users',    name: 'users',    component: Users },
+        {
+          path: 'support',
+          name: 'support',
+          component: Support,
+        },
+        {
+          path: 'billing',
+          name: 'billing',
+          component: Billing,
+          meta: { permission: 'console_billing_view' },
+        },
+        {
+          path: 'security',
+          name: 'security',
+          component: Security,
+          meta: { permission: 'console_security_view' },
+        },
+        {
+          path: 'products',
+          name: 'products',
+          component: Product,
+          meta: { permission: 'console_products_view' },
+        },
+        {
+          path: 'products/:id',
+          name: 'product-detail',
+          component: ProductDetail,
+          meta: { permission: 'console_products_view' },
+        },
+        {
+          path: 'users',
+          name: 'users',
+          component: Users,
+          meta: { permission: 'console_users_view' },
+        },
         {
           path: '/users/:id',
           name: 'user-profile',
           component: UserProfile,
+          meta: { permission: 'console_users_view' },
         },
-        { path: 'profile',  name: 'profile',  component: Profile },
-        { path: 'demo',  name: 'demo',  component: Demo },
-        { path: 'announcements', name: 'announcements', component: Announcements, meta: { superAdmin: false } },
+        {
+          path: 'profile',
+          name: 'profile',
+          component: Profile,
+        },
+        {
+          path: 'demo',
+          name: 'demo',
+          component: Demo,
+          meta: { permission: 'console_demos_view' },
+        },
+        {
+          path: 'demo/:id',
+          name: 'demo-detail',
+          component: DemoDetail
+        },
+        {
+          path: 'announcements',
+          name: 'announcements',
+          component: Announcements,
+          meta: { permission: 'console_announcements_view' },
+        },
         {
           path: '/history',
           name: 'history',
           component: HistoryView,
-        }
+        },
       ],
+    },
+    {
+      path: '/403',
+      name: 'forbidden',
+      component: Forbidden,
+      meta: { public: true },
     },
     {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
       redirect: '/login',
     },
-    
   ],
 })
 
+// Mapping permission → path de la route
+const permissionToPath: Record<string, any> = {
+  console_dashboard_view:     '/',
+  console_clients_view:       '/clients',
+  console_products_view:      '/products',
+  console_billing_view:       '/billing',
+  console_demos_view:         '/demo',
+  console_announcements_view: '/announcements',
+  console_security_view:      '/security',
+  console_users_view:         '/users',
+}
+
+// Retourne le path de la première route accessible
+export const getFirstAccessiblePath = (permissionsStore: any): string => {
+  const first = Object.keys(permissionToPath).find(p => permissionsStore.can(p))
+  return first ? permissionToPath[first] : '/403'
+}
+
 router.beforeEach((to) => {
-  const authStore = useAuthStore()
+  const authStore        = useAuthStore()
+  const permissionsStore = usePermissionsStore()
 
   if (to.meta.public) {
-    if (authStore.isAuthenticated && to.name === 'login') return { name: 'dashboard' }
+    if (authStore.isAuthenticated && to.name === 'login') {
+      const path = getFirstAccessiblePath(permissionsStore)
+      console.log('[Router] Login → redirect to:', path)
+      return { path }
+    }
     return true
   }
 
   if (!authStore.isAuthenticated) return { name: 'login' }
 
-  if ((to.meta as any)?.superAdmin && !authStore.isSuperAdmin) return { name: 'dashboard' }
+  const requiredPermission = (to.meta as any)?.permission as string | undefined
+  if (requiredPermission && !permissionsStore.can(requiredPermission)) {
+    console.warn('[Router] Permission refusée:', requiredPermission)
+    console.warn('[Router] Permissions dispo:', [...permissionsStore.permissionNames])
+    if (to.name === 'dashboard') {
+      const path = getFirstAccessiblePath(permissionsStore)
+      console.log('[Router] Dashboard sans perm → redirect to:', path)
+      return { path }
+    }
+    return { name: 'forbidden', query: { permission: requiredPermission } }
+  }
 
   return true
 })

@@ -55,6 +55,11 @@ export const userService = {
   getRoleAll: async (): Promise<Role[]> => {
     const res = await api.get('console/roles')
     return res.data
+  },
+
+   getCommercial: async (): Promise<any[]> => {
+    const res = await api.get('console/users/commercials')
+    return res.data.data
   }
 }
 

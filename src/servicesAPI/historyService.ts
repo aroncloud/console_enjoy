@@ -40,4 +40,9 @@ export const historyService = {
     const res = await api.get(`/console/hotels/${hotelId}/activity-logs`, { params: filters })
     return res.data
   },
+
+   getAllDemo: async (id:any): Promise<ActivityLogResponse> => {
+    const res = await api.get(`/console/demo-requests/${id}/history`)
+    return res.data
+  },
 }

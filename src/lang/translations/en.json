@@ -36,10 +36,12 @@
 		"restore": "Restore",
 		"suspend": "Suspend",
 		"actions": "Actions",
+		"delete" : "Delete",
 		"errors": {
 			"save": "Error while saving",
 			"delete": "Error while deleting"
-		}
+		},
+		"update" :"Update"
 	},
 	"table": {
 		"searchPlaceholder": "Search…",
@@ -90,7 +92,8 @@
 		"actions": {
 			"resendEmail": "Resend email",
 			"emailSent": "Email sent",
-			"saveChanges": "Save changes"
+			"saveChanges": "Save changes",
+			"add": "Add a demo"
 		},
 		"edit": {
 			"title": "Edit request"
@@ -145,7 +148,9 @@
 			"emailResent": "Confirmation email resent!",
 			"emailResendError": "Error while sending",
 			"success": "Step updated successfully",
-        	"error": "Update error"
+        	"error": "Update error",
+			"addSuccess": "Demo created successfully",
+			"errorCreated" : "Error while demo creating"
 		},
 		"text": {
 			"converted": "Is the contract ready? This action will change the prospect status to",
@@ -183,7 +188,36 @@
 				"lostReasonRequired": "Please indicate the reason for the loss"
 			},
 			"lostPrefix": "LOST REASON: "
-    }
+    	},
+		"add": {
+				"title": "New demo",
+				"subtitle": "Fill in the prospect's information",
+				"btn": "Create a demo"
+		},
+		"history": {
+			"actions": {
+			"create":   "Demo request created",
+			"update":   "Demo updated",
+			"assign":   "Commercial assigned",
+			"resend":   "Email resent",
+			"convert":  "Converted to client",
+			"lost":     "Marked as lost",
+			"schedule": "Demo scheduled",
+			"complete": "Demo completed"
+			},
+			"fields": {
+			"status":       "Status",
+			"ownerAssigned":"Commercial assigned",
+			"followUpDate": "Demo date",
+			"competition":  "Competition",
+			"notes":        "Notes"
+			},
+			"lead" : "Commercial",
+			"assign":      "Commercial assigned",
+			"planified":   "Demo scheduled",
+			"title":       "Action history",
+			"noActivity":  "No activity recorded"
+		}
 	},
 	"billing": {
 		"invoice": "invoice",
@@ -734,7 +768,9 @@
 			"online": "Online",
 			"activeTenants": "Active tenants",
 			"suspended": "Suspended",
-			"revokedAccess": "Revoked access"
+			"revokedAccess": "Revoked access",
+			"totalRoles" : "Total roles",
+			"totalPermissions" : "Total permissions"
 		},
 		"tenants": {
 			"title": "Tenant status"
@@ -763,7 +799,49 @@
 		"toast": {
 			"suspended": "Product suspended successfully",
 			"restored": "Product restored successfully",
-			"updateError": "Error while updating"
+			"updateError": "Error while updating",
+			"deleteError": "Error while deleting",
+			"created" : "Role created successfully!",
+			"updated" : "Role updated successfully!",
+			"deleted" : "Role deleted successfully!",
+			"permissionsSaved" : "Permission saved successfully!",
+			"permissionsError" : "Error while saving"
+		},
+		"title" : "Security & Access",
+		"subTitle" : "Tenant, role, and permission management",
+		"status" : "Operational system",
+		"tenant" : "Tenants",
+		"roles" : {
+			"title" : "Roles & Permissions",
+			"subTitle" : "Roles",
+			"new" : "New",
+			"search" : "Search ...",
+			"loading" :"Loading...",
+			"noRoleFound" : "No roles found",
+			"noDescription" : "No description",
+			"select" : "Select a role",
+			"selectSubtitle" : "The permissions will appear here",
+			"permissionActives" : "Active permissions",
+			"checkAll" : "Check All",
+			"uncheckALL" : "Uncheck All",
+			"uncheck" : "Uncheck",
+			"modal" : {
+				"name" : "Role name",
+				"namePlaceholder" : "admin",
+				"description" : "Description",
+				"descriptionPlaceholder" : "Description ...",
+				"editTitle" : "Edit a role",
+				"createTitle" :"Add a new role",
+				"edit" : "Edit role information",
+				"access" : "Define a new access level"
+			},
+			"create" : "Create a role",
+			"deleteRole" : "Delete role",
+			"theRole": "The role",
+			"deleted": "will be permanently deleted.",
+			"delete" : {
+				"warning" : "Warning: this action is irreversible"
+			}
 		}
 	},
 	"history": {

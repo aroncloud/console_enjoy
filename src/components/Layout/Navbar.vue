@@ -27,7 +27,7 @@
     <button
         type="button"
         @click="toggleTheme"
-        class="relative inline-flex h-8 w-16 items-center rounded-full border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 px-1 transition-colors cursor-pointer"
+        class="hidden md:flex relative h-8 w-16 items-center rounded-full border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 px-1 transition-colors cursor-pointer"
         :aria-label="t('common.toggleTheme')"
       >
         <span

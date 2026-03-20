@@ -4,13 +4,10 @@ import { useI18n } from 'vue-i18n'
 import {
   Search,
   CheckCircle,
-  Calendar,
   Mail,
   MailCheck,
   Eye,
-  Building2,
-  Phone,
-  Globe,
+  Plus,
   BedDouble,
   ArrowRight,
   UserCheck,
@@ -44,7 +41,6 @@ const meta  = ref<any>(null)
 
 // --- ÉTATS DES MODALES ---
 const showWorkflowModal = ref(false);
-const showDetailModal = ref(false);
 const currentDemo = ref<Demo | null>(null);
 const currentStep = ref<
   "qualify" | "schedule" | "complete" | "negotiate" | "lost" | "convert" | null
@@ -160,6 +156,10 @@ const fetchDemos = async (p = 1) => {
   } finally {
     loading.value = false
   }
+};
+
+const handleDetail = (row: any) => {
+  router.push({ name: 'demo-detail', params: { id: row.id } })
 }
 
 const fetchAllDemos = async () => {
@@ -177,9 +177,9 @@ const fetchAllDemos = async () => {
 // Chargement des utilisateurs (commerciaux)
 const fetchUsers = async () => {
   try {
-    const res = await userService.getAll({ page: 1, limit: 1000 });
+    const res = await userService.getCommercial();
     console.log("res", res);
-    users.value = res.data.map((u: any) => ({
+    users.value = res.map((u: any) => ({
       label:
         u.fullname ||
         `${u.firstName || ""} ${u.lastName || ""}`.trim() ||
@@ -204,15 +204,7 @@ watch([searchQuery, filterStatus], () => {
 });
 watch(page, (p) => fetchDemos(p));
 
-const formatDate = (iso: string) =>
-  iso
-    ? new Date(iso).toLocaleDateString("fr-FR", {
-        day: "2-digit",
-        month: "short",
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    : "—";
+
 
 // --- GESTION DU WORKFLOW ---
 const openModal = (demo: any, step: StepType) => {
@@ -329,10 +321,47 @@ const handleResendEmail = async (row: any) => {
   }
 };
 
-const handleDetail =(row:any) =>{
-  currentDemo.value = row;
-  showDetailModal.value = true;
+
+const showAddModal = ref(false)
+const addSaving = ref(false)
+
+const addForm = reactive({
+  contactName: '',
+  companyName: '',
+  email: '',
+  phoneNumber: '',
+  country: '',
+  numberOfRooms: 1,
+  propertyType: '',
+  preferredLanguage: '',
+  leadSource: '',
+  notesMessage: '',
+  competition: '',
+  acceptCondition: false,
+})
+
+const handleAddDemo = async () => {
+  addSaving.value = true
+  try {
+    await demoService.create(addForm)
+    toastStore.show({ message: t('demos.toast.addSuccess'), type: 'success' })
+    showAddModal.value = false
+    Object.assign(addForm, {
+      contactName: '', companyName: '', email: '',
+      phoneNumber: '', country: '', numberOfRooms: 0,
+      propertyType: '', preferredLanguage: '', leadSource: '',
+      notesMessage: '', competition: '', acceptCondition: false,
+    })
+    fetchDemos(1)
+    fetchAllDemos()
+  } catch (e: any) {
+    toastStore.show({ message: e.message || t('demos.toast.errorCreated'), type: 'error' })
+  } finally {
+    addSaving.value = false
+  }
 }
+
+
 </script>
 
 <template>
@@ -342,16 +371,25 @@ const handleDetail =(row:any) =>{
       class="flex flex-col md:flex-row md:items-center justify-between gap-4"
     >
       <div>
-        <h1
-          class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2"
-        >
-          <MonitorPlay :size="20" class="text-slate-700 dark:text-slate-200" />
-          {{ $t('nav.demos') }}
-        </h1>
-        <p class="text-slate-500 text-sm mt-1">
-          {{ $t('demos.subtitle') }}
-        </p>
-      </div>
+    <h1
+      class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2"
+    >
+      <MonitorPlay :size="20" class="text-slate-700 dark:text-slate-200" />
+      {{ $t('nav.demos') }}
+    </h1>
+    <p class="text-slate-500 text-sm mt-1">
+      {{ $t('demos.subtitle') }}
+    </p>
+
+      <ButtonComponent
+        variant="primary"
+        :iconLeft="Plus"
+        class="mt-3"
+        @click="showAddModal = true"
+      >
+        {{ $t('demos.actions.add') }}
+      </ButtonComponent>
+    </div>
       <div class="flex gap-3">
         <div
           class="bg-white dark:bg-slate-900 px-5 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 text-center"
@@ -392,6 +430,7 @@ const handleDetail =(row:any) =>{
         <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">{{ t('demos.kpis.convertedClients') }}</p>
         <p class="text-2xl font-black mt-1 text-slate-900 dark:text-white">{{ countConverted }}</p>
       </div>
+      
     </div>
 
     <!-- Filtres -->
@@ -551,7 +590,7 @@ const handleDetail =(row:any) =>{
               v-model.number="workflowForm.numberOfRooms"
               type="number"
               :lb="$t('demos.fields.numberOfRooms')"
-              placeholder="Ex: 24"
+              :is-required="true"
             />
             <Input
               v-model="workflowForm.propertyType"
@@ -680,90 +719,81 @@ const handleDetail =(row:any) =>{
         </div>
       </template>
     </BaseModal>
-    
 
-    <!-- ── Modal détail ── -->
-    <BaseModal v-model="showDetailModal">
-      <div v-if="currentDemo" class="space-y-6">
-        <div
-          class="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-4"
-        >
+    <BaseModal v-model="showAddModal" customClass="max-w-lg">
+      <template #header>
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg text-blue-600">
+            <Plus :size="20" />
+          </div>
           <div>
-            <h2 class="text-2xl font-black text-slate-900 dark:text-white">
-              {{ currentDemo.contactName }}
-            </h2>
-            <p class="text-slate-500 font-medium">
-              {{ currentDemo.companyName }}
-            </p>
-          </div>
-          <span
-            :class="[
-              'px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest',
-              statusConfig[currentDemo.status]?.classes ,
-            ]"
-          >
-            {{ statusConfig[currentDemo.status].label }}
-          </span>
-        </div>
-
-        <!-- Infos principales -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-          <div class="flex items-start gap-2">
-            <Building2 :size="14" class="text-slate-400 mt-0.5 shrink-0" />
-            <div>
-              <p class="text-xs text-slate-400">{{ t('demos.fields.companyName') }}</p>
-              <p class="font-medium text-slate-800 dark:text-slate-100">{{ detailDemo.companyName }}</p>
-            </div>
-          </div>
-          <div class="flex items-start gap-2">
-            <Globe :size="14" class="text-slate-400 mt-0.5 shrink-0" />
-            <div>
-              <p class="text-xs text-slate-400">{{ t('hotelForm.fields.country') }}</p>
-              <p class="font-medium text-slate-800 dark:text-slate-100">{{ detailDemo.country ?? '—' }}</p>
-            </div>
-          </div>
-          <div class="space-y-4">
-            <div class="flex items-center gap-3 text-sm">
-              <BedDouble :size="16" class="text-slate-400" />
-              <span>{{ currentDemo.numberOfRooms }} {{ $t('demos.table.rooms') }}</span>
-            </div>
-            <div class="flex items-center gap-3 text-sm">
-              <Building2 :size="16" class="text-slate-400" />
-              <span>{{ currentDemo.propertyType || $t('demos.fields.typeNotSpecified') }}</span>
-            </div>
-            <div class="flex items-center gap-3 text-sm">
-              <Calendar :size="16" class="text-slate-400" />
-              <span>Reçu le {{ formatDate(currentDemo.createdAt) }}</span>
-            </div>
+            <h3 class="font-black text-slate-900 dark:text-white">
+              {{ $t('demos.add.title') }}
+            </h3>
+            <p class="text-xs text-slate-400">{{ $t('demos.add.subtitle') }}</p>
           </div>
         </div>
+      </template>
 
-        <div
-          v-if="currentDemo.notesMessage"
-          class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700"
-        >
-          <h5
-            class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-2"
-          >
+      <div class="space-y-4 py-2">
+        <div class="grid grid-cols-2 gap-4">
+          <Input v-model="addForm.contactName" :lb="$t('demos.fields.contactName')" :placeholder="$t('demos.placeholders.contactName')" isRequired />
+          <Input v-model="addForm.companyName" :lb="$t('demos.fields.companyName')" :placeholder="$t('demos.placeholders.companyName')" isRequired />
+          <Input v-model="addForm.email" :lb="$t('demos.fields.email')" type="email" placeholder="info@gmail.com" isRequired />
+          <Input v-model="addForm.phoneNumber" :lb="$t('demos.fields.phoneNumber')" placeholder="698574123"/>
+          <Input v-model="addForm.country" :lb="$t('demos.fields.country')" :placeholder="$t('demos.placeholders.country')" />
+          <Input
+            v-model.number="addForm.numberOfRooms"
+            type="number"
+            :lb="$t('demos.fields.numberOfRooms')"
+            placeholder="Ex: 24"
+          />
+          <Input
+            v-model="addForm.propertyType"
+            :lb="$t('demos.fields.propertyType')"
+            :placeholder="$t('demos.placeholders.propertyType')"
+            class="col-span-2"
+          />
+          <!-- <Input v-model="addForm.leadSource" :lb="$t('demos.fields.leadSource')" class="col-span-2" /> -->
+        </div>
+        <!-- <div>
+          <label class="block text-sm font-bold mb-1.5 text-slate-700 dark:text-slate-300">
             {{ $t('demos.fields.notes') }}
-          </h5>
-          <p
-            class="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-line leading-relaxed"
-          >
-            {{ currentDemo.notesMessage }}
-          </p>
-        </div>
+          </label>
+          <textarea
+            v-model="addForm.notesMessage"
+            rows="3"
+            class="w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 p-3 text-sm focus:ring-1 focus:ring-purple-400 outline-none"
+            :placeholder="$t('demos.placeholders.notes')"
+          ></textarea>
+        </div> -->
       </div>
 
       <template #footer>
-        <ButtonComponent variant="outline" @click="showDetailModal = false">{{ t('common.close') }}</ButtonComponent>
+        <div class="flex gap-3 w-full">
+          <ButtonComponent
+            variant="outline"
+            class="flex-1"
+            :disabled="addSaving"
+            @click="showAddModal = false"
+          >
+            {{ $t('common.cancel') }}
+          </ButtonComponent>
+          <ButtonComponent
+            variant="primary"
+            class="flex-[2]"
+            :loading="addSaving"
+            @click="handleAddDemo"
+          >
+            {{ $t('demos.add.btn') }}
+          </ButtonComponent>
+        </div>
       </template>
     </BaseModal>
+      
+      </div>
+    </template>
 
- 
-
-  </div>
-</template>
 <style scoped>
 
 </style>

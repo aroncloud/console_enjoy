@@ -1,5 +1,6 @@
 import api from './api'
 import { useAuthStore } from '../composables/useAuth'
+import { usePermissionsStore } from '../composables/usePermission';
 import router from '../router';
 
 // ── Connexion
@@ -34,7 +35,7 @@ export function resendEmailVerification(email: string) {
 // ── Réinitialisation du mot de passe 
 
 export function requestPasswordReset(payload: { email: string; hotelId?: number | string }) {
-  return api.post('/auth/forgot-password', payload)
+  return api.post('/auth/forgot-password-console', payload)
 }
 
 
@@ -44,6 +45,7 @@ export async function logout(): Promise<void> {
   const currentToken = authStore.token
 
   authStore.logout()
+  usePermissionsStore().reset()
   localStorage.removeItem('token')
 
   if (currentToken) {

@@ -42,17 +42,17 @@ export interface CreateHotelPayload {
 
 export const hotelService = {
   getAll: () =>
-    api.get<any>('/hotels').then(r => r.data),
+    api.get<any>('/console/hotels').then(r => r.data),
 
   getById: (id: number) =>
-    api.get<any>(`/hotels/${id}`).then(r => r.data),
+    api.get<any>(`/console/hotels/${id}`).then(r => r.data),
 
    create: (payload: CreateHotelPayload) =>
-    api.post<Hotel>('/hotels', payload).then(r => r.data),
+    api.post<Hotel>('/console/hotels', payload).then(r => r.data),
 
   update: (id: number, payload: Partial<Hotel>) =>
-    api.put<Hotel>(`/hotels/${id}`, payload).then(r => r.data),
+    api.put<Hotel>(`/console/hotels/${id}`, payload).then(r => r.data),
 
   delete: (id: number) =>
-    api.delete(`/hotels/${id}`).then(r => r.data),
+    api.delete(`/console/hotels/${id}`).then(r => r.data),
 }

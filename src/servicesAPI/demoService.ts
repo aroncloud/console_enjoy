@@ -89,6 +89,10 @@ export const demoService = {
   resendEmail: (id: number): Promise<Demo> =>
     api.post(`/console/demo-requests/${id}/resend-email`).then(r => r.data),
 
-  getAllUnpaginated: (params?: Omit<GetAllParams, 'page' | 'limit'>): Promise<{ data: Demo[]; meta: { total: number; all: true } }> =>
-    api.get('/request-demos', { params: { ...params, all: true } }).then(r => r.data),
+  getById: (id: number) => api.get(`/console/demo-requests/${id}`).then(r => r.data),
+
+  create : (payload: UpdateDemoPayload): Promise<Demo> =>
+    api.post('/console/demo-requests', payload).then(r => r.data),
+
+
 }

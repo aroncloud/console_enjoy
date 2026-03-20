@@ -24,7 +24,7 @@ const searchQuery = ref('')
 const filterActive = ref<'all' | 'active' | 'inactive'>('all')
 
 const page = ref(1)
-const limit = ref(20)
+const limit = ref(10)
 const meta = ref<any>(null)
 
 const columns = computed<Column[]>(() => [

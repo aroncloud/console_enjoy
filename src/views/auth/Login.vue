@@ -333,6 +333,8 @@ import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '../../composables/useAuth'
 import { useThemeStore } from '../../composables/theme'
 import { auth, resendEmailVerification, requestPasswordReset } from '../../servicesAPI/auth'
+import { usePermissionsStore } from '../../composables/usePermission'
+import { getFirstAccessiblePath } from '../../router'
 import api from '../../servicesAPI/api'
 const router = useRouter()
 const authStore = useAuthStore()
@@ -426,7 +428,7 @@ onMounted(() => {
 
 const selectAccount = (acc: RememberedAccount) => { selectedAccount.value = acc; email.value = acc.email; accountPickerMode.value = false }
 const useAnotherAccount = () => { selectedAccount.value = null; accountPickerMode.value = false; email.value = '' }
-
+  const permissionsStore = usePermissionsStore()
 const handleSubmit = async () => {
   error.value = null
   loginAttempts.value++
@@ -446,10 +448,13 @@ const handleSubmit = async () => {
 
     localStorage.setItem('token', token)
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`
-
+    console.log('res',res)
     authStore.login(user, token)
     authStore.setRoleId(user.roleId)
     authStore.setUserId(user.id ?? user.UserId)
+    // Init les permissions depuis le rôle retourné
+
+    permissionsStore.init(user.role)
 
     if (keepLoggedIn.value) {
       const entry: RememberedAccount = { id: user.id, name: user.name || user.fullName || user.username || user.email, email: user.email || email.value }
@@ -459,7 +464,8 @@ const handleSubmit = async () => {
     }
 
     loginAttempts.value = 0
-    router.push({ path: '/' })
+    const firstPath = getFirstAccessiblePath(permissionsStore)
+    router.push({ path: firstPath })
 
   } catch (err: any) {
     console.log(' Erreur status:', err.response?.status, '| data:', err.response?.data)

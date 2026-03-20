@@ -36,10 +36,12 @@
 		"restore": "Restaurer",
 		"suspend": "Suspendre",
 		"actions": "Actions",
+		"delete" : "Suppression",
 		"errors": {
 			"save": "Erreur lors de la sauvegarde",
 			"delete": "Erreur lors de la suppression"
-		}
+		},
+		"update" : "Mise à jour"
 	},
 	"table": {
 		"searchPlaceholder": "Rechercher…",
@@ -90,7 +92,8 @@
 		"actions": {
 			"resendEmail": "Renvoyer email",
 			"emailSent": "Email envoyé",
-			"saveChanges": "Enregistrer les modifications"
+			"saveChanges": "Enregistrer les modifications",
+			 "add": "Ajouter un demo"
 		},
 		"edit": {
 			"title": "Modifier la demande"
@@ -145,7 +148,9 @@
 			"emailResent": "Email de confirmation renvoyé !",
 			"emailResendError": "Erreur lors de l'envoi",
 			"success": "Étape mise à jour avec succès",
-        	"error": "Erreur de mise à jour"
+        	"error": "Erreur de mise à jour",
+			"addSuccess": "Demo créé avec succès",
+			"errorCreated": "Erreur lors de la création de la démo"
 		},
 		"text" : {
 			"converted" : "Le contrat est-il prêt ? Cette action changera le statut du prospect en",
@@ -183,7 +188,39 @@
 				"lostReasonRequired": "Veuillez indiquer la raison de la perte"
 			},
 			"lostPrefix": "RAISON PERTE: "
-    	}
+    	},
+		"add": {
+				"title": "Nouveau demo",
+				"subtitle": "Remplissez les informations du prospect",
+				"btn": "Créer le demo"
+		},
+		"history": {
+			"actions": {
+				"create":      "Demande de démo créée",
+				"update":      "Démo mise à jour",
+				"assign":      "Commercial assigné",
+				"resendEmail": "Email renvoyé",
+				"convert":     "Converti en client",
+				"lost":        "Marqué comme perdu",
+				"schedule":    "Démo planifiée",
+				"complete":    "Démo complétée",
+				"delete":      "Demande supprimée",
+				 "add": "Ajouter un demo"
+			},
+			
+			"fields": {
+			"status":       "Statut",
+			"ownerAssigned":"Commercial assigné",
+			"followUpDate": "Date de démo",
+			"competition":  "Concurrence",
+			"notes":        "Notes"
+			},
+			"lead" : "Commercial",
+			"assign" : "Commercial assigné",
+			"planified" : "Démo planifiée",
+			"title" : "Historique des actions",
+			"noActivity" : " Aucune activité enregistrée"
+		}
 		
 	},
 	"billing": {
@@ -735,7 +772,9 @@
 			"online": "En ligne",
 			"activeTenants": "Tenants actifs",
 			"suspended": "Suspendus",
-			"revokedAccess": "Accès révoqués"
+			"revokedAccess": "Accès révoqués",
+			"totalRoles" : "Nombre total de rôles",
+			"totalPermissions" : "Nombre total d'autorisations"
 		},
 		"tenants": {
 			"title": "Statut des tenants"
@@ -764,7 +803,49 @@
 		"toast": {
 			"suspended": "Produit suspendu avec succès",
 			"restored": "Produit restauré avec succès",
-			"updateError": "Erreur lors de la mise à jour"
+			"updateError": "Erreur lors de la mise à jour",
+			"created" : "Rôle créé avec succès !",
+			"updated" : "Rôle mis à jour avec succès !",
+			"deleted" : "Rôle supprimé avec succès !",
+			"deleteError": "Erreur lors de la suppression",
+			"permissionsSaved" : "Permissions enregistrées avec succès !",
+			"permissionsError" : "Erreur lors de l'enregistrement"
+		},
+		"title" : "Sécurité & Accès",
+		"subTitle" : "Gestion des tenants, rôles et permissions",
+		"status" : "Système opérationnel",
+		"tenant" : "Tenants",
+		"roles" : {
+			"title" : "Rôles & Permissions",
+			"subTitles" : "Rôles",
+			"new" : "Nouveau",
+			"search" : "Recherche ...",
+			"loading" : "Chargement...",
+			"noRoleFound" : "Aucun rôle trouvé",
+			"noDescription" : "No description",
+			"select" : "Sélectionnez un rôle",
+			"selectSubtitle" : "Les permissions apparaîtront ici",
+			"permissionActives" : "Permissions actives",
+			"checkAll" : "Tout cocher",
+			"uncheckALL" : " Tout décocher",
+			"uncheck" : "Décocher",
+			"modal" : {
+				"name" : "Nom du rôle",
+				"namePlaceholder" : "administrateur",
+				"description" : "Description",
+				"descriptionPlaceholder" : "Description ...",
+				"editTitle" : "Modifier un role",
+				"createTitle" :"Ajouter un nouveau role",
+				"edit" : "Modifier les informations du rôle",
+				"access" : "Définir un nouveau niveau d'accès"
+			},
+			"create" : "Créer un rôle",
+			"deleteRole" : "Supprimer le rôle",
+			"theRole" : "Le rôle",
+			"deleted" : "sera supprimé définitivement.",
+			"delete" : {
+				"warning" : "Avertissement : cette action est irréversible"
+			}
 		}
 	},
 	"history": {

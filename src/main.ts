@@ -13,9 +13,12 @@ const app = createApp(App)
 const pinia = createPinia()
 
 pinia.use(piniaPluginPersistedstate)
+
+const savedLang = localStorage.getItem('lang') ?? 'fr'  
+
 const i18n = createI18n({
   legacy: false, 
-  locale: 'fr',
+  locale: savedLang,        
   fallbackLocale: 'en',
   messages: {
     en,

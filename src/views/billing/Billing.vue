@@ -83,7 +83,9 @@
 
       <!-- Table des factures -->
       <div class="lg:col-span-2  dark:border-slate-800  overflow-hidden flex flex-col">
-        <BaseTable :columns="columns" :data="invoiceData" :searchable="true" :sortable="false" :title="t('billing.table.title')" :showSearch="true" :loading="loading" :meta="metaData" @page-change="handlePage">
+        <BaseTable :columns="columns" :data="invoiceData" :searchable="true" :sortable="false" :title="t('billing.table.title')" :showSearch="true" :loading="loading" :meta="metaData" @page-change="handlePage"  @limit-change="handleLimit" 
+        :defaultPageSize=5
+        >
           <template #cell-amount="{ value }">
             <span class="font-bold text-green-500">
               {{ formatCurrency(Number(value) )}}
@@ -92,7 +94,7 @@
 
           <template #cell-status="{ value }">
             <span
-              class="px-2 py-1 text-[10px] font-bold rounded-full uppercase"
+              class="px-2 inline-flex py-1 text-[10px] font-bold rounded-full whitespace-nowrap uppercase"
               :class="{
                 'bg-emerald-100 text-emerald-600': value === 'paid',
                 'bg-purple-100 text-purple-600':   value === 'pending',
@@ -301,6 +303,7 @@ const result = ref('')
 const hasOverage = ref(false)
 const surplusAmount = ref(0)
 const loadingFacture = ref(false)
+const limit = ref(5)
 
 // ── Geste commercial ──────────
 const selectedHotelId = ref<number | null>(null)
@@ -328,12 +331,13 @@ const fetchData = async ( currentPage=1) => {
   try {
     const response  = await invoiceService.get({
       page: currentPage,
+      limit: limit.value,
       search: searchQuery.value,
     })
     invoiceData.value = response.invoices?.data || []
     metaData.value = response.invoices?.meta || []
     statsData.value = response?.stats || null
-    console.log('response',response)
+   console.log('META:', metaData.value)
   } catch(e:any){
     console.error('error',e)
     toastore.show({
@@ -347,6 +351,11 @@ const fetchData = async ( currentPage=1) => {
 
 const handlePage = (newPage:number)=>{
   fetchData(newPage)
+}
+
+const handleLimit = (l: number) => {
+  limit.value = l
+  fetchData(1)
 }
 
 // Stats

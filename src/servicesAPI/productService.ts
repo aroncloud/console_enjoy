@@ -30,8 +30,11 @@ export interface PaginatedResponse<T> {
 }
 
 export const productService = {
-    getAll: (params?: { page?: number; limit?: number; search?: string; isActive?: boolean | '' }) =>
+    getAll: (params?: { page?: number; limit?: number; search?: string; isActive?: boolean | '';all?:any }) =>
     api.get<PaginatedResponse<Product>>('/console/modules', { params }).then(r => r.data),
+
+    getAllProducts: (params?: { all?:any }) =>
+    api.get<Product[]>('/console/modules', { params }).then(r => r.data),
 
     getById: (id: number) =>
     api.get<Product>(`/console/modules/${id}`).then(r => r.data),

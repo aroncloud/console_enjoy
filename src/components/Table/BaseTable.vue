@@ -197,7 +197,7 @@
 
       <!-- Pagination externe -->
       <Pagination
-         v-if="meta && meta.total > meta.perPage"
+         v-if="meta && meta.lastPage > 1"
         :meta="meta"
         @page-change="(page) => emit('page-change', page)"
       />
@@ -252,6 +252,7 @@ const { t } = useI18n()
 
 const emit = defineEmits<{
   (e: 'page-change', page: number): void
+  (e: 'limit-change', limit: number): void 
 }>()
 
 // ── Sort 
@@ -295,6 +296,12 @@ watch([searchQuery, pageSize], () => (currentPage.value = 1))
 const paginatedData = computed(() =>
   filteredData.value.slice((currentPage.value - 1) * pageSize.value, currentPage.value * pageSize.value)
 )
+
+watch(pageSize, (newSize) => {
+  currentPage.value = 1
+  emit('limit-change', newSize)
+  console.log('newsize',newSize)
+})
 </script>
 <style scoped>
 /* Custom thin scrollbar */

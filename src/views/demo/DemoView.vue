@@ -2,10 +2,21 @@
 import { ref, computed, watch, onMounted,reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
-  MonitorPlay, Search, Clock, CheckCircle, 
-   Calendar, Mail, MailCheck, Eye,
-  Building2, Phone, Globe, BedDouble,Edit
-} from 'lucide-vue-next'
+  Search,
+  CheckCircle,
+  Calendar,
+  Mail,
+  MailCheck,
+  Eye,
+  Building2,
+  Phone,
+  Globe,
+  BedDouble,
+  ArrowRight,
+  UserCheck,
+  ChevronRight,
+  MonitorPlay
+} from "lucide-vue-next";
 
 import Input              from '../../components/FormElements/Input.vue'
 import ButtonComponent    from '../../components/Button/ButtonComponent.vue'
@@ -31,44 +42,104 @@ const page  = ref(1)
 const limit = ref(20)
 const meta  = ref<any>(null)
 
-//  Modales 
-const showDetailModal = ref(false)
-const editingDemo     = ref<Demo | null>(null)
-const detailDemo      = ref<Demo | null>(null)
-const showEditModal = ref(false)
+// --- ÉTATS DES MODALES ---
+const showWorkflowModal = ref(false);
+const showDetailModal = ref(false);
+const currentDemo = ref<Demo | null>(null);
+const currentStep = ref<
+  "qualify" | "schedule" | "complete" | "negotiate" | "lost" | "convert" | null
+>(null);
 
+// Formulaire unique pour le workflow
+const workflowForm = reactive({
+  numberOfRooms: 0,
+  propertyType: "",
+  followUpDate: "",
+  ownerId: null as number | null,
+  notesMessage: "",
+  competition: "",
+  status: "New" as DemoStatus,
+  // Champs pour l'édition générale
+  contactName: "",
+  companyName: "",
+  email: "",
+  phoneNumber: "",
+  country: "",
+});
 
-const columns = computed<Column[]>(() => [
-  { key: 'contact',   label: t('demos.table.contact') },
-  { key: 'company',   label: t('demos.table.company') },
-  { key: 'rooms',     label: t('demos.table.rooms'), sortable: false },
-  { key: 'createdAt', label: t('demos.table.date'), sortable: false },
-  { key: 'status',    label: t('demos.table.status'), sortable: false },
-  { key: 'actions',   label: t('common.actions'), sortable: false },
-])
+// --- CONFIGURATION DU WORKFLOW ---
+type StepType =
+  | "qualify"
+  | "schedule"
+  | "complete"
+  | "negotiate"
+  | "lost"
+  | "convert"
+  | undefined;
 
-
-const ALL_STATUSES: DemoStatus[] = [
-  'New', 'Qualified', 'Demo Scheduled', 'Demo Completed',
-  'Trial', 'Negotiation', 'Converted', 'Lost', 'Junk',
-]
-
-const statusConfig = computed<Record<DemoStatus, { label: string; classes: string }>>(() => ({
-  New: { label: t('demos.status.new'), classes: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200' },
-  Qualified: { label: t('demos.status.qualified'), classes: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200' },
-  'Demo Scheduled': { label: t('demos.status.demoScheduled'), classes: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200' },
-  'Demo Completed': { label: t('demos.status.demoCompleted'), classes: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-200' },
-  Trial: { label: t('demos.status.trial'), classes: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-200' },
-  Negotiation: { label: t('demos.status.negotiation'), classes: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-200' },
-  Converted: { label: t('demos.status.converted'), classes: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200' },
-  Lost: { label: t('demos.status.lost'), classes: 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-200' },
-  Junk: { label: t('demos.status.junk'), classes: 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400' },
+const statusConfig = computed<Record<DemoStatus, { label: string; classes: string; nextLabel?: string; nextStep?: StepType }>>(() => ({
+  New: {
+    label: t('demos.status.new'),
+    classes: "bg-blue-100 text-blue-800",
+    nextLabel: t('demos.status.contacted'),
+    nextStep: "qualify",
+  },
+  Qualified: {
+    label: t('demos.status.qualified'),
+    classes: "bg-purple-100 text-purple-800",
+    nextLabel: t('demos.status.demoScheduled'),
+    nextStep: "schedule",
+  },
+  "Demo Scheduled": {
+    label: t('demos.status.demoScheduled'),
+    classes: "bg-amber-100 text-amber-800",
+    nextLabel: t('demos.status.demoCompleted'),
+    nextStep: "complete",
+  },
+  "Demo Completed": {
+    label: t('demos.status.demoCompleted'),
+    classes: "bg-cyan-100 text-cyan-800",
+    nextLabel: t('demos.status.negotiation'),
+    nextStep: "negotiate",
+  },
+  Trial: {
+    label: t('demos.status.inTesting'),
+    classes: "bg-indigo-100 text-indigo-800",
+    nextLabel: t('demos.status.converted'),
+    nextStep: "convert",
+  },
+  Negotiation: {
+    label: t('demos.status.negotiation'),
+    classes: "bg-orange-100 text-orange-800",
+    nextLabel: t('demos.status.converted'),
+    nextStep: "convert",
+  },
+  Converted: { label: t('demos.status.converted'), classes: "bg-emerald-100 text-emerald-800" },
+  Lost: { label: t('demos.status.lost'), classes: "bg-rose-100 text-rose-800" },
+  Junk: { label: t('demos.status.junk'), classes: "bg-slate-100 text-slate-500" },
 }))
 
-const getStatus = (s: string) =>
-  statusConfig.value[s as DemoStatus] ?? { label: s, classes: 'bg-slate-100 text-slate-500' }
+const workflowConfig = computed(() => {
+  const map = {
+    qualify:  { title: t('demos.workflow.qualify.title'),  btn: t('demos.workflow.qualify.btn'),  color: 'primary' },
+    schedule: { title: t('demos.workflow.schedule.title'), btn: t('demos.workflow.schedule.btn'), color: 'primary' },
+    complete: { title: t('demos.workflow.complete.title'), btn: t('demos.workflow.complete.btn'), color: 'primary' },
+    negotiate:{ title: t('demos.workflow.negotiate.title'),btn: t('demos.workflow.negotiate.btn'),color: 'primary' },
+    convert:  { title: t('demos.workflow.convert.title'), btn: t('demos.workflow.convert.btn'),  color: 'success' },
+    lost:     { title: t('demos.workflow.lost.title'),    btn: t('demos.workflow.lost.btn'),     color: 'danger'  },
+  }
+  return currentStep.value ? map[currentStep.value] : map.qualify
+})
 
+const columns = computed<Column[]>(() => [
+  { key: 'contact', label: t('demos.table.contact') },
+  { key: 'company', label: t('demos.table.company') },
+  { key: 'status',  label: t('demos.table.currentStatus') },
+  { key: 'next',    label: t('demos.table.nextAction') },
+  { key: 'actions', label: t('common.actions'), sortable: false },
+])
 
+// --- LOGIQUE API ---
 const fetchDemos = async (p = 1) => {
   loading.value = true
   try {
@@ -76,18 +147,16 @@ const fetchDemos = async (p = 1) => {
       page:   p,
       limit:  limit.value,
       search: searchQuery.value || undefined,
-      status: filterStatus.value === 'all' ? undefined : filterStatus.value,
-    })
-    demos.value = res.data
-    meta.value = {
-      total:      res.meta.total,
-      page:       res.meta.currentPage,
-      limit:      res.meta.perPage,
-      totalPages: res.meta.lastPage,
-    }
+      status: filterStatus.value === "all" ? undefined : filterStatus.value,
+    });
+    console.log('meta:', res.meta)
+    demos.value = res.data;
+    meta.value = res.meta
   } catch (e) {
-    console.error(e)
-    toastStore.show({ message: t('demos.toast.loadError'), type: 'error' })
+    toastStore.show({
+      type: "error",
+      message: t('demos.toast.loadError'),
+    });
   } finally {
     loading.value = false
   }
@@ -101,11 +170,27 @@ const fetchAllDemos = async () => {
     })
     allDemos.value = res.data
   } catch (e) {
-    console.error(e)
-  } finally {
-    loading.value = false
+    console.error(e);
   }
-}
+};
+
+// Chargement des utilisateurs (commerciaux)
+const fetchUsers = async () => {
+  try {
+    const res = await userService.getAll({ page: 1, limit: 1000 });
+    console.log("res", res);
+    users.value = res.data.map((u: any) => ({
+      label:
+        u.fullname ||
+        `${u.firstName || ""} ${u.lastName || ""}`.trim() ||
+        u.email ||
+        "Sans nom",
+      value: u.id,
+    }));
+  } catch (e) {
+    console.error(e);
+  }
+};
 
 onMounted(() => {
     fetchDemos(1)
@@ -113,198 +198,229 @@ onMounted(() => {
 
 })
 
-watch([searchQuery, filterStatus], () => { page.value = 1; fetchDemos(1) })
-watch(page, (p) => fetchDemos(p))
+watch([searchQuery, filterStatus], () => {
+  page.value = 1;
+  fetchDemos(1);
+});
+watch(page, (p) => fetchDemos(p));
 
-const handlePageChange = (newPage: number) => { page.value = newPage }
+const formatDate = (iso: string) =>
+  iso
+    ? new Date(iso).toLocaleDateString("fr-FR", {
+        day: "2-digit",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "—";
 
-const countNew       = computed(() => allDemos.value.filter(d => d.status === 'New').length)
-const countConverted = computed(() => allDemos.value.filter(d => d.status === 'Converted').length)
+// --- GESTION DU WORKFLOW ---
+const openModal = (demo: any, step: StepType) => {
+  currentDemo.value = demo;
+  currentStep.value = step || null;
+  workflowForm.status = "Qualified";
+  workflowForm.contactName = demo.contactName;
+  workflowForm.companyName = demo.companyName;
+  workflowForm.email = demo.email;
+  workflowForm.phoneNumber = demo.phoneNumber || "";
+  workflowForm.country = demo.country || "";
+  workflowForm.numberOfRooms = demo.numberOfRooms || 0;
+  workflowForm.propertyType = demo.propertyType || "";
+  workflowForm.followUpDate = demo.followUpDate
+    ? demo.followUpDate.substring(0, 16)
+    : "";
+  workflowForm.ownerId = demo.ownerId;
+  workflowForm.notesMessage = "";
+  workflowForm.competition = demo.competition || "";
+  showWorkflowModal.value = true;
+};
 
-//  Détail 
-const openDetail = (row: any) => {
-  detailDemo.value    = row
-  showDetailModal.value = true
-}
-
-//  Update demo
-
-const editForm = reactive({
-  contactName: '',
-  companyName: '',
-  email: '',
-  phoneNumber: '',
-  country: '',
-  numberOfRooms: 0,
-  propertyType: '',
-  preferredLanguage: '',
-  leadSource: '',
-  notesMessage: '',
-  competition: '',
-  status: 'New' as DemoStatus,
-  followUpDate: '',
-  ownerId: null as number | null,
-  acceptCondition:   false,
-  emailSend:  false,
-})
-
-const editFormErrors = reactive({
-  contactName: '',
-  companyName: '',
-  email:       '',
-})
-
-const openEditModal = (row: any) => {
-    console.log('row',row)
-  editingDemo.value          = row
-  editForm.contactName       = row.contactName
-  editForm.companyName       = row.companyName
-  editForm.email             = row.email
-  editForm.phoneNumber       = row.phoneNumber       ?? ''
-  editForm.country           = row.country           ?? ''
-  editForm.numberOfRooms     = row.numberOfRooms     ?? 0
-  editForm.propertyType      = row.propertyType      ?? ''
-  editForm.preferredLanguage = row.preferredLanguage ?? ''
-  editForm.leadSource        = row.leadSource        ?? ''
-  editForm.notesMessage      = row.notesMessage      ?? ''
-  editForm.competition       = row.competition       ?? ''
-  editForm.status            = row.status
-  editForm.followUpDate      = row.followUpDate      ?? ''
-  editForm.ownerId           = row.ownerId           ?? null
-  editForm.acceptCondition   = row.acceptCondition
-  editForm.emailSend         = row.emailSend
-  editFormErrors.contactName = ''
-  editFormErrors.companyName = ''
-  editFormErrors.email       = ''
-  showEditModal.value = true
-}
-
-const validateEditForm = () => {
-  editFormErrors.contactName = editForm.contactName.trim() ? '' : t('demos.validation.contactNameRequired')
-  editFormErrors.companyName = editForm.companyName.trim() ? '' : t('demos.validation.companyNameRequired')
-  editFormErrors.email       = editForm.email.trim()       ? '' : t('demos.validation.emailRequired')
-  return !editFormErrors.contactName && !editFormErrors.companyName && !editFormErrors.email
-}
-
-const handleUpdate = async () => {
-  if (!validateEditForm() || !editingDemo.value) return
+const handleSubmit = async () => {
+  if (!currentDemo.value || !currentStep.value) return
   saving.value = true
+  let payload: Partial<UpdateDemoPayload> = {}
+
   try {
-    const payload: UpdateDemoPayload = {
-      contactName:       editForm.contactName.trim(),
-      companyName:       editForm.companyName.trim(),
-      email:             editForm.email.trim(),
-      phoneNumber:       editForm.phoneNumber.trim()       || null,
-      country:           editForm.country.trim()           || null,
-      numberOfRooms:     editForm.numberOfRooms            || null,
-      propertyType:      editForm.propertyType.trim()      || null,
-      preferredLanguage: editForm.preferredLanguage.trim() || null,
-      leadSource:        editForm.leadSource.trim()        || null,
-      notesMessage:      editForm.notesMessage.trim()      || null,
-      competition:       editForm.competition.trim()       || null,
-      status:            editForm.status,
-      followUpDate:      editForm.followUpDate             || null,
-      ownerId:           editForm.ownerId,
-      acceptCondition:   editForm.acceptCondition,
-      emailSend:         editForm.emailSend,
+    if (currentStep.value === 'qualify') {
+      payload = {
+        status: workflowForm.status === 'Lost' ? 'Lost' : 'Qualified',
+        contactName: workflowForm.contactName,
+        companyName: workflowForm.companyName,
+        email: workflowForm.email,
+        phoneNumber: workflowForm.phoneNumber,
+        country: workflowForm.country,
+        numberOfRooms: workflowForm.numberOfRooms,
+        propertyType: workflowForm.propertyType,
+        ...(workflowForm.status === 'Lost' && workflowForm.notesMessage
+          ? { notesMessage: `${t('demos.workflow.lostPrefix')}${workflowForm.notesMessage}` }
+          : {}),
+      }
+    } else if (currentStep.value === 'schedule') {
+      if (!workflowForm.followUpDate)
+        throw new Error(t('demos.workflow.errors.dateRequired'))
+      if (!workflowForm.ownerId)
+        throw new Error(t('demos.workflow.errors.ownerRequired'))
+      payload = {
+        status: 'Demo Scheduled',
+        followUpDate: workflowForm.followUpDate,
+        ownerId: workflowForm.ownerId,
+      }
+    } else if (currentStep.value === 'complete') {
+      if (!workflowForm.notesMessage)
+        throw new Error(t('demos.workflow.errors.demoNotesRequired'))
+      payload = {
+        status: 'Demo Completed',
+        notesMessage: workflowForm.notesMessage,
+        competition: workflowForm.competition,
+      }
+    } else if (currentStep.value === 'negotiate') {
+      payload = { status: 'Negotiation' }
+    } else if (currentStep.value === 'convert') {
+      showWorkflowModal.value = false
+      router.push({
+        path: '/clients',
+        state: {
+          openHotelForm: true,
+          demoId: currentDemo.value.id,
+          prefill: {
+            companyName: currentDemo.value.companyName,
+            email: currentDemo.value.email,
+            phoneNumber: currentDemo.value.phoneNumber,
+            country: currentDemo.value.country,
+            numberOfRooms: currentDemo.value.numberOfRooms,
+            contactName: currentDemo.value.contactName,
+          },
+        },
+      })
+      return
+    } else if (currentStep.value === 'lost') {
+      if (!workflowForm.notesMessage)
+        throw new Error(t('demos.workflow.errors.lostReasonRequired'))
+      payload = {
+        status: 'Lost',
+        notesMessage: `${t('demos.workflow.lostPrefix')}${workflowForm.notesMessage}`,
+      }
     }
-    await demoService.update(editingDemo.value.id, payload)
-    toastStore.show({ message: t('demos.toast.updated'), type: 'success' })
-    showEditModal.value = false
-    editingDemo.value   = null
-    await fetchDemos(page.value)
-  } catch (e) {
-    console.error(e)
-    toastStore.show({ message: t('common.errors.save'), type: 'error' })
+
+    await demoService.update(currentDemo.value.id, payload)
+    toastStore.show({ message: t('demos.toast.success'), type: 'success' })
+    showWorkflowModal.value = false
+    fetchDemos(page.value)
+    fetchAllDemos()
+  } catch (e: any) {
+    toastStore.show({ message: e.message || t('demos.toast.error'), type: 'error' })
   } finally {
     saving.value = false
   }
 }
 
 
-
 //  Renvoi email 
 const handleResendEmail = async (row: any) => {
   try {
-    await demoService.resendEmail(row.id)
-    toastStore.show({ message: t('demos.toast.emailResent'), type: 'success' })
-    await fetchDemos(page.value)
+    await demoService.resendEmail(id);
+    toastStore.show({ message: t('demos.toast.emailResent'), type: "success" });
+    fetchDemos(page.value);
   } catch (e) {
-    toastStore.show({ message: t('demos.toast.emailResendError'), type: 'error' })
+    toastStore.show({
+      message: t('demos.toast.emailResendError'),
+      type: "error",
+    });
   }
-}
+};
 
-
-
-const statusOptions = computed(() => [
-  { label: t('demos.filters.allStatuses'), value: 'all' },
-  ...ALL_STATUSES.map(s => ({ label: statusConfig.value[s].label, value: s }))
-])
-
-const formatDate = (iso: string) => {
-  const loc = locale.value === 'fr' ? 'fr-FR' : 'en-US'
-  return new Date(iso).toLocaleDateString(loc, { day: '2-digit', month: 'short', year: 'numeric' })
+const handleDetail =(row:any) =>{
+  currentDemo.value = row;
+  showDetailModal.value = true;
 }
 </script>
 
 <template>
-  <div class="p-4 md:p-8 bg-slate-50 dark:bg-slate-950 min-h-screen space-y-6">
-
-    <!-- Header -->
-    <div>
-      <h1 class="text-2xl font-bold text-slate-900 dark:text-white">{{ t('demos.title') }}</h1>
-      <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">
-        {{ t('demos.subtitle') }}
-      </p>
-    </div>
-
-    <!-- KPIs -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
-        <div class="flex items-center justify-between mb-2">
-          <div class="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg">
-            <MonitorPlay :size="18" class="text-slate-600 dark:text-slate-300" />
-          </div>
-          <span class="text-[10px] font-bold text-slate-500 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-full">{{ t('common.total') }}</span>
-        </div>
-        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">{{ t('demos.kpis.received') }}</p>
-        <p class="text-2xl font-black mt-1 text-slate-900 dark:text-white">{{ allDemos.length ?? 0 }}</p>
+  <div class="p-4 md:p-8 bg-slate-50 dark:bg-slate-950 space-y-6">
+    <!-- Header & KPIs -->
+    <div
+      class="flex flex-col md:flex-row md:items-center justify-between gap-4"
+    >
+      <div>
+        <h1
+          class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2"
+        >
+          <MonitorPlay :size="20" class="text-slate-700 dark:text-slate-200" />
+          {{ $t('nav.demos') }}
+        </h1>
+        <p class="text-slate-500 text-sm mt-1">
+          {{ $t('demos.subtitle') }}
+        </p>
       </div>
-
-      <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
-        <div class="flex items-center justify-between mb-2">
-          <div class="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-            <Clock :size="18" class="text-blue-600 dark:text-blue-400" />
-          </div>
-          <span class="text-[10px] font-bold text-blue-600 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 px-2 py-1 rounded-full">{{ t('demos.kpis.new') }}</span>
+      <div class="flex gap-3">
+        <div
+          class="bg-white dark:bg-slate-900 px-5 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 text-center"
+        >
+          <p
+            class="text-[10px] uppercase font-bold text-slate-400 tracking-widest"
+          >
+            {{ $t('demos.kpis.received') }}
+          </p>
+          <p class="text-2xl font-black text-slate-900 dark:text-white">
+            {{ allDemos.length }}
+          </p>
         </div>
-        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">{{ t('demos.kpis.toProcess') }}</p>
-        <p class="text-2xl font-black mt-1 text-slate-900 dark:text-white">{{ countNew }}</p>
-      </div>
-
-      <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
-        <div class="flex items-center justify-between mb-2">
-          <div class="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
-            <CheckCircle :size="18" class="text-emerald-600 dark:text-emerald-400" />
-          </div>
-          <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/30 px-2 py-1 rounded-full">{{ t('demos.kpis.converted') }}</span>
+        <div
+          class="bg-white dark:bg-slate-900 px-5 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 text-center"
+        >
+          <p
+            class="text-[10px] uppercase font-bold text-blue-500 tracking-widest"
+          >
+            {{ $t('demos.kpis.new') }}
+          </p>
+          <p class="text-2xl font-black text-blue-600">
+            {{ allDemos.filter((d) => d.status === "New").length }}
+          </p>
+        </div>
+        <div
+          class="bg-white dark:bg-slate-900 px-5 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 text-center"
+        >
+          <p
+            class="text-[10px] uppercase font-bold text-emerald-500 tracking-widest"
+          >
+             {{ $t('demos.kpis.converted') }}
+          </p>
+          <p class="text-2xl font-black text-emerald-600">
+            {{ allDemos.filter((d) => d.status === "Converted").length }}
+          </p>
         </div>
         <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">{{ t('demos.kpis.convertedClients') }}</p>
         <p class="text-2xl font-black mt-1 text-slate-900 dark:text-white">{{ countConverted }}</p>
       </div>
     </div>
 
-    <!-- Filtres + Recherche -->
-    <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-  <div class="flex-1 relative">
-    <Search :size="15" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 z-10" />
-    <Input v-model="searchQuery" :placeholder="t('demos.searchPlaceholder')" customClass="pl-9 w-full" />
-  </div>
-
-  <div class="w-full sm:w-52 shrink-0">
-    <Select v-model="filterStatus" :options="statusOptions" />
-  </div>
-</div>
+    <!-- Filtres -->
+    <div
+      class="flex flex-col sm:flex-row gap-3 bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800"
+    >
+      <div class="flex-1 relative">
+        <Search
+          :size="16"
+          class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+        />
+        <Input
+          v-model="searchQuery"
+          :placeholder="$t('demos.placeholders.search')"
+          customClass="pl-10 w-full !bg-slate-50 dark:!bg-slate-950"
+        />
+      </div>
+      <Select
+        v-model="filterStatus"
+        :options="[
+          { label: t('demos.filters.allStatuses'), value: 'all' },
+          ...Object.keys(statusConfig).map((k) => ({
+            label: statusConfig[k as DemoStatus].label,
+            value: k,
+          })),
+        ]"
+        class="w-full sm:w-56 -translate-y-1.5"
+      />
+    </div>
 
     <!-- Table -->
     <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
@@ -314,7 +430,8 @@ const formatDate = (iso: string) => {
         :loading="loading"
         :show-search="false"
         :meta="meta"
-        @page-change="handlePageChange"
+        @page-change="(p) => fetchDemos(p)"
+        @limit-change="(l) => { limit = l; fetchDemos(1) }" 
       >
         <!-- Contact -->
         <template #cell-contact="{ row }">
@@ -361,9 +478,11 @@ const formatDate = (iso: string) => {
           <span
             :class="[' text-xs font-semibold px-2 py-1 rounded-full inline-flex items-center gap-1 transition-opacity hover:opacity-75 whitespace-nowrap', getStatus(row.status).classes]"
           >
-            {{ getStatus(row.status).label }}
-            
+            <CheckCircle :size="14" /> {{ $t('fileFinalized') }}
           </span>
+          <span v-else class="text-[11px] text-slate-400 font-medium"
+            >{{ $t('noAction') }}</span
+          >
         </template>
 
         <!-- Actions -->
@@ -375,7 +494,17 @@ const formatDate = (iso: string) => {
             <ButtonComponent variant="ghost" size="sm" :iconLeft="Edit"
                 :aria-label="t('common.edit')" @click.stop="openEditModal(row)" />
             <ButtonComponent
-              variant="ghost" size="sm"
+              variant="ghost"
+              size="sm"
+              :iconLeft="Eye"
+              @click.stop="
+                handleDetail(row)
+              "
+              :title="$t('demos.detail.title')"
+            />
+            <ButtonComponent
+              variant="ghost"
+              size="sm"
               :iconLeft="row.emailSend ? MailCheck : Mail"
               :aria-label="row.emailSend ? t('demos.actions.emailSent') : t('demos.actions.resendEmail')"
               :class="row.emailSend ? 'text-emerald-500' : ''"
@@ -387,147 +516,193 @@ const formatDate = (iso: string) => {
       </BaseTable>
     </div>
 
-    <!-- ── Modal update ── -->
-     <BaseModal v-model="showEditModal" customClass="max-w-4xl">
-        <template #header>
-            <div>
-            <h3 class="font-black text-slate-900 dark:text-white">{{ t('demos.edit.title') }}</h3>
-            <p class="text-xs text-slate-400 mt-0.5">
-                {{ editingDemo?.contactName }} — {{ editingDemo?.companyName }}
+    <!-- ── MODALE  ── -->
+    <BaseModal v-model="showWorkflowModal" customClass="max-w-lg">
+      <template #header>
+        <div class="flex items-center gap-3">
+          <div
+            class="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg text-blue-600"
+          >
+            <ArrowRight :size="20" />
+          </div>
+          <div>
+            <h3 class="font-black text-slate-900 dark:text-white">
+              {{ workflowConfig.title }}
+            </h3>
+            <p class="text-xs text-slate-400">
+              {{ currentDemo?.contactName }} — {{ currentDemo?.companyName }}
             </p>
             </div>
         </template>
 
-        <div class="space-y-4 ">
-
-            <!-- Statut -->
-            <div>
-                 <Select v-model="editForm.status" :options="statusOptions" :lb="t('common.status')" :disabled="saving"  :is-required="true"/>
-           
-            </div>
-
-            <!-- Ligne 1 : Nom + Société -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Input v-model="editForm.contactName" :lb="t('demos.fields.contactName')"
-                :placeholder="t('demos.placeholders.contactName')"
-                :errorMsg="editFormErrors.contactName"
-                :disabled="saving" customClass="w-full" isRequired />
-            <Input v-model="editForm.companyName" :lb="t('demos.fields.companyName')"
-                :placeholder="t('demos.placeholders.companyName')"
-                :errorMsg="editFormErrors.companyName"
-                :disabled="saving" customClass="w-full" isRequired />
-            <Input v-model="editForm.leadSource" :lb="t('demos.fields.leadSource')"
-                :placeholder="t('demos.placeholders.leadSource')"
-                :disabled="saving" customClass="w-full" />
-
-            </div>
-
-            <!-- Ligne 2 : Email + Téléphone -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Input v-model="editForm.email" :lb="t('users.fields.email')" type="email"
-                placeholder="jean@hotel.com"
-                :errorMsg="editFormErrors.email"
-                :disabled="saving" customClass="w-full" isRequired />
-            <Input v-model="editForm.phoneNumber" :lb="t('demos.fields.phoneNumber')"
-                placeholder="+237690000000"
-                :disabled="saving" customClass="w-full" />
-            <Input v-model="editForm.country" :lb="t('hotelForm.fields.country')"
-                :placeholder="t('demos.placeholders.country')"
-                :disabled="saving" customClass="w-full" />
-            </div>
-
-            <!-- Ligne 3 : Pays + Chambres -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Input v-model="editForm.propertyType" :lb="t('demos.fields.propertyType')"
-                :placeholder="t('demos.placeholders.propertyType')"
-                :disabled="saving" customClass="w-full" />
-            <Input v-model.number="editForm.numberOfRooms" :lb="t('demos.fields.numberOfRooms')"
-                type="number" placeholder="45"
-                :disabled="saving" customClass="w-full" />
-             <Input v-model="editForm.preferredLanguage" :lb="t('demos.fields.preferredLanguage')"
-                :placeholder="t('demos.placeholders.preferredLanguage')"
-                :disabled="saving" customClass="w-full" />
-            </div>
-
-
-            <!-- Ligne 5 : Source + Concurrent -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-           
-            <Input v-model="editForm.competition" :lb="t('demos.fields.competition')"
-                :placeholder="t('demos.placeholders.competition')"
-                :disabled="saving" customClass="w-full" />
-
-             <!-- Date de suivi -->
-            <Input v-model="editForm.followUpDate" :lb="t('demos.fields.followUpDate')"
-                type="datetime-local"
-                :disabled="saving" customClass="w-full" />
-            </div>
-
-           
-
-            <!-- Notes -->
-            <div>
-            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">{{ t('demos.fields.notes') }}</label>
-            <textarea
-                v-model="editForm.notesMessage"
-                rows="2"
-                :disabled="saving"
-                :placeholder="t('demos.placeholders.notes')"
-                class="w-full rounded-lg border px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-purple-500 focus:outline-hidden focus:ring-3 focus:ring-purple-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-purple-800 transition-colors"
-                :class="saving ? 'bg-gray-100 dark:bg-slate-800 text-gray-400 cursor-not-allowed' : 'bg-transparent dark:bg-slate-900 border-gray-300 dark:border-slate-700'"
+      <div class="space-y-5 py-2">
+        <!-- CHAMPS ÉTAPE : QUALIFY -->
+        <div
+          v-if="currentStep === 'qualify'"
+          class="space-y-4 animate-in fade-in duration-300"
+        >
+          <div class="grid grid-cols-2 gap-4">
+            <Input v-model="workflowForm.contactName" :lb="$t('demos.fields.contactName')" />
+            <Input v-model="workflowForm.companyName" :lb="$t('demos.fields.companyName')" />
+            <Input v-model="workflowForm.email" :lb="$t('demos.fields.companyName')" type="email" />
+            <Input v-model="workflowForm.phoneNumber" :lb="$t('demos.fields.phoneNumber')" />
+            <Input v-model="workflowForm.country" :lb="$t('demos.fields.country')" />
+            <Input
+              v-model.number="workflowForm.numberOfRooms"
+              type="number"
+              :lb="$t('demos.fields.numberOfRooms')"
+              placeholder="Ex: 24"
             />
-            </div>
-
-            <!-- Toggles -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div class="flex items-center justify-between p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-                <div>
-                <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">{{ t('demos.toggles.conditionsAccepted') }}</p>
-                <p class="text-xs text-slate-400">{{ t('demos.toggles.conditionsAcceptedHelp') }}</p>
-                </div>
-                <Toggle v-model="editForm.acceptCondition" :disabled="saving" />
-            </div>
-            <div class="flex items-center justify-between p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-                <div>
-                <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">{{ t('demos.toggles.emailSent') }}</p>
-                <p class="text-xs text-slate-400">{{ t('demos.toggles.emailSentHelp') }}</p>
-                </div>
-                <Toggle v-model="editForm.emailSend" :disabled="saving" />
-            </div>
-            </div>
-
+            <Input
+              v-model="workflowForm.propertyType"
+              :lb="$t('demos.fields.propertyType')"
+              :placeholder="$t('demos.placeholders.propertyType')"
+              class="col-span-2"
+            />
+          </div>
+          <Select
+            v-model="workflowForm.status"
+            :lb="$t('common.status')"
+            :options="[
+              { label: statusConfig['Qualified'].label, value: 'Qualified' },
+              { label: statusConfig['Lost'].label, value: 'Lost' },
+            ]"
+          />
+          <div v-if="workflowForm.status === 'Lost'">
+            <label
+              class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 truncate"
+              >{{ $t('demos.fields.reason') }}</label
+            >
+            <textarea
+              v-model="workflowForm.notesMessage"
+              rows="3"
+              class="w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 p-3 text-sm focus:ring-1 focus:ring-purple-400 outline-none"
+              :placeholder="$t('demos.placeholders.reason')"
+            ></textarea>
+          </div>
         </div>
 
-        <template #footer>
-            <div class="flex gap-3">
-            <ButtonComponent variant="outline" :disabled="saving" @click="showEditModal = false">
-                {{ t('common.cancel') }}
-            </ButtonComponent>
-            <ButtonComponent variant="primary" :loading="saving" @click="handleUpdate">
-                {{ t('demos.actions.saveChanges') }}
-            </ButtonComponent>
-            </div>
-        </template>
+        <!-- CHAMPS ÉTAPE : SCHEDULE -->
+        <div
+          v-if="currentStep === 'schedule'"
+          class="space-y-4 animate-in fade-in duration-300"
+        >
+          <Input
+            v-model="workflowForm.followUpDate"
+            type="datetime-local"
+            :lb="$t('demos.fields.followUpDate')"
+            isRequired
+          />
+         
+          <Select
+            v-model="workflowForm.ownerId"
+            :options="users"
+            :lb="$t('demos.fields.assignedTo')"
+            :placeholder="$t('demos.placeholders.select')"
+            isRequired
+          />
+        </div>
+
+        <!-- CHAMPS ÉTAPE : COMPLETE OU LOST -->
+        <div
+          v-if="currentStep === 'complete' || currentStep === 'lost'"
+          class="space-y-4 animate-in fade-in duration-300"
+        >
+          <div>
+            <label
+              class="block text-sm font-bold mb-1.5 text-slate-700 dark:text-slate-300"
+            >
+              {{
+                currentStep === "lost"
+                  ? $t('demos.fields.reason')
+                  : $t('demos.fields.notes')
+              }}
+            </label>
+            <textarea
+              v-model="workflowForm.notesMessage"
+              rows="4"
+              class="w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 p-3 text-sm focus:ring-1 focus:ring-purple-400 outline-none"
+              :placeholder="
+                currentStep === 'lost'
+                  ? $t('demos.placeholders.reason')
+                  : $t('demos.placeholders.notes')
+              "
+            ></textarea>
+          </div>
+          <Input
+            v-if="currentStep === 'complete'"
+            v-model="workflowForm.competition"
+            :lb="$t('demos.fields.competition')"
+            :placeholder="$t('demos.placeholders.competition')"
+          />
+        </div>
+
+        <!-- CHAMPS ÉTAPE : CONVERT -->
+        <div
+          v-if="currentStep === 'convert' || currentStep === 'negotiate'"
+          class="py-6 text-center animate-in zoom-in duration-300"
+        >
+          <div
+            class="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4"
+          >
+            <UserCheck :size="40" />
+          </div>
+          <h4 class="text-lg font-black text-slate-900 dark:text-white">
+            {{ $t('demos.text.final') }}
+          </h4>
+          <p class="text-sm text-slate-500 mt-2 px-6">
+           {{ $t('demos.text.converted') }}
+            <strong>{{
+              currentStep === "convert" ? $t('demos.status.converted') : $t('demos.status.negotiation')
+            }}</strong
+            >.
+          </p>
+        </div>
+      </div>
+
+      <template #footer>
+        <div class="flex gap-3 w-full">
+          <ButtonComponent
+            variant="outline"
+            class="flex-1"
+            :disabled="saving"
+            @click="showWorkflowModal = false"
+            >{{ $t('common.cancel') }}</ButtonComponent
+          >
+          <ButtonComponent
+            variant="primary"
+            class="flex-[2]"
+            :loading="saving"
+            @click="handleSubmit"
+          >
+            {{ workflowConfig.btn }}
+          </ButtonComponent>
+        </div>
+      </template>
     </BaseModal>
     
 
     <!-- ── Modal détail ── -->
     <BaseModal v-model="showDetailModal">
-      <template #header>
-        <div>
-          <h3 class="font-black text-slate-900 dark:text-white">{{ t('demos.detail.title') }}</h3>
-          <p class="text-xs text-slate-400 mt-0.5">{{ detailDemo?.contactName }}</p>
-        </div>
-      </template>
-
-      <div v-if="detailDemo" class="space-y-4">
-        <!-- Statut actuel -->
-        <div class="flex items-center gap-2">
-          <span :class="['text-xs font-semibold px-2 py-1 rounded-full', getStatus(detailDemo.status).classes]">
-            {{ getStatus(detailDemo.status).label }}
-          </span>
-          <span v-if="detailDemo.emailSend" class="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-            <MailCheck :size="12" /> {{ t('demos.actions.emailSent') }}
+      <div v-if="currentDemo" class="space-y-6">
+        <div
+          class="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-4"
+        >
+          <div>
+            <h2 class="text-2xl font-black text-slate-900 dark:text-white">
+              {{ currentDemo.contactName }}
+            </h2>
+            <p class="text-slate-500 font-medium">
+              {{ currentDemo.companyName }}
+            </p>
+          </div>
+          <span
+            :class="[
+              'px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest',
+              statusConfig[currentDemo.status]?.classes ,
+            ]"
+          >
+            {{ statusConfig[currentDemo.status].label }}
           </span>
         </div>
 
@@ -547,56 +722,36 @@ const formatDate = (iso: string) => {
               <p class="font-medium text-slate-800 dark:text-slate-100">{{ detailDemo.country ?? '—' }}</p>
             </div>
           </div>
-          <div class="flex items-start gap-2">
-            <Phone :size="14" class="text-slate-400 mt-0.5 shrink-0" />
-            <div>
-              <p class="text-xs text-slate-400">{{ t('demos.fields.phoneNumber') }}</p>
-              <p class="font-medium text-slate-800 dark:text-slate-100">{{ detailDemo.phoneNumber ?? '—' }}</p>
+          <div class="space-y-4">
+            <div class="flex items-center gap-3 text-sm">
+              <BedDouble :size="16" class="text-slate-400" />
+              <span>{{ currentDemo.numberOfRooms }} {{ $t('demos.table.rooms') }}</span>
             </div>
-          </div>
-          <div class="flex items-start gap-2">
-            <BedDouble :size="14" class="text-slate-400 mt-0.5 shrink-0" />
-            <div>
-              <p class="text-xs text-slate-400">{{ t('demos.fields.numberOfRooms') }}</p>
-              <p class="font-medium text-slate-800 dark:text-slate-100">{{ detailDemo.numberOfRooms ?? '—' }}</p>
+            <div class="flex items-center gap-3 text-sm">
+              <Building2 :size="16" class="text-slate-400" />
+              <span>{{ currentDemo.propertyType || $t('demos.fields.typeNotSpecified') }}</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm">
+              <Calendar :size="16" class="text-slate-400" />
+              <span>Reçu le {{ formatDate(currentDemo.createdAt) }}</span>
             </div>
           </div>
         </div>
 
-        <!-- Champs optionnels -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm border-t border-slate-100 dark:border-slate-800 pt-3">
-          <div v-if="detailDemo.propertyType">
-            <p class="text-xs text-slate-400">{{ t('demos.fields.propertyType') }}</p>
-            <p class="font-medium text-slate-800 dark:text-slate-100">{{ detailDemo.propertyType }}</p>
-          </div>
-          <div v-if="detailDemo.preferredLanguage">
-            <p class="text-xs text-slate-400">{{ t('demos.fields.preferredLanguage') }}</p>
-            <p class="font-medium text-slate-800 dark:text-slate-100">{{ detailDemo.preferredLanguage }}</p>
-          </div>
-          <div v-if="detailDemo.leadSource">
-            <p class="text-xs text-slate-400">{{ t('demos.fields.leadSource') }}</p>
-            <p class="font-medium text-slate-800 dark:text-slate-100">{{ detailDemo.leadSource }}</p>
-          </div>
-          <div v-if="detailDemo.competition">
-            <p class="text-xs text-slate-400">{{ t('demos.fields.competition') }}</p>
-            <p class="font-medium text-slate-800 dark:text-slate-100">{{ detailDemo.competition }}</p>
-          </div>
-          <div v-if="detailDemo.followUpDate">
-            <p class="text-xs text-slate-400">{{ t('demos.fields.followUpDate') }}</p>
-            <p class="font-medium text-slate-800 dark:text-slate-100">{{ formatDate(detailDemo.followUpDate) }}</p>
-          </div>
-          <div v-if="detailDemo.owner">
-            <p class="text-xs text-slate-400">{{ t('demos.fields.assignedTo') }}</p>
-            <p class="font-medium text-slate-800 dark:text-slate-100">
-              {{ detailDemo.owner.firstName }} {{ detailDemo.owner.lastName }}
-            </p>
-          </div>
-        </div>
-
-        <!-- Notes -->
-        <div v-if="detailDemo.notesMessage" class="border-t border-slate-100 dark:border-slate-800 pt-3">
-          <p class="text-xs text-slate-400 mb-1">{{ t('demos.fields.notes') }}</p>
-          <p class="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-line">{{ detailDemo.notesMessage }}</p>
+        <div
+          v-if="currentDemo.notesMessage"
+          class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700"
+        >
+          <h5
+            class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-2"
+          >
+            {{ $t('demos.fields.notes') }}
+          </h5>
+          <p
+            class="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-line leading-relaxed"
+          >
+            {{ currentDemo.notesMessage }}
+          </p>
         </div>
       </div>
 

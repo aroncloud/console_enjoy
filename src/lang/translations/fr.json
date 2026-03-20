@@ -64,10 +64,12 @@
 		},
 		"table": {
 			"contact": "Contact",
-			"company": "Société",
+			"company": "Société / Chambres",
 			"rooms": "Chambres",
 			"date": "Date",
-			"status": "Statut"
+			"status": "Statut",
+			"currentStatus": "Statut Actuel",
+      		"nextAction": "Action Suivante"
 		},
 		"filters": {
 			"allStatuses": "Tous les statuts"
@@ -81,7 +83,9 @@
 			"negotiation": "Négociation",
 			"converted": "Converti",
 			"lost": "Perdu",
-			"junk": "Indésirable"
+			"junk": "Indésirable",
+			"contacted" : "Contacter",
+			"inTesting" : "En essai"
 		},
 		"actions": {
 			"resendEmail": "Renvoyer email",
@@ -105,7 +109,11 @@
 			"competition": "Concurrent",
 			"followUpDate": "Date de suivi",
 			"assignedTo": "Assigné à",
-			"notes": "Notes"
+			"notes": "Notes",
+			"email" : "Email",
+			"country" : "Pays",
+			"reason" : "Raison de la perte",
+			"typeNotSpecified" : "Type non spécifié"
 		},
 		"placeholders": {
 			"contactName": "Jean Dupont",
@@ -115,7 +123,10 @@
 			"propertyType": "Hotel, Resort…",
 			"preferredLanguage": "fr, en…",
 			"competition": "Opera, Mews…",
-			"notes": "Notes internes sur cette demande…"
+			"notes": "Notes internes sur cette demande…",
+			"search" : "Rechercher nom, email ou société...",
+			"reason" : "Pourquoi le prospect a refusé ?",
+			"select" : "Sélectionner "
 		},
 		"toggles": {
 			"conditionsAccepted": "Conditions acceptées",
@@ -132,8 +143,48 @@
 			"loadError": "Erreur lors du chargement des demandes",
 			"updated": "Demande mise à jour avec succès !",
 			"emailResent": "Email de confirmation renvoyé !",
-			"emailResendError": "Erreur lors de l'envoi"
-		}
+			"emailResendError": "Erreur lors de l'envoi",
+			"success": "Étape mise à jour avec succès",
+        	"error": "Erreur de mise à jour"
+		},
+		"text" : {
+			"converted" : "Le contrat est-il prêt ? Cette action changera le statut du prospect en",
+			"final" : "Passage à l'étape finale"
+		},
+		"workflow": {
+			"qualify": {
+				"title": "Étape 2 : Qualification",
+				"btn": "Confirmer la Qualification"
+			},
+			"schedule": {
+				"title": "Étape 3 : Planification",
+				"btn": "Programmer le RDV"
+			},
+			"complete": {
+				"title": "Étape 4 : Compte-rendu",
+				"btn": "Clôturer la Démo"
+			},
+			"negotiate": {
+				"title": "Étape 6 : Négociation",
+				"btn": "Lancer la Négociation"
+			},
+			"convert": {
+				"title": "Étape 7 : Conversion",
+				"btn": "Finaliser la Vente"
+			},
+			"lost": {
+				"title": "Marquer comme Perdu",
+				"btn": "Confirmer la Perte"
+			},
+			"errors": {
+				"dateRequired": "La date du rendez-vous est requise",
+				"ownerRequired": "Veuillez sélectionner un commercial",
+				"demoNotesRequired": "Veuillez saisir les retours de la démo",
+				"lostReasonRequired": "Veuillez indiquer la raison de la perte"
+			},
+			"lostPrefix": "RAISON PERTE: "
+    	}
+		
 	},
 	"billing": {
 		"invoice": "facture",
@@ -618,7 +669,9 @@
 			"taxRate": "Ex: 19.25",
 			"roomsCount": "Ex: 20",
 			"cancellationPolicy": "Ex: Annulation gratuite jusqu'à 48h avant l'arrivée...",
-			"hotelPolicy": "Ex: Non-fumeur. Animaux non admis. Accès PMR disponible..."
+			"hotelPolicy": "Ex: Non-fumeur. Animaux non admis. Accès PMR disponible...",
+			"firstName" : "Prénom",
+			"lastName" : "Nom"
 		},
 		"starRating": {
 			"stars": "{count} étoile{suffix}",
@@ -1092,5 +1145,7 @@
 		"zm": "Zambie",
 		"zw": "Zimbabwe"
 	},
-	"phoneNumberPlaceholder" : "Entrez le numéro de téléphone"
+	"phoneNumberPlaceholder" : "Entrez le numéro de téléphone",
+	"fileFinalized" : "Dossier Finalisé",
+	"noAction" : "Aucune action"
 }

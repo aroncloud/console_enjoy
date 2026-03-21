@@ -1,9 +1,9 @@
 <template>
-  <div class="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans">
+  <div class="min-h-dvh bg-slate-50 dark:bg-slate-950 font-sans">
 
     <!-- ── Page header ── -->
     <div class="dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
-      <div class="px-6">
+      <div class="px-4 sm:px-6">
 
         <div class="pt-5 pb-4">
           <button
@@ -40,7 +40,7 @@
                 <span v-else>{{ i + 1 }}</span>
               </div>
               <span
-                class="text-[10px] font-bold mt-1.5 whitespace-nowrap transition-colors"
+                class="text-[10px] font-bold mt-1.5 transition-colors text-center max-w-20 sm:max-w-none"
                 :class="currentStep === i + 1 ? 'text-purple-600' : 'text-slate-400'"
               >{{ step }}</span>
             </div>
@@ -55,7 +55,7 @@
     </div>
 
     <!-- ── Page content ── -->
-    <div class="max-w-6xl mx-auto px-6 py-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
 
       <!-- ── Step 1 ── -->
       <div v-if="currentStep === 1">

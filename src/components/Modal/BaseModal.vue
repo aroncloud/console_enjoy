@@ -8,7 +8,7 @@
       <div :class="['bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 w-full shadow-2xl ', customClass || 'max-w-lg']">
 
         <!-- header slot with close button -->
-        <div v-if="$slots.header" class="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
+        <div v-if="$slots.header" class="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-200 dark:border-slate-800">
           <slot name="header" />
           <button @click="close" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
             <X :size="18" class="text-slate-500 dark:text-slate-300" />
@@ -16,12 +16,12 @@
         </div>
 
         <!-- default slot for body -->
-        <div class="p-6 overflow-y-auto h-120 custom-scrollbar">
+        <div class="p-4 sm:p-6 overflow-y-auto max-h-[80dvh] custom-scrollbar">
           <slot />
         </div>
 
         <!-- footer slot -->
-        <div v-if="$slots.footer" class="px-6 py-4 border-t border-slate-200 dark:border-slate-800">
+        <div v-if="$slots.footer" class="px-4 sm:px-6 py-3.5 sm:py-4 border-t border-slate-200 dark:border-slate-800">
           <slot name="footer" />
         </div>
       </div>

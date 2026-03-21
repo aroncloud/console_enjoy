@@ -2,15 +2,15 @@
   <div class=" bg-slate-50 dark:bg-slate-950">
 
     <!-- Header -->
-    <div class="bg-white dark:bg-slate-900 border-b border-slate-200 rounded-lg dark:border-slate-800 px-6 py-4">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-3">
+    <div class="bg-white dark:bg-slate-900 border-b border-slate-200 rounded-lg dark:border-slate-800 px-4 sm:px-6 py-3.5 sm:py-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
           <button @click="router.back()" class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-colors">
             <ArrowLeft :size="18" />
           </button>
-          <div>
-            <h1 class="text-lg font-black text-slate-900 dark:text-white">{{ demo?.contactName }}</h1>
-            <p class="text-xs text-slate-500">{{ demo?.companyName }}</p>
+          <div class="min-w-0">
+            <h1 class="text-lg font-black text-slate-900 dark:text-white truncate">{{ demo?.contactName }}</h1>
+            <p class="text-xs text-slate-500 truncate">{{ demo?.companyName }}</p>
           </div>
         </div>
         <div class="flex items-center gap-2">
@@ -22,7 +22,7 @@
     </div>
 
     <!-- Loading -->
-    <div v-if="loading" class="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div v-if="loading" class="p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
   <div class="lg:col-span-1 space-y-4">
     <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 space-y-3">
       <div class="h-2.5 w-16 bg-slate-100 dark:bg-slate-800 rounded animate-pulse" />
@@ -55,7 +55,7 @@
   </div>
 </div>
 
-    <div v-else-if="demo" class="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div v-else-if="demo" class="p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
 
       <!-- Colonne gauche : infos + commercial -->
       <div class="lg:col-span-1 space-y-4">
@@ -215,19 +215,17 @@ import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import {
   ArrowLeft, Mail, Phone, Globe, BedDouble, Building2,
-  Calendar, CalendarClock, UserCheck, UserX, Lock,
+  Calendar, CalendarClock, UserCheck, UserX,
   ClipboardList, Clock, Swords,
 } from 'lucide-vue-next'
 import { demoService } from '../../servicesAPI/demoService'
 import type { DemoStatus } from '../../servicesAPI/demoService'
 import { historyService } from '../../servicesAPI/historyService'
-import { usePermissionsStore } from '../../composables/usePermission'
 import { useToastStore } from '../../composables/toast'
 
 const route   = useRoute()
 const router  = useRouter()
 const { t, locale } = useI18n()
-const permissionsStore = usePermissionsStore()
 const toastStore       = useToastStore()
 
 const demo           = ref<any>(null)
@@ -242,9 +240,6 @@ const paginatedTimeline = computed(() => {
   return timeline.value.slice(start, start + historyPerPage)
 })
 
-
-// ── Permissions ────────────
-const showLockedConvert = computed(() => !permissionsStore.can('console_clients_create') && demo.value?.status !== 'Converted' && demo.value?.status !== 'Lost')
 
 // ── Status config (même que DemoView) ─────────────
 const statusConfig = computed<Record<DemoStatus, { label: string; classes: string }>>(() => ({

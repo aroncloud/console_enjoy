@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-slate-950 px-6 py-8">
+  <div class="min-h-dvh bg-gray-50 dark:bg-slate-950 px-4 sm:px-6 py-6 sm:py-8">
     <div class="">
 
       <!-- Loading skeleton (mode édition) -->
@@ -13,7 +13,7 @@
 
       <div v-else>
         <!-- Header -->
-        <div class="flex items-start justify-between mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-start justify-between mb-6 gap-4">
           <div>
             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
               {{ isEditMode ? t('hotelForm.header.editTitle') : t('hotelForm.header.createTitle') }}
@@ -34,7 +34,7 @@
         </div>
 
         <!-- Tab navigation -->
-        <div class="flex border-b border-gray-200 dark:border-slate-800 mb-6 gap-6">
+        <div class="flex border-b border-gray-200 dark:border-slate-800 mb-6 gap-6 overflow-x-auto">
           <button
             v-for="tab in tabs"
             :key="tab.key"
@@ -53,7 +53,7 @@
         </div>
 
         <!-- Form card -->
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-8 space-y-8" :class="loading ? 'pointer-events-none opacity-60' : ''">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-4 sm:p-8 space-y-8" :class="loading ? 'pointer-events-none opacity-60' : ''">
 
           <!-- ── Informations Générales ── -->
       <section v-show="activeTab === 'general'">

@@ -4,7 +4,7 @@
     <!-- ── TOOLBAR  -->
     <div
       v-if="title || showSearch || (showFilters && $slots.filters) || $slots.actions"
-      class="flex items-center justify-between flex-wrap gap-3 px-5 py-4 border-b border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900"
+      class="flex items-center justify-between flex-wrap gap-3 px-4 sm:px-5 py-3.5 sm:py-4 border-b border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900"
     >
       <div class="flex items-center gap-3">
         <h3 v-if="title" class="text-sm font-bold tracking-tight text-gray-900 dark:text-white">{{ title }}</h3>
@@ -16,7 +16,7 @@
           <slot name="filters" />
         </template>
         <!-- Search -->
-        <div v-if="showSearch" class="relative flex items-center">
+        <div v-if="showSearch" class="relative flex items-center w-full sm:w-auto">
           <svg class="absolute left-2.5 w-3.5 h-3.5 text-gray-400 pointer-events-none" viewBox="0 0 20 20" fill="none">
             <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.5"/>
             <path d="M13 13l3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -26,8 +26,8 @@
             type="text"
             :placeholder="t('table.searchPlaceholder')"
             class="pl-8 pr-7 py-1.5 text-sm bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg outline-none
-                   text-gray-800 dark:text-slate-200 placeholder-gray-400 dark:placeholder:text-slate-400 w-52
-                   focus:border-purple-500 focus:ring-2 focus:ring-purple-100 focus:w-64
+                   text-gray-800 dark:text-slate-200 placeholder-gray-400 dark:placeholder:text-slate-400 w-full sm:w-52
+                   focus:border-purple-500 focus:ring-2 focus:ring-purple-100 focus:w-full sm:focus:w-64
                    transition-all duration-150"
           />
           <button
@@ -182,7 +182,7 @@
     </div>
 
     <!-- ── FOOTER -->
-    <div class="flex items-center justify-between flex-wrap gap-3 px-5 py-3 border-t border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+    <div class="flex items-center justify-between flex-wrap gap-3 px-4 sm:px-5 py-3 border-t border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900">
       <!-- Page size -->
       <div class="flex items-center gap-2 text-xs text-gray-400 dark:text-slate-400">
         <span>{{ t('table.rows') }} :</span>

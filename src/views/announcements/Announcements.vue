@@ -200,8 +200,8 @@ onMounted(() => {
 
 <template>
   <div class="space-y-6">
-    <div class="flex items-start justify-between gap-4">
-      <div>
+    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+      <div class="min-w-0">
         <h1 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
           <Megaphone :size="20" class="text-slate-700 dark:text-slate-200" />
           {{ t('announcements.title') }}
@@ -222,8 +222,8 @@ onMounted(() => {
       @page-change="fetchAnnouncements"
     >
       <template #filters>
-        <div class="flex md:flex-row flex-col  gap-3">
-          <div class="w-50">
+        <div class="flex md:flex-row flex-col gap-3">
+          <div class="w-full sm:w-60">
           <Select
             :lb="t('announcements.filters.type')"
             :options="[{ label: t('common.all'), value: '' }, ...typeOptions]"
@@ -231,7 +231,7 @@ onMounted(() => {
             customClass="h-10 "
           />
           </div>
-          <div class="w-50">
+          <div class="w-full sm:w-60">
           <Select
             :lb="t('announcements.filters.status')"
             :options="activeOptions"
@@ -312,7 +312,7 @@ onMounted(() => {
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Select :lb="t('announcements.fields.type')" :options="typeOptions" v-model="form.type" />
-          <div class="pt-7">
+          <div class="pt-0 md:pt-7">
             <Toggle v-model="form.isActive" :title="t('announcements.fields.isActive')" />
           </div>
         </div>

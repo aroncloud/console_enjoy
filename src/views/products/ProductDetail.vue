@@ -177,17 +177,17 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="p-4 md:p-8 bg-slate-50 dark:bg-slate-950 min-h-screen space-y-6">
-    <div class="flex items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
+  <div class="p-4 md:p-8 bg-slate-50 dark:bg-slate-950 min-h-dvh space-y-6">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div class="flex items-center gap-3 min-w-0">
         <button class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800" @click="router.push({ name: 'products' })">
           <ArrowLeft class="w-5 h-5 text-slate-600 dark:text-slate-300" />
         </button>
-        <div>
-          <h1 class="text-2xl font-bold text-slate-900 dark:text-white">
+        <div class="min-w-0">
+          <h1 class="text-2xl font-bold text-slate-900 dark:text-white truncate">
             {{ product?.name ?? t('products.product') }}
           </h1>
-          <p class="text-sm text-slate-500 dark:text-slate-300">
+          <p class="text-sm text-slate-500 dark:text-slate-300 truncate">
             {{ product?.description ?? '—' }}
           </p>
         </div>

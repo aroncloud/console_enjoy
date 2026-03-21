@@ -231,14 +231,14 @@ const sendResetPassword = async (row: any) => {
 </script>
 
 <template>
-  <div class="p-4 md:p-8 bg-slate-50 dark:bg-slate-950 min-h-screen space-y-6">
+  <div class="p-4 md:p-8 bg-slate-50 dark:bg-slate-950 min-h-dvh space-y-6">
     <div class="flex flex-col md:flex-row justify-between md:items-start gap-4">
       <div>
         <h1 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2"> <UsersIcon :size="20" class="text-slate-700 dark:text-slate-200" />{{ t('users.title') }}</h1>
         <p class="text-sm text-slate-500 dark:text-slate-300 mt-1">{{ t('users.subtitle') }}</p>
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex flex-wrap items-center gap-2">
         <ButtonComponent variant="secondary" :iconLeft="UsersIcon" @click="fetchUsers(1)">{{ t('common.refresh') }}</ButtonComponent>
         <ButtonComponent :iconLeft="Plus" @click="openCreate">{{ t('common.add') }}</ButtonComponent>
       </div>

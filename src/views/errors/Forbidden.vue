@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-6">
+  <div class="min-h-dvh bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4 sm:p-6">
     <div class="w-full max-w-md text-center">
 
       <!-- Icône -->

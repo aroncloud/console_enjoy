@@ -46,7 +46,7 @@ const close = () => {
         <div class="h-1.5 w-full bg-linear-to-r from-red-400 via-red-500 to-rose-500" />
 
         <!-- Body -->
-        <div class="p-6">
+        <div class="p-4 sm:p-6">
 
           <!-- Icône + titre -->
           <div class="flex items-start gap-4 mb-5">

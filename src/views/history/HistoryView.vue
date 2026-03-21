@@ -1,5 +1,5 @@
 <template>
-  <div class="p-4 md:p-8 bg-slate-50 dark:bg-slate-950 min-h-screen space-y-6">
+  <div class="p-4 md:p-8 bg-slate-50 dark:bg-slate-950 min-h-dvh space-y-6">
     <div class="flex items-center gap-3">
       <button
         v-if="hotelId"

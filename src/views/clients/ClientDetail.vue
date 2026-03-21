@@ -253,7 +253,7 @@ const updateSub = (sub: any) => {
   <template v-else>
 
     <!-- Loading skeleton -->
-    <div v-if="loading" class="min-h-screen bg-slate-50 dark:bg-slate-950 p-8 space-y-6">
+    <div v-if="loading" class="min-h-dvh bg-slate-50 dark:bg-slate-950 p-4 sm:p-8 space-y-6">
       <div class="space-y-3">
         <div class="h-6 w-3/4 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div>
         <div class="h-4 w-1/4 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div>
@@ -266,7 +266,7 @@ const updateSub = (sub: any) => {
     </div>
 
     <!-- Erreur -->
-    <div v-else-if="error" class="flex flex-col items-center justify-center min-h-screen bg-slate-50 dark:bg-slate-950 gap-4">
+    <div v-else-if="error" class="flex flex-col items-center justify-center min-h-dvh bg-slate-50 dark:bg-slate-950 gap-4 p-4">
       <button @click="router.push('/clients')" class="text-sm text-purple-600 hover:underline">
         ← {{ t('clients.actions.backToList') }}
       </button>
@@ -347,7 +347,7 @@ const updateSub = (sub: any) => {
                   <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ t('clientDetail.fields.phone') }}</p>
                   <p class="text-sm text-slate-700 dark:text-slate-200">{{ hotelPhone }}</p>
                 </div>
-                <div class="grid grid-cols-3 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
                   <div class="space-y-1">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ t('clientDetail.fields.currency') }}</p>
                     <p class="text-sm font-semibold text-slate-900 dark:text-white">{{ currency }}</p>

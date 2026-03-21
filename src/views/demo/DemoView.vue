@@ -591,7 +591,7 @@ const handleAddDemo = async () => {
           v-if="currentStep === 'qualify'"
           class="space-y-4 animate-in fade-in duration-300"
         >
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input v-model="workflowForm.contactName" :lb="$t('demos.fields.contactName')" />
             <Input v-model="workflowForm.companyName" :lb="$t('demos.fields.companyName')" />
             <Input v-model="workflowForm.email" :lb="$t('demos.fields.companyName')" type="email" />
@@ -700,7 +700,7 @@ const handleAddDemo = async () => {
           <h4 class="text-lg font-black text-slate-900 dark:text-white">
             {{ $t('demos.text.final') }}
           </h4>
-          <p class="text-sm text-slate-500 mt-2 px-6">
+          <p class="text-sm text-slate-500 mt-2 sm:px-6">
            {{ $t('demos.text.converted') }}
             <strong>{{
               currentStep === "convert" ? $t('demos.status.converted') : $t('demos.status.negotiation')
@@ -747,7 +747,7 @@ const handleAddDemo = async () => {
       </template>
 
       <div class="space-y-4 py-2">
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input v-model="addForm.contactName" :lb="$t('demos.fields.contactName')" :placeholder="$t('demos.placeholders.contactName')" isRequired />
           <Input v-model="addForm.companyName" :lb="$t('demos.fields.companyName')" :placeholder="$t('demos.placeholders.companyName')" isRequired />
           <Input v-model="addForm.email" :lb="$t('demos.fields.email')" type="email" placeholder="info@gmail.com" isRequired />

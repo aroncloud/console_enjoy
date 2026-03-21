@@ -3,7 +3,7 @@
   <div class="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 flex flex-col h-full">
 
     <!-- Header -->
-    <div class="flex items-center justify-between p-5 border-b border-gray-100 dark:border-slate-800">
+    <div class="flex items-center justify-between p-4 sm:p-5 border-b border-gray-100 dark:border-slate-800">
       <div class="flex items-center gap-2">
         <div class="w-8 h-8 bg-purple-50 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
           <History class="w-4 h-4 text-purple-600 dark:text-purple-300" />
@@ -17,7 +17,7 @@
     </div>
 
     <!-- Filtres -->
-   <div v-if="showFilters" class="flex flex-col md:flex-row items-start md:items-center gap-2 px-5 py-3 border-b border-gray-100 dark:border-slate-800">
+   <div v-if="showFilters" class="flex flex-col md:flex-row items-start md:items-center gap-2 px-4 sm:px-5 py-3 border-b border-gray-100 dark:border-slate-800">
   <Input
     v-model="search"
     :lb="t('common.search')"
@@ -35,7 +35,7 @@
 </div>
 
     <!-- Skeleton -->
-    <div v-if="loading" class="p-5 flex flex-col animate-pulse gap-0">
+    <div v-if="loading" class="p-4 sm:p-5 flex flex-col animate-pulse gap-0">
       <div v-for="i in 4" :key="i" class="relative flex gap-4">
         <div v-if="i < 4" class="absolute left-4 top-10 -bottom-6 w-0.5 bg-gray-100 dark:bg-slate-800 z-0" />
         <div class="w-8 h-8 bg-gray-200 dark:bg-slate-700 rounded-full shrink-0 z-10" />
@@ -47,7 +47,7 @@
     </div>
 
     <!-- Liste -->
-    <div v-else class="flex-1 overflow-y-auto p-5">
+    <div v-else class="flex-1 overflow-y-auto p-4 sm:p-5">
       <div v-if="filteredLogs.length > 0" class="flex flex-col">
         <div
           v-for="(item, index) in filteredLogs"
@@ -101,7 +101,7 @@
     <!-- Pagination -->
     <div
       v-if="meta && meta.lastPage > 1"
-      class="flex items-center justify-between px-5 py-3 border-t border-gray-100 dark:border-slate-800"
+      class="flex items-center justify-between px-4 sm:px-5 py-3 border-t border-gray-100 dark:border-slate-800"
     >
       <span class="text-xs text-slate-400">{{ t('history.pagination', { current: meta.currentPage, last: meta.lastPage }) }}</span>
       <div class="flex items-center gap-1">

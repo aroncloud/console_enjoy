@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6 p-6 bg-slate-50 dark:bg-slate-950 min-h-screen">
+  <div class="space-y-6 p-4 sm:p-6 bg-slate-50 dark:bg-slate-950 min-h-dvh">
 
     <!-- KPIs -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -40,12 +40,12 @@
 
       <!-- Quotas & Dépassements -->
       <div class="lg:col-span-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-        <div class="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <div class="px-4 sm:px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
           <h3 class="font-bold text-xs uppercase tracking-wider text-slate-500">{{ t('billing.quotas.title') }}</h3>
           <ChartLine :size="16" class="text-slate-400" />
         </div>
 
-        <div class="p-5 space-y-3 max-h-100 overflow-y-auto scrollbar">
+        <div class="p-4 sm:p-5 space-y-3 max-h-100 overflow-y-auto scrollbar">
           <div v-if="loadingQuotas" class="space-y-3">
             <div v-for="i in 3" :key="i" class="h-20 w-full bg-gray-100 rounded-lg animate-pulse" />
           </div>
@@ -162,7 +162,7 @@
       <!-- Offrir un mois gratuit -->
     
       <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-visible">
-        <div class="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
+        <div class="px-4 sm:px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
           <div class="p-2 bg-purple-100 text-purple-500 rounded-lg">
             <Gift :size="18" />
           </div>
@@ -171,7 +171,7 @@
             <p class="text-xs text-slate-500">{{ t('billing.gift.subtitle') }}</p>
           </div>
         </div>
-        <div class="p-5 space-y-4">
+        <div class="p-4 sm:p-5 space-y-4">
           <BaseSelect
             :lb="t('billing.fields.hotel')"
             v-model="selectedHotelId"
@@ -199,7 +199,7 @@
 
      <!-- Calculateur de quotas -->
       <div id="calculateur"  class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-        <div class="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
+        <div class="px-4 sm:px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
           <div class="p-2 bg-orange-100 text-orange-500 rounded-lg">
             <ChartLine :size="18" />
           </div>
@@ -208,7 +208,7 @@
             <p class="text-xs text-slate-500">{{ t('billing.calculator.subtitle') }}</p>
           </div>
         </div>
-        <div class="p-5 space-y-4">
+        <div class="p-4 sm:p-5 space-y-4">
           <BaseSelect
             :lb="t('billing.fields.affectedSubscription')"
             v-model="calcSubscriptionId"

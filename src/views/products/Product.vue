@@ -235,7 +235,7 @@ const confirmDelete = async () => {
 </script>
 
 <template>
-  <div class="p-4 md:p-8 bg-slate-50 dark:bg-slate-950 min-h-screen space-y-6">
+  <div class="p-4 md:p-8 bg-slate-50 dark:bg-slate-950 min-h-dvh space-y-6">
 
     <!-- ── Header ── -->
     <div class="flex flex-col md:flex-row justify-between md:items-start gap-4">

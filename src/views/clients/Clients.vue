@@ -167,7 +167,7 @@ const getProducts = (row: any) =>
   />
 
   <!-- ── Vue Liste ── -->
-  <div v-else class="p-4 md:p-8 bg-gray-50 dark:bg-slate-950 min-h-screen font-sans">
+  <div v-else class="p-4 md:p-8 bg-gray-50 dark:bg-slate-950 min-h-dvh font-sans">
 
     <div class="flex flex-col md:flex-row justify-between md:items-start mb-8 gap-4">
       <div>

@@ -45,8 +45,8 @@ const resetMyPassword = async () => {
 </script>
 
 <template>
-  <div class="p-4 md:p-8 bg-slate-50 dark:bg-slate-950 min-h-screen space-y-6">
-    <div class="flex items-center justify-between gap-4">
+  <div class="p-4 md:p-8 bg-slate-50 dark:bg-slate-950 min-h-dvh space-y-6">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
         <h1 class="text-2xl font-bold text-slate-900 dark:text-white">{{ t('profile.title') }}</h1>
         <p class="text-sm text-slate-500 dark:text-slate-300 mt-1">{{ t('profile.subtitle') }}</p>
@@ -56,7 +56,7 @@ const resetMyPassword = async () => {
       </ButtonComponent>
     </div>
 
-    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 sm:p-6">
       <div class="flex items-center gap-4">
         <div class="w-14 h-14 rounded-2xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
           <span class="text-lg font-bold text-purple-700 dark:text-purple-200">{{ initials }}</span>

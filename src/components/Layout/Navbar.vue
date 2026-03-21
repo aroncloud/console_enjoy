@@ -1,13 +1,13 @@
 <template>
-  <header class="bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 px-6 py-3 flex items-center justify-between">
+  <header class="bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between">
     <button class="md:hidden p-2 " @click="$emit('toggle-sidebar')">
       <Menu class="w-6 h-6 text-gray-600 dark:text-slate-300" />
     </button>
 
     <div class="hidden md:block" />
 
-    <div class="flex  gap-4 ">
-      <div class="border-r border-gray-200 pr-4">
+    <div class="flex items-center gap-2 sm:gap-4 min-w-0">
+      <div class="border-r border-gray-200 pr-2 sm:pr-4">
         <button class="relative p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition cursor-pointer">
           <Bell class="w-5 h-5 text-gray-500 dark:text-slate-300" />
           <span class="absolute top-1 right-1 w-1 h-1 bg-red-500 rounded-full"></span>
@@ -32,9 +32,9 @@
     </button>
 
       <div class="relative" ref="dropdownRef">
-        <div class="flex items-center gap-3 cursor-pointer" @click="toggleDropdown">
-          <div class="text-right">
-            <p class="text-sm font-semibold text-gray-800 dark:text-white">{{ displayName }}</p>
+        <div class="flex items-center gap-3 cursor-pointer min-w-0" @click="toggleDropdown">
+          <div class="hidden sm:block text-right min-w-0">
+            <p class="text-sm font-semibold text-gray-800 dark:text-white max-w-32 sm:max-w-none truncate">{{ displayName }}</p>
             <p class="text-xs text-green-500">{{ t('nav.online') }}</p>
           </div>
           <div class="w-9 h-9 bg-amber-200 rounded-full flex items-center justify-center font-bold text-sm text-amber-700">

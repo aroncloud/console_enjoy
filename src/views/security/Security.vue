@@ -1,8 +1,8 @@
 <template>
-  <div class="min-h-screen bg-slate-50 dark:bg-[#0a0a0f]">
+  <div class="min-h-dvh bg-slate-50 dark:bg-[#0a0a0f]">
     <!-- ── Page Header ── -->
     <div
-      class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-5 rounded-t-xl"
+      class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-4 sm:py-5 rounded-t-xl"
     >
       <div class="flex items-start justify-between mb-5">
         <div>
@@ -24,7 +24,7 @@
       </div>
 
       <!-- Stats bar -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
         <div
           class="flex items-center gap-3 px-4 py-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700"
         >
@@ -115,12 +115,12 @@
 
     <!-- ── Tab nav ── -->
     <div
-      class="bg-white dark:bg-slate-900 border-b border-slate-200 rounded-b-xl dark:border-slate-800 px-6"
+      class="bg-white dark:bg-slate-900 border-b border-slate-200 rounded-b-xl dark:border-slate-800 px-4 sm:px-6"
     >
-      <div class="flex">
+      <div class="flex overflow-x-auto">
         <button
           @click="activeTab = 'tenants'"
-          class="flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 transition-all"
+          class="flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 transition-all whitespace-nowrap shrink-0"
           :class="
             activeTab === 'tenants'
               ? 'border-purple-500 text-purple-600 dark:text-purple-400'
@@ -142,7 +142,7 @@
         </button>
         <button
           @click="activeTab = 'roles'"
-          class="flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 transition-all"
+          class="flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 transition-all whitespace-nowrap shrink-0"
           :class="
             activeTab === 'roles'
               ? 'border-purple-500 text-purple-600 dark:text-purple-400'
@@ -166,7 +166,7 @@
     </div>
 
     <!-- ── Content ── -->
-    <div class="p-6">
+    <div class="p-4 sm:p-6">
       <!-- TAB: Tenants -->
       <div v-show="activeTab === 'tenants'">
         <div
@@ -249,12 +249,11 @@
       <!-- TAB: Rôles & Permissions -->
       <div
         v-show="activeTab === 'roles'"
-        class="flex gap-5"
-        style="height: calc(100vh - 290px); min-height: 520px"
+        class="flex flex-col lg:flex-row gap-5 lg:h-[calc(100vh-290px)] lg:min-h-[520px]"
       >
         <!-- Colonne gauche: liste rôles -->
         <div
-          class="w-72 shrink-0 flex flex-col bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden"
+          class="w-full lg:w-72 shrink-0 flex flex-col bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden"
         >
           <div
             class="px-4 py-3.5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between"
@@ -432,7 +431,7 @@
           <template v-else>
             <!-- Header permissions -->
             <div
-              class="px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between"
+              class="px-4 sm:px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between"
             >
               <div class="flex items-center gap-3">
                 <div
@@ -473,7 +472,7 @@
 
             <!-- Toolbar -->
             <div
-              class="px-5 py-2 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/30"
+              class="px-4 sm:px-5 py-2 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/30"
             >
               <div class="flex items-center gap-1.5">
                 <button

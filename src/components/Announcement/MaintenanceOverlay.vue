@@ -41,7 +41,7 @@ const reload = () => {
 <template>
   <div v-if="visible" class="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
     <div class="w-full max-w-2xl rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl overflow-hidden">
-      <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4">
+      <div class="px-4 sm:px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4">
         <div class="flex items-center gap-3 min-w-0">
           <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
             <component :is="icon" :size="18" />
@@ -66,7 +66,7 @@ const reload = () => {
           {{ t('common.retry') }}
         </button>
       </div>
-      <div class="px-6 py-5">
+      <div class="px-4 sm:px-6 py-5">
         <p class="text-sm leading-relaxed text-slate-700 dark:text-slate-200 whitespace-pre-line">
           {{ active?.content }}
         </p>

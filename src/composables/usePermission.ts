@@ -20,18 +20,19 @@ export const usePermissionsStore = defineStore('permissions', () => {
 
   const permissionNames = computed(() => new Set(permissions.value.map((p) => p.name)))
 
+  const isSuperAdmin = computed(() => (role.value?.roleName ?? '').toLowerCase() === 'super admin')
 
   // L'utilisateur a cette permission ?
   const can = (permission: string): boolean =>
-    permissionNames.value.has(permission)
+    isSuperAdmin.value || permissionNames.value.has(permission)
 
   // L'utilisateur a AU MOINS UNE des permissions ?
   const canAny = (...perms: string[]): boolean =>
-    perms.some((p) => permissionNames.value.has(p))
+    isSuperAdmin.value || perms.some((p) => permissionNames.value.has(p))
 
   // L'utilisateur a TOUTES les permissions ?
   const canAll = (...perms: string[]): boolean =>
-    perms.every((p) => permissionNames.value.has(p))
+    isSuperAdmin.value || perms.every((p) => permissionNames.value.has(p))
 
 
   const init = (userRole: any) => {
@@ -55,5 +56,5 @@ export const usePermissionsStore = defineStore('permissions', () => {
     role.value        = null
   }
 
-   return { permissions, role, permissionNames, can, canAny, canAll, init, reset }
+   return { permissions, role, permissionNames, isSuperAdmin, can, canAny, canAll, init, reset }
 }, { persist: true })

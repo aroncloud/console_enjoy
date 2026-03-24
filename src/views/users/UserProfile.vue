@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { useI18n } from 'vue-i18n'
 import {
   ArrowLeft,
   Mail,
@@ -13,13 +14,14 @@ import { userService, type User } from "../../servicesAPI/userService";
 
 const route = useRoute();
 const router = useRouter();
+const { t, locale } = useI18n()
 
 const user = ref<any | null>(null);
 const loading = ref(false);
 
 const displayName = (u: User) => u.fullName || u.username || u.email || "—";
 const displayRole = (u: User) =>
-  u.role?.roleName || (u.roleId ? `Rôle #${u.roleId}` : "—");
+  u.role?.roleName || (u.roleId ? t('users.profile.roleFallback', { id: u.roleId }) : "—");
 
 const initials = (name: string) =>
   name
@@ -43,17 +45,19 @@ onMounted(async () => {
 
 const actionHistory = computed(() => user.value?.activityLogs ?? []);
 
-const actionConfig: Record<string, { label: string; color: string }> = {
-  LOGIN:                     { label: "Connexion",                     color: "emerald" },
-  LOGOUT:                    { label: "Déconnexion",                   color: "slate"   },
-  PASSWORD_RESET:            { label: "Mot de passe réinitialisé",     color: "amber"   },
-  FORGOT_PASSWORD_REQUEST:   { label: "Demande de réinitialisation",   color: "orange"  },
-  EMAIL_VERIFIED:            { label: "Email vérifié",                 color: "blue"    },
-  RESEND_VERIFICATION_EMAIL: { label: "Email de vérification renvoyé", color: "purple"  },
+const actionConfig: Record<string, { labelKey: string; color: string }> = {
+  LOGIN:                     { labelKey: 'users.profile.actions.login',                     color: "emerald" },
+  LOGOUT:                    { labelKey: 'users.profile.actions.logout',                    color: "slate"   },
+  PASSWORD_RESET:            { labelKey: 'users.profile.actions.passwordReset',             color: "amber"   },
+  FORGOT_PASSWORD_REQUEST:   { labelKey: 'users.profile.actions.forgotPasswordRequest',     color: "orange"  },
+  EMAIL_VERIFIED:            { labelKey: 'users.profile.actions.emailVerified',             color: "blue"    },
+  RESEND_VERIFICATION_EMAIL: { labelKey: 'users.profile.actions.resendVerificationEmail',   color: "purple"  },
 };
 
-const getActionLabel = (action: string) =>
-  actionConfig[action]?.label ?? action;
+const getActionLabel = (action: string) => {
+  const key = actionConfig[action]?.labelKey
+  return key ? t(key) : action
+}
 
 const getActionDotColor = (action: string) => {
   const color = actionConfig[action]?.color ?? "slate";
@@ -68,14 +72,16 @@ const getActionDotColor = (action: string) => {
   return map[color] ?? map.slate;
 };
 
-const formatDate = (d: string) =>
-  new Date(d).toLocaleString("fr-FR", {
+const formatDate = (d: string) => {
+  const loc = locale.value === 'fr' ? 'fr-FR' : 'en-US'
+  return new Date(d).toLocaleString(loc, {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-  });
+  })
+}
 
 const historyPage = ref(1);
 const historyPageSize = 5;
@@ -96,7 +102,7 @@ const totalPages = computed(() =>
       @click="router.back()"
       class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition cursor-pointer"
     >
-      <ArrowLeft class="w-4 h-4" /> Retour
+      <ArrowLeft class="w-4 h-4" /> {{ t('common.back') }}
     </button>
 
     <!-- Skeleton -->
@@ -190,7 +196,7 @@ const totalPages = computed(() =>
               <span
                 :class="['w-1.5 h-1.5 rounded-full', user.isActive ? 'bg-emerald-500' : 'bg-slate-400']"
               />
-              {{ user.isActive ? "Actif" : "Inactif" }}
+              {{ user.isActive ? t('status.active') : t('status.inactive') }}
             </span>
           </div>
         </div>
@@ -210,53 +216,53 @@ const totalPages = computed(() =>
             class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 space-y-4"
           >
             <h2 class="text-sm font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wide">
-              Informations
+              {{ t('users.profile.infoTitle') }}
             </h2>
             <div class="space-y-3 grid grid-cols-2">
               <div>
-                <p class="text-xs text-slate-400">Prénom</p>
+                <p class="text-xs text-slate-400">{{ t('users.fields.firstName') }}</p>
                 <p class="text-sm font-semibold text-slate-900 dark:text-white mt-0.5">
                   {{ user.firstName ?? "—" }}
                 </p>
               </div>
               <div>
-                <p class="text-xs text-slate-400">Nom</p>
+                <p class="text-xs text-slate-400">{{ t('users.fields.lastName') }}</p>
                 <p class="text-sm font-semibold text-slate-900 dark:text-white mt-0.5">
                   {{ user.lastName ?? "—" }}
                 </p>
               </div>
               <div>
-                <p class="text-xs text-slate-400">Email</p>
+                <p class="text-xs text-slate-400">{{ t('users.fields.email') }}</p>
                 <p class="text-sm font-semibold text-slate-900 dark:text-white mt-0.5">
                   {{ user.email }}
                 </p>
               </div>
               <div>
-                <p class="text-xs text-slate-400">Téléphone</p>
+                <p class="text-xs text-slate-400">{{ t('users.fields.phoneNumber') }}</p>
                 <p class="text-sm font-semibold text-slate-900 dark:text-white mt-0.5">
                   {{ user.phoneNumber ?? "—" }}
                 </p>
               </div>
               <div>
-                <p class="text-xs text-slate-400">Rôle</p>
+                <p class="text-xs text-slate-400">{{ t('users.fields.role') }}</p>
                 <p class="text-sm font-semibold text-slate-900 dark:text-white mt-0.5">
                   {{ displayRole(user) }}
                 </p>
               </div>
               <div>
-                <p class="text-xs text-slate-400">Statut</p>
+                <p class="text-xs text-slate-400">{{ t('common.status') }}</p>
                 <p class="text-sm font-semibold text-slate-900 dark:text-white mt-0.5 capitalize">
                   {{ user.status ?? "—" }}
                 </p>
               </div>
               <div>
-                <p class="text-xs text-slate-400">Email vérifié</p>
+                <p class="text-xs text-slate-400">{{ t('users.fields.emailVerified') }}</p>
                 <p class="text-sm font-semibold text-slate-900 dark:text-white mt-0.5">
-                  {{ user.emailVerified ? "Oui" : "Non" }}
+                  {{ user.emailVerified ? t('common.yes') : t('common.no') }}
                 </p>
               </div>
               <div>
-                <p class="text-xs text-slate-400">Dernière connexion</p>
+                <p class="text-xs text-slate-400">{{ t('users.fields.lastLogin') }}</p>
                 <p class="text-sm font-semibold text-slate-900 dark:text-white mt-0.5">
                   {{ user.lastLogin ? formatDate(user.lastLogin) : "—" }}
                 </p>
@@ -279,7 +285,7 @@ const totalPages = computed(() =>
             <div class="flex items-center gap-2 mb-4">
               <Activity class="w-4 h-4 text-slate-400" />
               <h2 class="text-sm font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wide">
-                Historique des actions
+                {{ t('users.profile.activityTitle') }}
               </h2>
               <span
                 class="ml-auto text-xs bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-semibold px-2 py-0.5 rounded-full"
@@ -289,7 +295,7 @@ const totalPages = computed(() =>
             </div>
 
             <div v-if="totalHistory === 0" class="text-sm text-slate-400 text-center py-6">
-              Aucune activité enregistrée
+              {{ t('users.profile.noActivity') }}
             </div>
 
             <div v-else>
@@ -329,7 +335,7 @@ const totalPages = computed(() =>
                 class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800 mt-2"
               >
                 <span class="text-xs text-slate-400">
-                  Page {{ historyPage }} / {{ totalPages }}
+                  {{ t('pagination.page', { current: historyPage, total: totalPages }) }}
                 </span>
                 <div class="flex items-center gap-1">
                   <button
@@ -337,14 +343,14 @@ const totalPages = computed(() =>
                     :disabled="historyPage === 1"
                     class="px-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                   >
-                    Précédent
+                    {{ t('common.previous') }}
                   </button>
                   <button
                     @click="historyPage++"
                     :disabled="historyPage === totalPages"
                     class="px-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                   >
-                    Suivant
+                    {{ t('common.next') }}
                   </button>
                 </div>
               </div>

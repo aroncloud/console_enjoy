@@ -152,6 +152,11 @@ const formatDate  = (d: string) => {
   const loc = locale.value === 'fr' ? 'fr-FR' : 'en-US'
   return new Date(d).toLocaleDateString(loc)
 }
+const formatDateTime = (d: string) => {
+  if (!d) return '—'
+  const loc = locale.value === 'fr' ? 'fr-FR' : 'en-US'
+  return new Date(d).toLocaleString(loc)
+}
 const formatPrice = (p: string | number) => {
   const loc = locale.value === 'fr' ? 'fr-FR' : 'en-US'
   return Number(p).toLocaleString(loc) + ' XAF'
@@ -358,7 +363,7 @@ const updateSub = (sub: any) => {
                   </div>
                   <div class="space-y-1">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ t('clientDetail.fields.lastUpdate') }}</p>
-                    <p class="text-xs text-slate-600 dark:text-slate-300">{{ hotel?.updatedAt ? new Date(hotel.updatedAt).toLocaleString('fr-FR') : '—' }}</p>
+                    <p class="text-xs text-slate-600 dark:text-slate-300">{{ formatDateTime(hotel?.updatedAt) }}</p>
                   </div>
                 </div>
               </div>

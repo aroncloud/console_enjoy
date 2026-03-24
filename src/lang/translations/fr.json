@@ -4,6 +4,20 @@
 	"no_results": "Aucun résultat",
 	"selected_period": "Sélectionner une période",
 	"select_time": "Sélectionner une heure",
+	"languages": {
+		"french": "Français",
+		"english": "Anglais"
+	},
+	"hotelTypes": {
+		"hotels": "Hôtels",
+		"resorts": "Resorts",
+		"hostels": "Auberges",
+		"bnb": "B&B (Chambres d'hôtes)",
+		"servicedApartments": "Appartements avec services",
+		"guestHouses": "Maisons d'hôtes",
+		"chainOfProperties": "Chaîne de propriétés",
+		"vacationRentals": "Locations de vacances"
+	},
 	"common": {
 		"add": "Ajouter",
 		"all": "Tous",
@@ -25,6 +39,8 @@
 		"apply": "Appliquer",
 		"previous": "Précédent",
 		"next": "Suivant",
+		"yes": "Oui",
+		"no": "Non",
 		"refresh": "Rafraîchir",
 		"retry": "Réessayer",
 		"search": "Recherche",
@@ -50,6 +66,7 @@
 	},
 	"pagination": {
 		"range": "Affichage de {start} à {end} sur {total}",
+		"page": "Page {current} / {total}",
 		"previous": "Précédent",
 		"next": "Suivant"
 	},
@@ -217,6 +234,7 @@
 			},
 			"lead" : "Commercial",
 			"assign" : "Commercial assigné",
+			"noSalesAssigned": "Aucun commercial assigné",
 			"planified" : "Démo planifiée",
 			"title" : "Historique des actions",
 			"noActivity" : " Aucune activité enregistrée"
@@ -369,6 +387,15 @@
 		"suspended": "Suspendu",
 		"demo": "Démo"
 	},
+	"errors": {
+		"forbidden": {
+			"code": "Erreur {code}",
+			"title": "Accès refusé",
+			"description": "Vous n'avez pas les permissions nécessaires pour accéder à cette page.",
+			"hint": "Contactez votre administrateur si vous pensez qu'il s'agit d'une erreur.",
+			"requiredPermission": "Permission requise"
+		}
+	},
 	"nav": {
 		"dashboard": "Tableau de bord",
 		"clients": "Parc Clients",
@@ -452,7 +479,10 @@
 			"lastName": "Nom",
 			"username": "Username",
 			"email": "Email",
+			"phoneNumber": "Téléphone",
 			"role": "Rôle",
+			"emailVerified": "Email vérifié",
+			"lastLogin": "Dernière connexion",
 			"activeAccount": "Compte actif",
 			"activeAccountHelp": "Désactivez pour bloquer la connexion"
 		},
@@ -460,7 +490,21 @@
 			"createTitle": "Ajouter un utilisateur",
 			"editTitle": "Modifier un utilisateur"
 		},
-		"profile": { "title": "Profil utilisateur" },
+		"profile": {
+			"title": "Profil utilisateur",
+			"infoTitle": "Informations",
+			"activityTitle": "Historique des actions",
+			"noActivity": "Aucune activité enregistrée",
+			"roleFallback": "Rôle #{id}",
+			"actions": {
+				"login": "Connexion",
+				"logout": "Déconnexion",
+				"passwordReset": "Mot de passe réinitialisé",
+				"forgotPasswordRequest": "Demande de réinitialisation",
+				"emailVerified": "Email vérifié",
+				"resendVerificationEmail": "Email de vérification renvoyé"
+			}
+		},
 		"validation": {
 			"firstNameRequired": "Le prénom est obligatoire",
 			"lastNameRequired": "Le nom est obligatoire",
@@ -489,7 +533,17 @@
 			"openDashboard": "Ouvrir le dashboard",
 			"alert": "Ouverture du dashboard pour {tenant}"
 		},
-		"logs": { "title": "Logs d’erreurs" },
+		"logs": {
+			"title": "Logs d’erreurs",
+			"services": {
+				"channelManager": "Channel Manager",
+				"pos": "POS"
+			},
+			"samples": {
+				"bookingFailed": "Connexion échouée à Booking",
+				"itemSyncFailed": "Synchronisation article KO"
+			}
+		},
 		"versions": {
 			"title": "Gestion des versions",
 			"stable": "stable",

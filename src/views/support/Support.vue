@@ -30,15 +30,15 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 const tenant = ref('')
 const version = ref('stable')
-const logs = ref([
-  { id: 1, service: 'Channel Manager', message: 'Connexion échouée à Booking' },
-  { id: 2, service: 'POS', message: 'Synchronisation article KO' },
-])
+const logs = computed(() => ([
+  { id: 1, service: t('support.logs.services.channelManager'), message: t('support.logs.samples.bookingFailed') },
+  { id: 2, service: t('support.logs.services.pos'), message: t('support.logs.samples.itemSyncFailed') },
+]))
 const impersonate = () => {
   alert(t('support.impersonate.alert', { tenant: tenant.value }))
 }

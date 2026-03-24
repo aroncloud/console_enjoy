@@ -38,17 +38,17 @@ import { ChevronDown } from 'lucide-vue-next'
 import FR from '../../assets/Flag_of_France.png'
 import GB from '../../assets/united-kingdom_551844.png'
 
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 
-const languages = [
-  { code: 'fr', label: 'Français', flag: FR },
-  { code: 'en', label: 'English',  flag: GB },
-]
+const languages = computed(() => [
+  { code: 'fr', label: t('languages.french'),  flag: FR },
+  { code: 'en', label: t('languages.english'), flag: GB },
+])
 
 const isOpen       = ref(false)
 const langDropdownRef = ref<HTMLElement | null>(null)
 
-const currentLang = computed(() => languages.find(l => l.code === locale.value) ?? languages[0])
+const currentLang = computed(() => languages.value.find(l => l.code === locale.value) ?? languages.value[0])
 
 const switchLang = (code: string) => {
   locale.value = code

@@ -40,11 +40,25 @@ const saving = ref(false);
 const searchQuery = ref("");
 const filterStatus = ref<DemoStatus | "all">("all");
 const toastStore = useToastStore();
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const page = ref(1);
 const limit = ref(20);
 const meta = ref<any>(null);
 const users = ref<any[]>([]);
+
+const propertyTypeOptions = computed(() => {
+  locale.value
+  return [
+  { label: t('hotelTypes.hotels'), value: 'Hotels' },
+  { label: t('hotelTypes.resorts'), value: 'Resorts' },
+  { label: t('hotelTypes.hostels'), value: 'Hostels' },
+  { label: t('hotelTypes.bnb'), value: 'B&Bs' },
+  { label: t('hotelTypes.servicedApartments'), value: 'Serviced Apartments' },
+  { label: t('hotelTypes.guestHouses'), value: 'Guest houses' },
+  { label: t('hotelTypes.chainOfProperties'), value: 'Chain of Properties' },
+  { label: t('hotelTypes.vacationRentals'), value: 'Vacation Rentals' },
+  ]
+})
 
 // --- ÉTATS DES MODALES ---
 const showWorkflowModal = ref(false);
@@ -80,47 +94,50 @@ type StepType =
   | "convert"
   | undefined;
 
-const statusConfig = computed<Record<DemoStatus, { label: string; classes: string; nextLabel?: string; nextStep?: StepType }>>(() => ({
-  New: {
-    label: t('demos.status.new'),
-    classes: "bg-blue-100 text-blue-800",
-    nextLabel: t('demos.status.contacted'),
-    nextStep: "qualify",
-  },
-  Qualified: {
-    label: t('demos.status.qualified'),
-    classes: "bg-purple-100 text-purple-800",
-    nextLabel: t('demos.status.demoScheduled'),
-    nextStep: "schedule",
-  },
-  "Demo Scheduled": {
-    label: t('demos.status.demoScheduled'),
-    classes: "bg-amber-100 text-amber-800",
-    nextLabel: t('demos.status.demoCompleted'),
-    nextStep: "complete",
-  },
-  "Demo Completed": {
-    label: t('demos.status.demoCompleted'),
-    classes: "bg-cyan-100 text-cyan-800",
-    nextLabel: t('demos.status.negotiation'),
-    nextStep: "negotiate",
-  },
-  Trial: {
-    label: t('demos.status.inTesting'),
-    classes: "bg-indigo-100 text-indigo-800",
-    nextLabel: t('demos.status.converted'),
-    nextStep: "convert",
-  },
-  Negotiation: {
-    label: t('demos.status.negotiation'),
-    classes: "bg-orange-100 text-orange-800",
-    nextLabel: t('demos.status.converted'),
-    nextStep: "convert",
-  },
-  Converted: { label: t('demos.status.converted'), classes: "bg-emerald-100 text-emerald-800" },
-  Lost: { label: t('demos.status.lost'), classes: "bg-rose-100 text-rose-800" },
-  Junk: { label: t('demos.status.junk'), classes: "bg-slate-100 text-slate-500" },
-}))
+const statusConfig = computed<Record<DemoStatus, { label: string; classes: string; nextLabel?: string; nextStep?: StepType }>>(() => {
+  locale.value
+  return {
+    New: {
+      label: t('demos.status.new'),
+      classes: "bg-blue-100 text-blue-800",
+      nextLabel: t('demos.status.contacted'),
+      nextStep: "qualify",
+    },
+    Qualified: {
+      label: t('demos.status.qualified'),
+      classes: "bg-purple-100 text-purple-800",
+      nextLabel: t('demos.status.demoScheduled'),
+      nextStep: "schedule",
+    },
+    "Demo Scheduled": {
+      label: t('demos.status.demoScheduled'),
+      classes: "bg-amber-100 text-amber-800",
+      nextLabel: t('demos.status.demoCompleted'),
+      nextStep: "complete",
+    },
+    "Demo Completed": {
+      label: t('demos.status.demoCompleted'),
+      classes: "bg-cyan-100 text-cyan-800",
+      nextLabel: t('demos.status.negotiation'),
+      nextStep: "negotiate",
+    },
+    Trial: {
+      label: t('demos.status.inTesting'),
+      classes: "bg-indigo-100 text-indigo-800",
+      nextLabel: t('demos.status.converted'),
+      nextStep: "convert",
+    },
+    Negotiation: {
+      label: t('demos.status.negotiation'),
+      classes: "bg-orange-100 text-orange-800",
+      nextLabel: t('demos.status.converted'),
+      nextStep: "convert",
+    },
+    Converted: { label: t('demos.status.converted'), classes: "bg-emerald-100 text-emerald-800" },
+    Lost: { label: t('demos.status.lost'), classes: "bg-rose-100 text-rose-800" },
+    Junk: { label: t('demos.status.junk'), classes: "bg-slate-100 text-slate-500" },
+  }
+})
 
 const workflowConfig = computed(() => {
   const map = {
@@ -603,10 +620,11 @@ const handleAddDemo = async () => {
               :lb="$t('demos.fields.numberOfRooms')"
               :is-required="true"
             />
-            <Input
+            <Select
               v-model="workflowForm.propertyType"
               :lb="$t('demos.fields.propertyType')"
               :placeholder="$t('demos.placeholders.propertyType')"
+              :options="propertyTypeOptions"
               class="col-span-2"
             />
           </div>
@@ -759,10 +777,11 @@ const handleAddDemo = async () => {
             :lb="$t('demos.fields.numberOfRooms')"
             placeholder="Ex: 24"
           />
-          <Input
+          <Select
             v-model="addForm.propertyType"
             :lb="$t('demos.fields.propertyType')"
             :placeholder="$t('demos.placeholders.propertyType')"
+            :options="propertyTypeOptions"
             class="col-span-2"
           />
           <!-- <Input v-model="addForm.leadSource" :lb="$t('demos.fields.leadSource')" class="col-span-2" /> -->

@@ -624,7 +624,7 @@
                 </p>
                 <p class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1"><Check :size="9" /> {{ t('subscriptions.status.active') }}</p>
               </div>
-              <span class="text-xs font-black text-slate-700 dark:text-slate-300">{{ getPrice(mod).toLocaleString('fr-FR') }} XAF</span>
+              <span class="text-xs font-black text-slate-700 dark:text-slate-300">{{ getPrice(mod).toLocaleString(locale === 'fr' ? 'fr-FR' : 'en-US') }} XAF</span>
             </div>
           </div>
 
@@ -666,7 +666,7 @@ import { hotelService } from '../../servicesAPI/clientService'
 
 const router = useRouter()
 const toastStore = useToastStore()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const loading = ref(false)
 const pageLoading = ref(true) 
 const existingSubscriptions = ref<any[]>([])

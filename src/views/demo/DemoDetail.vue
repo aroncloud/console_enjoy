@@ -119,7 +119,7 @@
             </div>
             <div v-else class="flex items-center gap-2 text-sm text-slate-400">
               <UserX :size="16" />
-              <span>Aucun commercial assigné</span>
+              <span>{{ $t('demos.history.noSalesAssigned') }}</span>
             </div>
           </div>
         </div>

@@ -84,7 +84,8 @@ type UserLike = {
 }
 
 const displayName = (u: UserLike) => u.fullName || u.username || u.email || '—'
-const displayRole = (u: UserLike) => u.role?.roleName || (u.roleId ? `Rôle #${u.roleId}` : '—')
+const displayRole = (u: UserLike) =>
+  u.role?.roleName || (u.roleId ? t('users.profile.roleFallback', { id: u.roleId }) : '—')
 
 const fetchUsers = async (targetPage = 1) => {
   loading.value = true

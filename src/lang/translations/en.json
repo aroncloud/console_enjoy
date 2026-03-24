@@ -4,6 +4,20 @@
 	"no_results": "No results",
 	"selected_period": "Select period",
 	"select_time": "Select time",
+	"languages": {
+		"french": "French",
+		"english": "English"
+	},
+	"hotelTypes": {
+		"hotels": "Hotels",
+		"resorts": "Resorts",
+		"hostels": "Hostels",
+		"bnb": "B&Bs (Bed and Breakfasts)",
+		"servicedApartments": "Serviced Apartments",
+		"guestHouses": "Guest houses",
+		"chainOfProperties": "Chain of Properties",
+		"vacationRentals": "Vacation Rentals"
+	},
 	"common": {
 		"add": "Add",
 		"all": "All",
@@ -25,6 +39,8 @@
 		"apply": "Apply",
 		"previous": "Previous",
 		"next": "Next",
+		"yes": "Yes",
+		"no": "No",
 		"refresh": "Refresh",
 		"retry": "Retry",
 		"search": "Search",
@@ -50,6 +66,7 @@
 	},
 	"pagination": {
 		"range": "Showing {start} to {end} of {total}",
+		"page": "Page {current} / {total}",
 		"previous": "Previous",
 		"next": "Next"
 	},
@@ -214,6 +231,7 @@
 			},
 			"lead" : "Commercial",
 			"assign":      "Commercial assigned",
+			"noSalesAssigned": "No sales representative assigned",
 			"planified":   "Demo scheduled",
 			"title":       "Action history",
 			"noActivity":  "No activity recorded"
@@ -365,6 +383,15 @@
 		"suspended": "Suspended",
 		"demo": "Demo"
 	},
+	"errors": {
+		"forbidden": {
+			"code": "Error {code}",
+			"title": "Access denied",
+			"description": "You don't have the required permissions to access this page.",
+			"hint": "Contact your administrator if you think this is an error.",
+			"requiredPermission": "Required permission"
+		}
+	},
 	"nav": {
 		"dashboard": "Dashboard",
 		"clients": "Clients",
@@ -448,7 +475,10 @@
 			"lastName": "Last name",
 			"username": "Username",
 			"email": "Email",
+			"phoneNumber": "Phone",
 			"role": "Role",
+			"emailVerified": "Email verified",
+			"lastLogin": "Last login",
 			"activeAccount": "Active account",
 			"activeAccountHelp": "Disable to block sign-in"
 		},
@@ -456,7 +486,21 @@
 			"createTitle": "Add a user",
 			"editTitle": "Edit a user"
 		},
-		"profile": { "title": "User profile" },
+		"profile": {
+			"title": "User profile",
+			"infoTitle": "Information",
+			"activityTitle": "Activity log",
+			"noActivity": "No activity recorded",
+			"roleFallback": "Role #{id}",
+			"actions": {
+				"login": "Sign in",
+				"logout": "Sign out",
+				"passwordReset": "Password reset",
+				"forgotPasswordRequest": "Password reset requested",
+				"emailVerified": "Email verified",
+				"resendVerificationEmail": "Verification email resent"
+			}
+		},
 		"validation": {
 			"firstNameRequired": "First name is required",
 			"lastNameRequired": "Last name is required",
@@ -485,7 +529,17 @@
 			"openDashboard": "Open dashboard",
 			"alert": "Opening the dashboard for {tenant}"
 		},
-		"logs": { "title": "Error logs" },
+		"logs": {
+			"title": "Error logs",
+			"services": {
+				"channelManager": "Channel Manager",
+				"pos": "POS"
+			},
+			"samples": {
+				"bookingFailed": "Failed connection to Booking",
+				"itemSyncFailed": "Item sync failed"
+			}
+		},
 		"versions": {
 			"title": "Version management",
 			"stable": "stable",

@@ -49,16 +49,31 @@ const users = ref<any[]>([]);
 const propertyTypeOptions = computed(() => {
   locale.value
   return [
-  { label: t('hotelTypes.hotels'), value: 'Hotels' },
-  { label: t('hotelTypes.resorts'), value: 'Resorts' },
-  { label: t('hotelTypes.hostels'), value: 'Hostels' },
-  { label: t('hotelTypes.bnb'), value: 'B&Bs' },
-  { label: t('hotelTypes.servicedApartments'), value: 'Serviced Apartments' },
-  { label: t('hotelTypes.guestHouses'), value: 'Guest houses' },
-  { label: t('hotelTypes.chainOfProperties'), value: 'Chain of Properties' },
-  { label: t('hotelTypes.vacationRentals'), value: 'Vacation Rentals' },
+    { label: t('hotelTypes.hotel'),  value: 'hotel' },
+    { label: t('hotelTypes.resorts'), value: 'Resorts' },
+    { label: t('hotelTypes.apart_hotel'),    value: 'apart_hotel' },
+    { label: t('hotelTypes.apartment'),       value: 'apartment' },
+    { label: t('hotelTypes.boat'),            value: 'boat' },
+    { label: t('hotelTypes.camping'),         value: 'camping' },
+    { label: t('hotelTypes.capsule_hotel'),   value: 'capsule_hotel' },
+    { label: t('hotelTypes.chalet'),          value: 'chalet' },
+    { label: t('hotelTypes.country_house'),   value: 'country_house' },
+    { label: t('hotelTypes.farm_stay'),       value: 'farm_stay' },
+    { label: t('hotelTypes.guest_house'),     value: 'guest_house' },
+    { label: t('hotelTypes.holiday_home'),    value: 'holiday_home' },
+    { label: t('hotelTypes.holiday_park'),    value: 'holiday_park' },
+    { label: t('hotelTypes.homestay'),        value: 'homestay' },
+    { label: t('hotelTypes.hostel'),          value: 'hostel' },
+    { label: t('hotelTypes.inn'),             value: 'inn' },
+    { label: t('hotelTypes.lodge'),           value: 'lodge' },
+    { label: t('hotelTypes.motel'),           value: 'motel' },
+    { label: t('hotelTypes.riad'),            value: 'riad' },
+    { label: t('hotelTypes.ryokan'),          value: 'ryokan' },
+    { label: t('hotelTypes.tent'),            value: 'tent' },
+    { label: t('hotelTypes.villa'),           value: 'villa' },
   ]
 })
+
 
 // --- ÉTATS DES MODALES ---
 const showWorkflowModal = ref(false);

@@ -84,6 +84,7 @@
             <button type="button" @click="useAnotherAccount" class="text-xs text-purple-600 hover:text-purple-800 shrink-0 font-medium">{{ t('common.change') }}</button>
           </div>
 
+          <form @submit.prevent="handleSubmit">
           <!-- Email -->
           <div v-if="!selectedAccount" class="mb-3.5">
             <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{{ t('auth.fields.email') }}</label>
@@ -150,8 +151,7 @@
 
           <!-- Submit -->
           <button
-            type="button"
-            @click.prevent="handleSubmit"
+            type="submit"
             :disabled="isLoading"
             class="w-full py-2.5 bg-purple-600 hover:bg-purple-700 active:bg-purple-800
                    disabled:opacity-60 disabled:cursor-not-allowed
@@ -163,6 +163,8 @@
             </svg>
             {{ isLoading ? t('auth.login.signingIn') : t('auth.login.signIn') }}
           </button>
+
+          </form>
 
           <p class="mt-4 text-center text-xs text-gray-400 dark:text-slate-500">{{ t('auth.login.restricted') }}</p>
         </div>

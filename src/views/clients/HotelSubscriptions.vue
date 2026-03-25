@@ -1043,15 +1043,22 @@ const buildSubscriptionPayload = (mod: any) => {
     ...(mod.slug === 'pos'             && { units: sel.units }),
     ...(mod.slug === 'mobile-app'      && { staff_quota: sel.staffQuota, guest_app: sel.guestApp }),
     ...(mod.slug === 'channel-manager' && { otas: sel.otas.filter(o => o.checked).map(o => o.name) }),
+    batch_module_ids: selectedModules.value.map(m => m.id),
   }
 }
 
 const goToStep3 = async () => {
   try {
     loading.value = true
-    for (const mod of selectedModules.value) {
-      const payload = buildSubscriptionPayload(mod)
+    const ORDER = ['pms', 'pos', 'mobile-app', 'analytics', 'crm', 'channel-manager']
 
+    const sortedModules = [...selectedModules.value].sort(
+      (a, b) => ORDER.indexOf(a.slug) - ORDER.indexOf(b.slug)
+    )
+
+    for (const mod of sortedModules) {
+  
+      const payload = buildSubscriptionPayload(mod)
       if (editSubId.value) {
        
         await subscriptionService.update(editSubId.value, {

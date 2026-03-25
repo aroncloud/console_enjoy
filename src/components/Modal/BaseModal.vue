@@ -3,7 +3,6 @@
     <div
       v-if="modelValue"
       class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-      @click.self="close"
     >
       <div :class="['bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 w-full shadow-2xl ', customClass || 'max-w-lg']">
 

@@ -9,14 +9,36 @@
 		"english": "Anglais"
 	},
 	"hotelTypes": {
-		"hotels": "Hôtels",
 		"resorts": "Resorts",
 		"hostels": "Auberges",
 		"bnb": "B&B (Chambres d'hôtes)",
 		"servicedApartments": "Appartements avec services",
 		"guestHouses": "Maisons d'hôtes",
 		"chainOfProperties": "Chaîne de propriétés",
-		"vacationRentals": "Locations de vacances"
+		"vacationRentals": "Locations de vacances",
+		"apart_hotel":   "Appart-hôtel",
+		"apartment":     "Appartement",
+		"boat":          "Bateau",
+		"camping":       "Camping",
+		"capsule_hotel": "Hôtel capsule",
+		"chalet":        "Chalet",
+		"country_house": "Maison de campagne",
+		"farm_stay":     "Séjour à la ferme",
+		"guest_house":   "Maison d'hôtes",
+		"holiday_home":  "Maison de vacances",
+		"holiday_park":  "Parc de vacances",
+		"homestay":      "Chambre chez l'habitant",
+		"hostel":        "Auberge de jeunesse",
+		"hotel":         "Hôtel",
+		"inn":           "Auberge",
+		"lodge":         "Lodge",
+		"motel":         "Motel",
+		"resort":        "Resort",
+		"riad":          "Riad",
+		"ryokan":        "Ryokan",
+		"tent":          "Tente",
+		"villa":         "Villa"
+	
 	},
 	"common": {
 		"add": "Ajouter",

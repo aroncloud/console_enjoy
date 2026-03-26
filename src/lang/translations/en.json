@@ -728,7 +728,8 @@
 		"tabs": {
 			"general": "General information",
 			"contact": "Primary contact",
-			"config": "Initial configuration"
+			"config": "Initial configuration",
+			"customModules": "Custom module"
 		},
 		"actions": {
 			"backToList": "Back to list",
@@ -745,6 +746,11 @@
 			"tenantHint": "Unique auto-generated identifier.",
 			"scheduleTitle": "Schedule",
 			"policiesTitle": "Policies"
+		},
+		"customModules": {
+			"title": "Custom module",
+			"useCashering": "Use cashiering",
+			"useChannel": "Use channel"
 		},
 		"fields": {
 			"hotelName": "Hotel name",
@@ -792,7 +798,8 @@
 			"cityRequired": "City is required",
 			"starRatingRequired": "Star rating is required",
 			"phoneRequired": "Phone number is required",
-			"emailValid": "A valid email is required"
+			"emailValid": "A valid email is required",
+			"totalFloorsMin": "Total floors must be at least 1"
 		},
 		"toast": {
 			"loadError": "Unable to load property data"
@@ -1029,7 +1036,8 @@
 		"price": {
 			"label": "Subscription price",
 			"monthly": "Monthly",
-			"yearly": "Yearly"
+			"yearly": "Yearly",
+			"customApplied": "Applied price"
 		},
 		"summary": {
 			"title": "Summary",

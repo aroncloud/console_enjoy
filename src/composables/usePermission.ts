@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import { useAuthStore } from './useAuth'
 
 interface Permission {
   id: number
@@ -20,7 +21,13 @@ export const usePermissionsStore = defineStore('permissions', () => {
 
   const permissionNames = computed(() => new Set(permissions.value.map((p) => p.name)))
 
-  const isSuperAdmin = computed(() => (role.value?.roleName ?? '').toLowerCase() === 'super admin')
+  const isSuperAdmin = computed(() => {
+    const authStore = useAuthStore()
+    if (authStore.isSuperAdmin) return true
+    
+    const name = (role.value?.roleName ?? '').toLowerCase().trim().replace('_', ' ')
+    return name === 'super admin' || name === 'superadmin'
+  })
 
   // L'utilisateur a cette permission ?
   const can = (permission: string): boolean =>

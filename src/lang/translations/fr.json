@@ -732,7 +732,8 @@
 		"tabs": {
 			"general": "Informations Générales",
 			"contact": "Contact Principal",
-			"config": "Configuration Initiale"
+			"config": "Configuration Initiale",
+			"customModules": "Module custom"
 		},
 		"actions": {
 			"backToList": "Retour à la liste",
@@ -749,6 +750,11 @@
 			"tenantHint": "Identifiant unique auto-généré.",
 			"scheduleTitle": "Horaires",
 			"policiesTitle": "Politiques"
+		},
+		"customModules": {
+			"title": "Module custom",
+			"useCashering": "Activer cashiering",
+			"useChannel": "Activer channel"
 		},
 		"fields": {
 			"hotelName": "Nom de l'hôtel",
@@ -796,7 +802,8 @@
 			"cityRequired": "La ville est obligatoire",
 			"starRatingRequired": "Les étoiles sont obligatoires",
 			"phoneRequired": "Le numéro de téléphone est obligatoire",
-			"emailValid": "Un email valide est requis"
+			"emailValid": "Un email valide est requis",
+			"totalFloorsMin": "Le nombre d'étages doit être d'au moins 1"
 		},
 		"toast": {
 			"loadError": "Impossible de charger les données de l'établissement"
@@ -1033,7 +1040,8 @@
 		"price": {
 			"label": "Prix de souscription",
 			"monthly": "Mensuel",
-			"yearly": "Annuel"
+			"yearly": "Annuel",
+			"customApplied": "Prix appliqué"
 		},
 		"summary": {
 			"title": "Récapitulatif",

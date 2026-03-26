@@ -188,52 +188,34 @@
                       <Tag :size="11" />
                       {{ t('subscriptions.price.label') }}
                     </p>
-                    <div class="p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex items-center justify-between">
-                      <span class="text-xs font-semibold text-slate-600 dark:text-slate-300">
-                        {{ getSel(mod.id).billingCycle === 'yearly' ? t('subscriptions.price.yearly') : t('subscriptions.price.monthly') }}
-                      </span>
-                      <span class="text-sm font-black text-slate-900 dark:text-white">
-                        {{ formatCurrency(getPrice(mod)) }}
-                      </span>
-                    </div>
-                    <!-- <div class="p-3 rounded-xl border border-slate-100 bg-slate-50/50">
-                      <div class="flex items-center gap-2">
-
-                     
-                        <div class="flex-1">
-                          <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Catalogue</p>
-                          <div class="flex items-center h-9 px-3 rounded-lg border border-slate-200 bg-slate-100 dark:bg-slate-700/50 dark:border-slate-600">
-                            <span class="text-xs font-bold text-slate-400 line-through">{{ mod.priceMonthly.toLocaleString('fr-FR') }}</span>
-                            <span class="text-[9px] text-slate-400 ml-1">/mois</span>
-                          </div>
-                        </div>
-
-                        <ArrowRight :size="13" class="text-slate-300 shrink-0 mt-4" />
-
+                    <div class="p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex flex-col gap-3">
+                      <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                          {{ getSel(mod.id).billingCycle === 'yearly' ? t('subscriptions.price.yearly') : t('subscriptions.price.monthly') }}
+                        </span>
+                        <span class="text-sm font-black text-slate-900 dark:text-white line-through opacity-50" v-if="getSel(mod.id)?.customPrice != null && getSel(mod.id)!.customPrice! >= 0">
+                          {{ formatCurrency(getDefaultPrice(mod)) }}
+                        </span>
+                        <span class="text-sm font-black text-slate-900 dark:text-white" v-else>
+                          {{ formatCurrency(getDefaultPrice(mod)) }}
+                        </span>
+                      </div>
                       
-                        <div class="flex-1">
-                          <p class="text-[9px] font-bold text-purple-500 uppercase tracking-wider mb-1">Prix appliqué</p>
-                          <div class="relative">
-                            <input
-                              type="number"
-                              v-model.number="getSel(mod.id).customPrice"
-                              :min="0"
-                              class="w-full h-9 rounded-lg border-2 border-purple-300 dark:border-purple-700/60 bg-white dark:bg-slate-800 px-3 pr-10 text-xs font-black text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-400/30 focus:border-purple-500 transition-all"
-                            />
-                            <span class="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-bold text-slate-400 pointer-events-none">XAF</span>
-                          </div>
+                      <div class="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-700">
+                        <span class="text-[10px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">{{ t('subscriptions.price.customApplied') || 'Prix appliqué' }}</span>
+                        <div class="relative w-32">
+                          <input
+                            type="number"
+                            :value="getPriceInputValue(mod)"
+                            @input="e => updateCustomPrice(mod, (e.target as HTMLInputElement).value)"
+                            :placeholder="getDefaultPrice(mod).toString()"
+                            :min="0"
+                            class="w-full h-8 rounded-lg border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-900 px-2 pr-10 text-sm font-bold text-purple-700 dark:text-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all text-right"
+                          />
+                          <span class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-purple-400 pointer-events-none">XAF</span>
                         </div>
                       </div>
-
-                      <div v-if="getSel(mod.id).customPrice > 0 && getSel(mod.id).customPrice < mod.priceMonthly" class="mt-2 flex items-center gap-1.5 text-[10px] font-bold text-emerald-600">
-                        <TrendingDown :size="11" />
-                        Remise de {{ Math.round((1 - getSel(mod.id).customPrice / mod.priceMonthly) * 100) }}% par rapport au catalogue
-                      </div>
-                      <div v-else-if="getSel(mod.id).customPrice > mod.priceMonthly" class="mt-2 flex items-center gap-1.5 text-[10px] font-bold text-amber-500">
-                        <TrendingUp :size="11" />
-                        Majoration de {{ Math.round((getSel(mod.id).customPrice / mod.priceMonthly - 1) * 100) }}% par rapport au catalogue
-                      </div>
-                    </div> -->
+                    </div>
                   </div>
 
               
@@ -699,7 +681,7 @@ interface Selection {
   otas         : OTA[]
   startMonth   : string
   endMonth     : string
-  customPrice  : number
+  customPrice  : number | null
   addOnId      : number | null
 }
 
@@ -848,7 +830,7 @@ const addOnOptionsForModule = (moduleId: number) =>
 const handleAddOnChange = (moduleId: number) => {
   const sel = selections[moduleId]
   if (!sel) return
-  sel.customPrice = 0
+  sel.customPrice = null
 }
 
 const getLimitCountForModule = (mod: any, sel: Selection) =>
@@ -903,13 +885,22 @@ const ensureAddOnsLoaded = async (moduleId: number) => {
 }
 
 
-const getPrice = (mod: any): number => {
+const updateCustomPrice = (mod: any, val: string | number) => {
+  const sel = getSel(mod.id)
+  if (!sel) return
+  if (val === '') {
+    sel.customPrice = null
+    return
+  }
+  const numVal = Number(val)
+  if (isNaN(numVal) || numVal < 0) return
+  // If yearly, the user is entering the yearly price, so base monthly is val / 12
+  sel.customPrice = sel.billingCycle === 'yearly' ? numVal / 12 : numVal
+}
+
+const getDefaultPrice = (mod: any): number => {
   const sel = selections[mod.id]
   if (!sel) return Number(mod.priceMonthly) 
-  if (sel.customPrice > 0) {
-    const baseMonthly = Number(sel.customPrice)
-    return sel.billingCycle === 'yearly' ? baseMonthly * 12 : baseMonthly
-  }
 
   const selectedAddOn = getSelectedAddOn(mod.id)
   if (selectedAddOn) {
@@ -921,6 +912,24 @@ const getPrice = (mod: any): number => {
 
   const baseMonthly = Number(mod.priceMonthly)
   return sel.billingCycle === 'yearly' ? baseMonthly * 12 : baseMonthly
+}
+
+const getPrice = (mod: any): number => {
+  const sel = selections[mod.id]
+  if (!sel) return Number(mod.priceMonthly) 
+  if (sel.customPrice != null && sel.customPrice >= 0) {
+    const baseMonthly = Number(sel.customPrice)
+    return sel.billingCycle === 'yearly' ? baseMonthly * 12 : baseMonthly
+  }
+  return getDefaultPrice(mod)
+}
+
+const getPriceInputValue = (mod: any) => {
+  const sel = getSel(mod.id)
+  if (!sel) return ''
+  if (sel.customPrice == null) return ''
+  if (sel.customPrice >= 0) return getPrice(mod)
+  return ''
 }
 
 const hasMonthlyBilling = computed(() =>

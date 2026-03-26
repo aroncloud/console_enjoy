@@ -94,7 +94,10 @@
 
           <InputPhone :title="t('hotelForm.fields.phoneNumber')" v-model="form.phone" :isRequired="false" />
 
-          <Input :lb="t('hotelForm.fields.totalFloors')" v-model.number="form.totalFloors" type="number" :placeholder="t('hotelForm.placeholders.totalFloors')" :is-required="true" />
+          <div class="flex flex-col gap-1.5">
+            <Input :lb="t('hotelForm.fields.totalFloors')" v-model.number="form.totalFloors" type="number" min="1" :placeholder="t('hotelForm.placeholders.totalFloors')" :is-required="true" />
+            <p v-if="errors.totalFloors" class="text-sm font-light italic text-red-500">{{ errors.totalFloors }}</p>
+          </div>
 
           <div class="flex flex-col gap-1.5">
             <label class="text-sm font-medium text-gray-700">
@@ -220,6 +223,19 @@
             </div>
           </section>
 
+          <!-- ── Custom module ── -->
+          <section v-show="activeTab === 'custom-modules'">
+            <div class="space-y-6">
+              <div>
+                <h3 class="text-sm font-semibold text-gray-500 dark:text-slate-300 uppercase tracking-wider mb-4">{{ t('hotelForm.customModules.title') }}</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <Toggle v-model="form.useCashering" :title="t('hotelForm.customModules.useCashering')" />
+                  <Toggle v-model="form.useChannel" :title="t('hotelForm.customModules.useChannel')" />
+                </div>
+              </div>
+            </div>
+          </section>
+
         </div>
 
         <!-- ── Footer ── -->
@@ -266,6 +282,7 @@ import Select          from '../FormElements/Select.vue'
 import ButtonComponent from '../Button/ButtonComponent.vue'
 import InputPhone      from '../FormElements/InputPhone.vue'
 import InputTime       from '../FormElements/InputTime.vue'
+import Toggle          from '../FormElements/Toggle.vue'
 import { hotelService } from '../../servicesAPI/clientService'
 import { useToastStore } from '../../composables/toast'
 
@@ -310,6 +327,7 @@ const tabs = computed(() => [
   { key: 'general', label: t('hotelForm.tabs.general') },
   { key: 'contact', label: t('hotelForm.tabs.contact') },
   { key: 'config',  label: t('hotelForm.tabs.config') },
+  { key: 'custom-modules', label: t('hotelForm.tabs.customModules') },
 ])
 
 const activeTab    = ref('general')
@@ -326,8 +344,8 @@ const errors = reactive({
   address: '',
   city:'',
   starRating:'',
-  adminPhoneNumber:''
-
+  adminPhoneNumber:'',
+  totalFloors: ''
 
 })
 
@@ -345,6 +363,8 @@ const form = reactive({
   pmsEnabled: true, pmsRooms: 1,
   posEnabled: false, posTerminals: 0,
   channelManagerEnabled: false, mobileAppEnabled: false,
+  useCashering: false,
+  useChannel: false,
 })
 
 const regenerateTenantId = () => { form.tenantId = generateTenantId() }
@@ -384,7 +404,7 @@ onMounted(async () => {
     form.city              = h.city              ?? ''
     form.country           = h.country           ?? 'CM'
     form.website           = (h.website ?? '').replace(/^https?:\/\//, '')
-    form.totalFloors       = h.totalFloors       ?? 0
+    form.totalFloors       = h.totalFloors || 1
     form.starRating        = h.grade        ?? 0
     form.managerName       = h.managerName       ?? ''
     form.managerEmail      = h.email             ?? ''
@@ -402,6 +422,8 @@ onMounted(async () => {
     form.pmsRooms          = h.totalRooms        ?? 1
     form.cancellationPolicy = h.cancellationPolicy ?? ''
     form.policies          = h.hotelPolicy          ?? ''
+    form.useCashering      = h.useCashering ?? false
+    form.useChannel        = h.useChannel   ?? false
 
   } catch (e) {
     console.error(e)
@@ -420,7 +442,8 @@ const validateTab = (tabKey: string): boolean => {
     errors.address = form.address.trim() ? '' : t('hotelForm.validation.addressRequired')
     errors.city = form.city.trim() ? '' : t('hotelForm.validation.cityRequired')
     errors.starRating = form.starRating ? '' : t('hotelForm.validation.starRatingRequired')
-    if (errors.hotelName || errors.address || errors.city || errors.starRating ) valid = false
+    errors.totalFloors = (Number(form.totalFloors) >= 1) ? '' : t('hotelForm.validation.totalFloorsMin')
+    if (errors.hotelName || errors.address || errors.city || errors.starRating || errors.totalFloors) valid = false
   }
   if (tabKey === 'contact') {
     errors.adminFirstName = form.adminFirstName.trim() ? '' : t('users.validation.firstNameRequired')
@@ -486,8 +509,8 @@ const handleSubmit = () => {
     email:              form.managerEmail,
     website:            form.website ? `https://${form.website}` : '',
     phone:              form.phone,
-    totalRooms:         Math.max(form.pmsRooms, 1),
-    totalFloors:        form.totalFloors,
+    totalRooms:         Math.max(Number(form.pmsRooms) || 1, 1),
+    totalFloors:        Math.max(Number(form.totalFloors) || 1, 1),
     starRating:         form.starRating,
     timezone:           form.timezone,
     currency:           form.currency,
@@ -497,6 +520,8 @@ const handleSubmit = () => {
     cancellationPolicy: form.cancellationPolicy,
     policies:           form.policies,
     isActive:           true,
+    useCashering:       form.useCashering,
+    useChannel:         form.useChannel,
     adminFirstName:     form.adminFirstName,
     adminLastName:      form.adminLastName,
     adminEmail:         form.adminEmail,

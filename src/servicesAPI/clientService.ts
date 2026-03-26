@@ -9,6 +9,8 @@ export interface Hotel {
   capacity: number
   contactName: string
   contactRole: string
+  useCashering?: boolean
+  useChannel?: boolean
 
 }
 
@@ -34,6 +36,8 @@ export interface CreateHotelPayload {
   cancellationPolicy?: string
   policies?: string
   isActive?: boolean
+  useCashering?: boolean
+  useChannel?: boolean
   adminFirstName: string
   adminLastName: string
   adminEmail: string

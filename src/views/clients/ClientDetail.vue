@@ -192,6 +192,8 @@ const hotelPhone  = computed(() => hotel.value?.phoneNumber        ?? '—')
 const hotelGrade  = computed(() => hotel.value?.grade              ?? 0)
 const currency    = computed(() => hotel.value?.currencyCode       ?? '—')
 const timezone    = computed(() => hotel.value?.timezone           ?? '—')
+const useCashering = computed(() => hotel.value?.useCashering ?? false)
+const useChannel   = computed(() => hotel.value?.useChannel ?? false)
 // const workingDate = computed(() => hotel.value?.currentWorkingDate ?? '—')
 
 const initials = computed(() =>
@@ -364,6 +366,28 @@ const updateSub = (sub: any) => {
                   <div class="space-y-1">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ t('clientDetail.fields.lastUpdate') }}</p>
                     <p class="text-xs text-slate-600 dark:text-slate-300">{{ formatDateTime(hotel?.updatedAt) }}</p>
+                  </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
+                  <div class="space-y-1">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ t('hotelForm.customModules.useCashering') }}</p>
+                    <div class="flex items-center gap-2">
+                      <span class="relative flex h-2.5 w-2.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" :class="useCashering ? 'bg-emerald-400' : 'bg-slate-400'"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5" :class="useCashering ? 'bg-emerald-500' : 'bg-slate-500'"></span>
+                      </span>
+                      <p class="text-sm font-semibold text-slate-900 dark:text-white">{{ useCashering ? t('common.yes') : t('common.no') }}</p>
+                    </div>
+                  </div>
+                  <div class="space-y-1">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ t('hotelForm.customModules.useChannel') }}</p>
+                    <div class="flex items-center gap-2">
+                      <span class="relative flex h-2.5 w-2.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" :class="useChannel ? 'bg-emerald-400' : 'bg-slate-400'"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5" :class="useChannel ? 'bg-emerald-500' : 'bg-slate-500'"></span>
+                      </span>
+                      <p class="text-sm font-semibold text-slate-900 dark:text-white">{{ useChannel ? t('common.yes') : t('common.no') }}</p>
+                    </div>
                   </div>
                 </div>
               </div>

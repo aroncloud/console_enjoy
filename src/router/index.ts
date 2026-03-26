@@ -169,16 +169,15 @@ router.beforeEach((to) => {
   const authStore        = useAuthStore()
   const permissionsStore = usePermissionsStore()
 
+  if (authStore.isAuthenticated && permissionsStore.permissions.length === 0 && authStore.user?.role) {
+    permissionsStore.init(authStore.user.role)
+  }
+
   if (to.meta.public) {
-    if (authStore.isAuthenticated && to.name === 'login') {
-      const path = getFirstAccessiblePath(permissionsStore)
-      console.log('[Router] Login → redirect to:', path)
-      return { path }
-    }
     return true
   }
 
-  if (!authStore.isAuthenticated) return { name: 'login' }
+  if (!authStore.isAuthenticated || !authStore.user) return { name: 'login' }
 
   const requiredPermission = (to.meta as any)?.permission as string | undefined
   if (requiredPermission && !permissionsStore.can(requiredPermission)) {

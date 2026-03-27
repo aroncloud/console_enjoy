@@ -183,7 +183,7 @@
                   </div>
 
                   <!-- ── Prix de souscription (selon add-on + mensuel/annuel) ── -->
-                  <div v-if="isSelected(mod.id)" class="mb-4" @click.stop>
+                  <!-- <div v-if="isSelected(mod.id)" class="mb-4" @click.stop>
                     <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                       <Tag :size="11" />
                       {{ t('subscriptions.price.label') }}
@@ -195,47 +195,60 @@
                       <span class="text-sm font-black text-slate-900 dark:text-white">
                         {{ formatCurrency(getPrice(mod)) }}
                       </span>
+                    </div>  
+     
+                  </div> -->
+
+                  <div v-if="isSelected(mod.id)" class="mb-4" @click.stop>
+                    <div class="flex items-center justify-between mb-1.5">
+                      <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <Tag :size="11" />
+                        {{ t('subscriptions.price.label') }}
+                      </p>
+                      <!-- Toggle prix personnalisé -->
+                      <div class="flex items-center gap-1.5">
+                        <span class="text-[10px] text-slate-400">{{ t('subscriptions.price.custom') }}</span>
+                        <button
+                          @click="setSel(mod.id, 'useCustomPrice', !getSel(mod.id).useCustomPrice)"
+                          class="relative inline-flex h-4 w-7 items-center rounded-full transition-colors"
+                          :class="getSel(mod.id).useCustomPrice ? 'bg-purple-600' : 'bg-slate-200 dark:bg-slate-700'"
+                        >
+                          <span
+                            class="inline-block h-3 w-3 transform rounded-full bg-white transition-transform"
+                            :class="getSel(mod.id).useCustomPrice ? 'translate-x-3.5' : 'translate-x-0.5'"
+                          />
+                        </button>
+                      </div>
                     </div>
-                    <!-- <div class="p-3 rounded-xl border border-slate-100 bg-slate-50/50">
-                      <div class="flex items-center gap-2">
 
-                     
-                        <div class="flex-1">
-                          <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Catalogue</p>
-                          <div class="flex items-center h-9 px-3 rounded-lg border border-slate-200 bg-slate-100 dark:bg-slate-700/50 dark:border-slate-600">
-                            <span class="text-xs font-bold text-slate-400 line-through">{{ mod.priceMonthly.toLocaleString('fr-FR') }}</span>
-                            <span class="text-[9px] text-slate-400 ml-1">/mois</span>
-                          </div>
+                    <!-- Prix affiché ou input personnalisé -->
+                    <div class="p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
+                      <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                          {{ getSel(mod.id).billingCycle === 'yearly' ? t('subscriptions.price.yearly') : t('subscriptions.price.monthly') }}
+                        </span>
+                        <!-- Mode lecture -->
+                        <span v-if="!getSel(mod.id).useCustomPrice" class="text-sm font-black text-slate-900 dark:text-white">
+                          {{ formatCurrency(getPrice(mod)) }}
+                        </span>
+                      </div>
+
+                      <!-- Mode édition -->
+                      <Transition name="slide-down">
+                        <div v-if="getSel(mod.id).useCustomPrice" class="flex items-center gap-2 mt-2">
+                          <input
+                            type="number"
+                            min="0"
+                            :value="getSel(mod.id).customPrice"
+                            @input="setSel(mod.id, 'customPrice', Number(($event.target as HTMLInputElement).value))"
+                            class="h-9 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 text-sm font-bold text-slate-900 dark:text-white focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                            placeholder="0"
+                          />
+                          <span class="text-xs font-bold text-slate-400 shrink-0">FCFA</span>
                         </div>
-
-                        <ArrowRight :size="13" class="text-slate-300 shrink-0 mt-4" />
-
-                      
-                        <div class="flex-1">
-                          <p class="text-[9px] font-bold text-purple-500 uppercase tracking-wider mb-1">Prix appliqué</p>
-                          <div class="relative">
-                            <input
-                              type="number"
-                              v-model.number="getSel(mod.id).customPrice"
-                              :min="0"
-                              class="w-full h-9 rounded-lg border-2 border-purple-300 dark:border-purple-700/60 bg-white dark:bg-slate-800 px-3 pr-10 text-xs font-black text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-400/30 focus:border-purple-500 transition-all"
-                            />
-                            <span class="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-bold text-slate-400 pointer-events-none">XAF</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div v-if="getSel(mod.id).customPrice > 0 && getSel(mod.id).customPrice < mod.priceMonthly" class="mt-2 flex items-center gap-1.5 text-[10px] font-bold text-emerald-600">
-                        <TrendingDown :size="11" />
-                        Remise de {{ Math.round((1 - getSel(mod.id).customPrice / mod.priceMonthly) * 100) }}% par rapport au catalogue
-                      </div>
-                      <div v-else-if="getSel(mod.id).customPrice > mod.priceMonthly" class="mt-2 flex items-center gap-1.5 text-[10px] font-bold text-amber-500">
-                        <TrendingUp :size="11" />
-                        Majoration de {{ Math.round((getSel(mod.id).customPrice / mod.priceMonthly - 1) * 100) }}% par rapport au catalogue
-                      </div>
-                    </div> -->
+                      </Transition>
+                    </div>
                   </div>
-
               
                   <!-- <div class="flex items-end justify-between">
                     <div>
@@ -701,6 +714,7 @@ interface Selection {
   endMonth     : string
   customPrice  : number
   addOnId      : number | null
+  useCustomPrice : boolean 
 }
 
 
@@ -752,6 +766,7 @@ const openEditMode = (sub: any) => {
     startMonth   : sub.startsAt?.split('T')[0] ?? '',
     endMonth     : sub.endsAt?.split('T')[0] ?? '',
     customPrice  : Number(sub.price) ?? 0,
+    useCustomPrice: false, 
     addOnId      : sub.addOnId ?? sub.add_on_id ?? sub.addOn?.id ?? null,
   }
   void ensureAddOnsLoaded(mod.id)
@@ -905,8 +920,10 @@ const ensureAddOnsLoaded = async (moduleId: number) => {
 
 const getPrice = (mod: any): number => {
   const sel = selections[mod.id]
+  console.log('get',sel)
   if (!sel) return Number(mod.priceMonthly) 
-  if (sel.customPrice > 0) {
+
+  if (sel.customPrice > 0) {  
     const baseMonthly = Number(sel.customPrice)
     return sel.billingCycle === 'yearly' ? baseMonthly * 12 : baseMonthly
   }
@@ -993,6 +1010,7 @@ const defaultSelection = (): Selection => {
     endMonth   : fmtDate(end),
     customPrice: 0,
     addOnId: null,
+    useCustomPrice: false, 
   }
 }
 

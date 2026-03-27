@@ -1,3 +1,126 @@
 
 @import "tailwindcss";
 @variant dark (&:where(.dark, .dark *));
+
+/* Input visible (altInput) */
+
+.flatpickr-input {
+  height: 2.75rem;
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  padding: 0.625rem 2.5rem 0.625rem 1rem;
+  font-size: 0.875rem;
+  color: #111827;
+}
+
+.dark .flatpickr-input {
+  border-color: #374151 !important;
+  background-color: #111827 !important; /* ou ta valeur dark-900 */
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.dark .flatpickr-input::placeholder {
+  color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.dark .flatpickr-input:focus {
+  border-color: #6b21a8 !important;
+  outline: none !important;
+}
+
+
+/* Calendrier principal */
+.dark .flatpickr-calendar {
+  background: #1f2937;
+  color: #f9fafb;
+  border-color: #374151;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Flèche de la bulle */
+.dark .flatpickr-calendar.arrowTop::before { border-bottom-color: #374151; }
+.dark .flatpickr-calendar.arrowTop::after  { border-bottom-color: #1f2937; }
+.dark .flatpickr-calendar.arrowBottom::before { border-top-color: #374151; }
+.dark .flatpickr-calendar.arrowBottom::after  { border-top-color: #1f2937; }
+
+/* Header mois/année */
+.dark .flatpickr-months,
+.dark .flatpickr-month {
+  background: #1f2937;
+  color: #f9fafb;
+  fill: #f9fafb;
+}
+
+.dark .flatpickr-current-month input.cur-year,
+.dark .flatpickr-current-month .flatpickr-monthDropdown-months {
+  color: #f9fafb;
+  background: #1f2937;
+}
+
+.dark .flatpickr-monthDropdown-months option {
+  background: #1f2937;
+  color: #f9fafb;
+}
+
+/* Flèches prev/next */
+.dark .flatpickr-prev-month,
+.dark .flatpickr-next-month {
+  fill: #f9fafb !important;
+  color: #f9fafb !important;
+}
+.dark .flatpickr-prev-month:hover svg,
+.dark .flatpickr-next-month:hover svg {
+  fill: #a78bfa !important;
+}
+
+/* Jours de la semaine */
+.dark .flatpickr-weekdays,
+.dark span.flatpickr-weekday {
+  background: #1f2937;
+  color: #9ca3af;
+}
+
+/* Jours */
+.dark .flatpickr-day {
+  color: #f9fafb;
+}
+.dark .flatpickr-day:hover {
+  background: #374151;
+  border-color: #374151;
+}
+
+/* Jour sélectionné */
+.dark .flatpickr-day.selected,
+.dark .flatpickr-day.startRange,
+.dark .flatpickr-day.endRange {
+  background: #7c3aed;
+  border-color: #7c3aed;
+  color: #fff;
+}
+
+/* Plage entre les deux dates */
+.dark .flatpickr-day.inRange {
+  background: #4c1d95;
+  border-color: #4c1d95;
+  color: #e9d5ff;
+  box-shadow: -5px 0 0 #4c1d95, 5px 0 0 #4c1d95;
+}
+
+/* Aujourd'hui */
+.dark .flatpickr-day.today {
+  border-color: #7c3aed;
+  color: #a78bfa;
+}
+.dark .flatpickr-day.today:hover {
+  background: #7c3aed;
+  color: #fff;
+}
+
+/* Jours désactivés / autres mois */
+.dark .flatpickr-day.flatpickr-disabled,
+.dark .flatpickr-day.prevMonthDay,
+.dark .flatpickr-day.nextMonthDay {
+  color: #4b5563 !important;
+}

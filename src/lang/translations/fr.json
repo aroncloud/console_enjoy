@@ -1033,7 +1033,8 @@
 		"price": {
 			"label": "Prix de souscription",
 			"monthly": "Mensuel",
-			"yearly": "Annuel"
+			"yearly": "Annuel",
+			"custom": "Personnaliser"
 		},
 		"summary": {
 			"title": "Récapitulatif",

@@ -1029,7 +1029,8 @@
 		"price": {
 			"label": "Subscription price",
 			"monthly": "Monthly",
-			"yearly": "Yearly"
+			"yearly": "Yearly",
+			"custom" : "Custom"
 		},
 		"summary": {
 			"title": "Summary",

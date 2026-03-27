@@ -117,7 +117,8 @@ const rangeConfig = computed((): Partial<BaseOptions & { utc: boolean }> => ({
     const month = String(date.getMonth() + 1).padStart(2, '0')
     const year = date.getFullYear()
     return `${day}/${month}/${year}`
-  }
+  },
+  
 }))
 
 // Le callback 'onReady' de la config et celui de l'event @on-ready sont redondants.

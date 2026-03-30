@@ -7,6 +7,7 @@ import ClientDetail from '../views/clients/ClientDetail.vue'
 import HotelSubscriptions from '../views/clients/HotelSubscriptions.vue'
 import Support from '../views/support/Support.vue'
 import Billing from '../views/billing/Billing.vue'
+import BillingDetail from '../views/billing/BillingDetail.vue'
 import Security from '../views/security/Security.vue'
 import Product from '../views/products/Product.vue'
 import ProductDetail from '../views/products/ProductDetail.vue'
@@ -72,6 +73,12 @@ const router = createRouter({
           path: 'billing',
           name: 'billing',
           component: Billing,
+          meta: { permission: 'console_billing_view' },
+        },
+        {
+          path: 'billing/:id',
+          name: 'billing-detail',
+          component: BillingDetail,
           meta: { permission: 'console_billing_view' },
         },
         {

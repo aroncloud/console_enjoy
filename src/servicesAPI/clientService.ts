@@ -44,6 +44,21 @@ export interface CreateHotelPayload {
   adminPhoneNumber?: string
 }
 
+export interface InvoiceSubscriptionItemPayload {
+  module_id: number
+  billing_cycle: 'monthly' | 'yearly'
+  price: number
+  limit_count: number | null
+  add_on_id?: number | null
+}
+
+export interface InvoicesSubscriptionsPayload {
+  periodStart: string
+  periodEnd: string
+  currency: string
+  subscriptions: InvoiceSubscriptionItemPayload[]
+}
+
 export const hotelService = {
   getAll: () =>
     api.get<any>('/console/hotels').then(r => r.data),
@@ -59,4 +74,7 @@ export const hotelService = {
 
   delete: (id: number) =>
     api.delete(`/console/hotels/${id}`).then(r => r.data),
+
+  createInvoicesSubscriptions: (hotelId: number, payload: InvoicesSubscriptionsPayload) =>
+    api.post<any>(`/console/hotels/${hotelId}/invoices-subscriptions`, payload).then(r => r.data),
 }

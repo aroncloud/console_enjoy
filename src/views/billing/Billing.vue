@@ -71,12 +71,6 @@
                 {{ formatCurrency(quota.price) }}
               </span>
             </div>
-            <button
-              @click="openSurplusModal(quota)"
-              class="w-full py-2 text-xs font-bold rounded-lg transition-all bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-purple-500 hover:text-white cursor-pointer"
-            >
-              {{ t('billing.quotas.billSurplus') }}
-            </button>
           </div>
         </div>
       </div>
@@ -120,6 +114,34 @@
           <template #cell-actions="{ row }">
             <div class="flex justify-end gap-2">
               <button
+                @click="goToInvoiceDetails(row)"
+                class="p-1.5 text-slate-400 hover:text-purple-500 transition-colors cursor-pointer"
+                :title="t('common.details')"
+              >
+                <Eye :size="16" />
+              </button>
+
+              <button
+                @click="openInvoicePdf(row)"
+                class="p-1.5 text-slate-400 hover:text-purple-500 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                :title="'PDF'"
+                :disabled="pdfLoadingId === Number(row?.id)"
+              >
+                <Loader2 v-if="pdfLoadingId === Number(row?.id)" :size="16" class="animate-spin" />
+                <FileText v-else :size="16" />
+              </button>
+
+              <button
+                @click="openReceiptPdf(row)"
+                class="p-1.5 text-slate-400 hover:text-purple-500 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                :title="'Receipt PDF'"
+                :disabled="receiptLoadingId === Number(row?.id)"
+              >
+                <Loader2 v-if="receiptLoadingId === Number(row?.id)" :size="16" class="animate-spin" />
+                <ReceiptText v-else :size="16" />
+              </button>
+
+              <button
                 v-if="row.status === 'pending' || row.status === 'failed'"
                 @click="handleMarkAsPaid(row)"
                 class="p-1.5 text-emerald-400 hover:text-emerald-600 transition-colors cursor-pointer"
@@ -156,124 +178,22 @@
       </div>
     </div>
 
-    <!-- Geste commercial + Calculateur -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-      <!-- Offrir un mois gratuit -->
-    
-      <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-visible">
-        <div class="px-4 sm:px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
-          <div class="p-2 bg-purple-100 text-purple-500 rounded-lg">
-            <Gift :size="18" />
-          </div>
-          <div>
-            <h3 class="font-bold text-sm">{{ t('billing.gift.title') }}</h3>
-            <p class="text-xs text-slate-500">{{ t('billing.gift.subtitle') }}</p>
-          </div>
-        </div>
-        <div class="p-4 sm:p-5 space-y-4">
-          <BaseSelect
-            :lb="t('billing.fields.hotel')"
-            v-model="selectedHotelId"
-            :options="hotelOptions"
-            :placeholder="t('billing.placeholders.chooseHotel')"
-            @update:modelValue="loadHotelSubscriptions"
-          />
-          <BaseSelect
-            :lb="t('billing.fields.subscription')"
-            v-model="selectedSubscriptionId"
-            :options="subscriptionOptions"
-            :placeholder="t('billing.placeholders.chooseSubscription')"
-            :disabled="!selectedHotelId"
-          />
-          <button
-            :disabled="!selectedSubscriptionId || loadingExtend"
-            @click="handleExtend"
-            class="w-full py-2.5 bg-purple-500 text-white font-bold rounded-lg text-sm hover:bg-purple-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-          >
-            <PlusCircle :size="16" />
-            {{ loadingExtend ? t('billing.gift.applying') : t('billing.gift.apply') }}
-          </button>
-        </div>
-      </div>
-
-     <!-- Calculateur de quotas -->
-      <div id="calculateur"  class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-        <div class="px-4 sm:px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
-          <div class="p-2 bg-orange-100 text-orange-500 rounded-lg">
-            <ChartLine :size="18" />
-          </div>
-          <div>
-            <h3 class="font-bold text-sm">{{ t('billing.calculator.title') }}</h3>
-            <p class="text-xs text-slate-500">{{ t('billing.calculator.subtitle') }}</p>
-          </div>
-        </div>
-        <div class="p-4 sm:p-5 space-y-4">
-          <BaseSelect
-            :lb="t('billing.fields.affectedSubscription')"
-            v-model="calcSubscriptionId"
-            :options="quotaItems.map(q => ({ label: `${q.hotel} — ${q.module}`, value: q.id }))"
-            :placeholder="t('billing.placeholders.chooseSubscription')"
-          />
-          <BaseInput
-            :lb="t('billing.fields.usedQuantity')"
-            type="number"
-            v-model="usedQuantity"
-            :placeholder="t('billing.placeholders.usedQuantity')"
-            :min="0"
-          />
-          <button
-            class="w-full py-2.5 bg-purple-500 text-white font-bold rounded-lg text-sm hover:bg-purple-600 transition-all cursor-pointer"
-            @click="calc"
-            :disabled="!calcSubscriptionId"
-          >
-            {{ t('billing.calculator.calculate') }}
-          </button>
-
-          <Transition name="fade">
-            <div v-if="result" class="space-y-3">
-              <div
-                class="flex items-center gap-3 p-3 rounded-lg text-sm font-medium"
-                :class="hasOverage
-                  ? 'bg-orange-50 text-orange-700 border border-orange-100'
-                  : 'bg-emerald-50 text-emerald-700 border border-emerald-100'"
-              >
-                <TriangleAlert v-if="hasOverage" :size="16" />
-                <CheckCircle v-else :size="16" />
-                {{ result }}
-              </div>
-
-              <button
-                v-if="hasOverage"
-                @click="handleFactureSurplus"
-                :disabled="loadingFacture"
-                class="w-full py-2 bg-orange-500 text-white font-bold rounded-lg text-xs hover:bg-orange-600 transition-all disabled:opacity-50 cursor-pointer"
-              >
-                {{ loadingFacture ? t('billing.calculator.generating') : t('billing.calculator.generateInvoice') }}
-              </button>
-            </div>
-          </Transition>
-        </div>
-      </div>
-    </div>
-
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed,onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useToastStore } from '../../composables/toast'
+import { useRouter } from 'vue-router'
 import {
   Banknote, Clock, TriangleAlert, ChartLine,
   Mail, Megaphone,
-  Gift, PlusCircle, CheckCircle
+  CheckCircle,
+  FileText, ReceiptText, Eye, Loader2
 } from 'lucide-vue-next'
 
-import { subscriptionService } from '../../servicesAPI/subscriptionService'
 import BaseTable      from '../../components/Table/BaseTable.vue'
-import BaseInput      from '../../components/FormElements/Input.vue'
-import BaseSelect     from '../../components/FormElements/Select.vue'
 import { invoiceService } from '../../servicesAPI/invoiceService'
 import { formatCurrency } from '../../components/Utilities/function'
 
@@ -291,38 +211,38 @@ const columns = computed(() => [
 ])
 
 const toastore = useToastStore()
+const router = useRouter()
 const searchQuery = ref('')
 const metaData = ref<any>()
 const invoiceData = ref<any[]>([])
 const loading = ref(false)
 const statsData = ref<any>(null)
-// ── Calculateur ──────────
-const calcSubscriptionId = ref<number | null>(null)
-const usedQuantity = ref<number>(0)
-const result = ref('')
-const hasOverage = ref(false)
-const surplusAmount = ref(0)
-const loadingFacture = ref(false)
 const limit = ref(5)
+const pdfLoadingId = ref<number | null>(null)
+const receiptLoadingId = ref<number | null>(null)
 
-// ── Geste commercial ──────────
-const selectedHotelId = ref<number | null>(null)
-const selectedSubscriptionId = ref<number | null>(null)
-const subscriptionOptions = ref<{ label: string; value: number }[]>([])
-const loadingExtend = ref(false)
 // ── Quotas ───────────────────
 const quotaItems = ref<any[]>([])
 const loadingQuotas = ref(false)
+const paying = ref(false)
 
+const markInvoiceAsPaid = async (id: number) => {
+  paying.value = true
+  try {
+    await invoiceService.createInvoiceSubscriptionPayment(id, {})
+    toastore.show({ title: t('billing.table.title'), message: t('billing.status.paid'), type: 'success' })
+    await fetchData(metaData.value?.currentPage ?? 1)
+  } catch (e) {
+    console.error(e)
+    toastore.show({ title: t('common.error'), message: t('common.genericError'), type: 'error' })
+  } finally {
+    paying.value = false
+  }
+}
 
-const openSurplusModal = (quota: any) => {
-  calcSubscriptionId.value = quota.id
-  usedQuantity.value = quota.limitCount 
-  result.value = ''
-  hasOverage.value = false
-
-  // Scroll vers le calculateur
-  document.querySelector('#calculateur')?.scrollIntoView({ behavior: 'smooth' })
+const goToInvoiceDetails = (row: any) => {
+  if (!row?.id) return
+  router.push({ name: 'billing-detail', params: { id: String(row.id) } })
 }
 
 
@@ -337,7 +257,7 @@ const fetchData = async ( currentPage=1) => {
     invoiceData.value = response.invoices?.data || []
     metaData.value = response.invoices?.meta || []
     statsData.value = response?.stats || null
-   console.log('META:', metaData.value)
+   console.log('META:', invoiceData.value)
   } catch(e:any){
     console.error('error',e)
     toastore.show({
@@ -375,12 +295,45 @@ const getInvoiceStatusLabel = (status: string) => {
 }
 
 const handleMarkAsPaid = async (row: any) => {
+  if (!row?.id) return
+  await markInvoiceAsPaid(Number(row.id))
+}
+
+const openBlobInNewTab = (blob: Blob) => {
+  const url = URL.createObjectURL(blob)
+  window.open(url, '_blank', 'noopener,noreferrer')
+  setTimeout(() => URL.revokeObjectURL(url), 60_000)
+}
+
+const openInvoicePdf = async (row: any) => {
+  const id = Number(row?.id)
+  if (!id) return
+  if (pdfLoadingId.value === id) return
+  pdfLoadingId.value = id
   try {
-    if (!row?.id) return
-    await invoiceService.markAsPaid(row.id)
-    await fetchData(metaData.value?.currentPage ?? 1)
+    const blob = await invoiceService.getInvoicesSubscriptionsPdf(id)
+    openBlobInNewTab(blob)
   } catch (e) {
-    console.error('Erreur paiement', e)
+    console.error(e)
+    toastore.show({ title: t('common.error'), message: t('common.genericError'), type: 'error' })
+  } finally {
+    if (pdfLoadingId.value === id) pdfLoadingId.value = null
+  }
+}
+
+const openReceiptPdf = async (row: any) => {
+  const id = Number(row?.id)
+  if (!id) return
+  if (receiptLoadingId.value === id) return
+  receiptLoadingId.value = id
+  try {
+    const blob = await invoiceService.getInvoicesSubscriptionsReceiptPdf(id)
+    openBlobInNewTab(blob)
+  } catch (e) {
+    console.error(e)
+    toastore.show({ title: t('common.error'), message: t('common.genericError'), type: 'error' })
+  } finally {
+    if (receiptLoadingId.value === id) receiptLoadingId.value = null
   }
 }
 
@@ -397,78 +350,6 @@ const fetchQuotas = async () => {
     console.error(e)
   } finally {
     loadingQuotas.value = false
-  }
-}
-
-
-
-const hotelOptions = computed(() =>
-  [...new Map(quotaItems.value.map(q => [q.hotelId, { label: q.hotel, value: q.hotelId }])).values()]
-)
-
-const loadHotelSubscriptions = () => {
-  selectedSubscriptionId.value = null
-  subscriptionOptions.value = quotaItems.value
-    .filter(q => q.hotelId === selectedHotelId.value)
-    .map(q => ({ label: q.module, value: q.id }))
-}
-
-const handleExtend = async () => {
-  if (!selectedSubscriptionId.value) return
-  loadingExtend.value = true
-  try {
-    await subscriptionService.extend(selectedSubscriptionId.value)
-    toastore.show({
-      title: t('billing.gift.toastTitle'), message: t('billing.toast.giftApplied'), type:'success'
-    })
-  }catch(e:any){
-    console.error(e)
-    toastore.show({
-      title: t('billing.gift.toastTitle'), message: t('billing.toast.giftError'), type:'error'
-    })
-  } finally {
-    loadingExtend.value = false
-  }
-}
-
-
-
-const calc = () => {
-  const sub = quotaItems.value.find(q => q.id === calcSubscriptionId.value)
-  if (!sub) return
-
-  const extra = Math.max(0, usedQuantity.value - sub.limitCount)
-  const pricePerUnit = sub.price / sub.limitCount
-  surplusAmount.value = Math.round(extra * pricePerUnit)
-  hasOverage.value = extra > 0
-  result.value = extra
-    ? t('billing.calculator.overageResult', { extra, amount: formatCurrency(surplusAmount.value) })
-    : t('billing.calculator.noOverageResult')
-}
-
-const handleFactureSurplus = async () => {
-  const sub = quotaItems.value.find(q => q.id === calcSubscriptionId.value)
-  if (!sub) return
-  loadingFacture.value = true
-  try {
-    await invoiceService.factureSurplus(sub.hotelId, {
-      subscriptionId: sub.id,
-      quantity: usedQuantity.value - sub.limitCount,
-      amount: surplusAmount.value,
-      description: t('billing.surplus.description', { extra: usedQuantity.value - sub.limitCount, module: sub.module, limit: sub.limitCount })
-    })
-    toastore.show({
-      title: t('billing.table.title'), message: t('billing.toast.surplusInvoiceGenerated'), type:'success'
-    })
-    hasOverage.value = false
-    await fetchData()
-  }catch(e:any){
-    console.error(e)
-    toastore.show({
-      title: t('common.error'), message: t('billing.toast.surplusInvoiceError'), type:'error'
-    })
-  } finally {
-    loadingFacture.value = false
   }
 }
 

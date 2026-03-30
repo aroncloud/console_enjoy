@@ -166,22 +166,6 @@
                     </div>
                   </div>
 
-                  <!-- ── Période (toujours visible) ── -->
-                  <div v-if="isSelected(mod.id)" class="mb-4" @click.stop>
-                    <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                      <CalendarRange :size="11" />
-                      {{ t('subscriptions.period.label') }}
-                    </p>
-                    <InputDoubleDate
-                      :modelValue="{ start: getSel(mod.id).startMonth, end: getSel(mod.id).endMonth }"
-                      @update:modelValue="val => { 
-                        setSel(mod.id, 'startMonth', val.start); 
-                        setSel(mod.id, 'endMonth', val.end);
-                        if (getSel(mod.id).billingCycle === 'yearly') ensurePeriodMatchesCycle(mod.id);
-                      }"
-                    />
-                  </div>
-
                   <!-- ── Prix de souscription (selon add-on + mensuel/annuel) ── -->
                   <div v-if="isSelected(mod.id)" class="mb-4" @click.stop>
                     <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
@@ -349,9 +333,6 @@
                     <p class="text-[10px] text-slate-400">
                       {{ getSel(mod.id).billingCycle === 'yearly' ? t('subscriptions.billing.yearlyFull') : t('subscriptions.billing.monthlyFull') }}
                     </p>
-                    <p v-if="getSel(mod.id).billingCycle === 'monthly' && getSel(mod.id).startMonth && getSel(mod.id).endMonth" class="text-[10px] text-purple-500 font-semibold mt-0.5 flex items-center gap-1">
-                      <CalendarRange :size="9" />{{ formatMonthShort(getSel(mod.id).startMonth) }} → {{ formatMonthShort(getSel(mod.id).endMonth) }}
-                    </p>
                   </div>
                   <span class="text-xs font-black text-slate-900 dark:text-white shrink-0">{{ formatCurrency(getPrice(mod)) }}</span>
                 </div>
@@ -505,12 +486,6 @@
                     <component :is="mod.icon" :size="14" class="text-slate-400 shrink-0 mt-0.5" />
                     <div class="min-w-0">
                       <span class="font-medium">{{ mod.fullName }}</span>
-                      <div v-if="getSel(mod.id).billingCycle === 'monthly' && getSel(mod.id).startMonth && getSel(mod.id).endMonth" class="flex items-center gap-1 mt-1">
-                        <div class="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold" :style="{ background: mod.color + '15', color: mod.color }">
-                          <CalendarRange :size="8" />
-                          {{ formatDateFull(getSel(mod.id).startMonth) }} → {{ formatDateFull(getSel(mod.id).endMonth) }}
-                        </div>
-                      </div>
                     </div>
                   </div>
                   <div class="text-right shrink-0">
@@ -522,6 +497,10 @@
                     </span>
                    
                   </div>
+                </div>
+
+                <div class="mt-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 p-3">
+                  <pre class="text-[11px] text-slate-700 dark:text-slate-200 whitespace-pre-wrap break-words">{{ JSON.stringify(invoicesSubscriptionsPayload, null, 2) }}</pre>
                 </div>
 
                 <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
@@ -601,8 +580,7 @@
               <div class="flex-1">
                 <p class="text-xs font-bold text-slate-800 dark:text-white">{{ mod.fullName }}</p>
                 <p class="text-[10px] text-slate-400">
-                  <span v-if="getSel(mod.id).billingCycle === 'monthly'">{{ formatDateFull(getSel(mod.id).startMonth) }} → {{ formatDateFull(getSel(mod.id).endMonth) }}</span>
-                  <span v-else>{{ t('subscriptions.billing.yearlyFull') }}</span>
+                  {{ getSel(mod.id).billingCycle === 'yearly' ? t('subscriptions.billing.yearlyFull') : t('subscriptions.billing.monthlyFull') }}
                 </p>
                 <p class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1"><Check :size="9" /> {{ t('subscriptions.status.active') }}</p>
               </div>
@@ -631,17 +609,16 @@ import { useRouter ,useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { productService, type Product } from '../../servicesAPI/productService'
 import { formatCurrency } from '../../components/Utilities/function'
-import InputDoubleDate from '../../components/FormElements/InputDoubleDate.vue'
 import Select from '../../components/FormElements/Select.vue'
 import { subscriptionService } from '../../servicesAPI/subscriptionService'
 import { useToastStore } from '../../composables/toast'
 import { addOnService, type AddOn } from '../../servicesAPI/addOnService'
+import { invoiceService, type InvoicesSubscriptionsPayload } from '../../servicesAPI/invoiceService'
 import {
   ArrowLeft, ShieldCheck, Check, Lock,
   Package, CheckCircle2, AlertTriangle, BedDouble, Utensils,
   ArrowLeftRight, Smartphone, BarChart2, Users,
   Receipt, RefreshCw, LayoutDashboard, Plus,
-  CalendarRange,
   Tag,
 } from 'lucide-vue-next'
 import { hotelService } from '../../servicesAPI/clientService'
@@ -756,24 +733,6 @@ onMounted(async () => {
   pageLoading.value = false
 })
 
-
-const formatMonthShort = (ymd: string): string => {
-  if (!ymd) return ''
-  const [y, m, d] = ymd.split('-')
-  if (!y || !m || !d) return ''
-  return `${d}/${m}/${y.slice(2)}`
-}
-
-
-const formatDateFull = (ymd: string): string => {
-  if (!ymd) return ''
-  const [y, m, d] = ymd.split('-')
-  if (!y || !m || !d) return ''
-  return `${d}/${m}/${y}`
-}
-
-
-
 // ── OTA defaults ───────
 const DEFAULT_OTAS: OTA[] = [
   { name: 'Booking.com', checked: true },
@@ -847,25 +806,28 @@ const getLimitCountForModule = (mod: any, sel: Selection) =>
 const fmtDate = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 
-const addMonths = (ymd: string, months: number) => {
-  if (!ymd) return ''
-  const [y, m, d] = ymd.split('-').map(Number)
-  if (!y || !m || !d) return ''
-  return fmtDate(new Date(y, m - 1 + months, d))
+const getPeriodStartYmd = () => fmtDate(new Date())
+
+const endOfMonthYmd = (ymd: string) => {
+  const [y, m] = ymd.split('-').map(Number)
+  if (!y || !m) return ''
+  return fmtDate(new Date(y, m, 0))
 }
 
-const addYears = (ymd: string, years: number) => {
-  if (!ymd) return ''
-  const [y, m, d] = ymd.split('-').map(Number)
-  if (!y || !m || !d) return ''
-  return fmtDate(new Date(y + years, m - 1, d))
+const endOfYearYmd = (ymd: string) => {
+  const [y] = ymd.split('-').map(Number)
+  if (!y) return ''
+  return fmtDate(new Date(y, 12, 0))
 }
 
 const ensurePeriodMatchesCycle = (moduleId: number) => {
   const sel = selections[moduleId]
   if (!sel) return
-  if (!sel.startMonth) sel.startMonth = fmtDate(new Date())
-  sel.endMonth = sel.billingCycle === 'yearly' ? addYears(sel.startMonth, 1) : addMonths(sel.startMonth, 1)
+  const today = getPeriodStartYmd()
+  sel.startMonth = editSubId.value ? (sel.startMonth || today) : today
+  sel.endMonth = sel.billingCycle === 'yearly'
+    ? endOfYearYmd(sel.startMonth)
+    : endOfMonthYmd(sel.startMonth)
 }
 
 const ensureAddOnsLoaded = async (moduleId: number) => {
@@ -952,6 +914,28 @@ const totalYearly = computed(() =>
   }, 0)
 )
 
+const periodStart = computed(() => getPeriodStartYmd())
+const periodEnd = computed(() =>
+  hasYearlyBilling.value ? endOfYearYmd(periodStart.value) : endOfMonthYmd(periodStart.value)
+)
+
+const invoicesSubscriptionsPayload = computed<InvoicesSubscriptionsPayload>(() => ({
+  periodStart: periodStart.value,
+  periodEnd: periodEnd.value,
+  currency: 'XAF',
+  subscriptions: selectedModules.value.map((mod) => {
+    const sel = getSel(mod.id)
+    const limitCount = getLimitCountForModule(mod, sel)
+    return {
+      module_id: mod.id,
+      billing_cycle: sel.billingCycle,
+      price: getPrice(mod),
+      limit_count: limitCount == null ? null : Number(limitCount),
+      ...(sel.addOnId != null ? { add_on_id: sel.addOnId } : {}),
+    }
+  }),
+}))
+
 
 
 const hasMissingPeriod = computed(() =>
@@ -990,16 +974,14 @@ const setSel = (id: number, key: keyof Selection, val: any) => {
 }
 
 const defaultSelection = (): Selection => {
-  const now   = new Date()
-  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-  const end   = new Date(now.getFullYear(), now.getMonth() + 1, 6) 
+  const start = getPeriodStartYmd()
 
   return {
     billingCycle: 'monthly',
     rooms: 10, units: 1, staffQuota: 5, guestApp: false,
     otas: DEFAULT_OTAS.map(o => ({ ...o })),
-    startMonth : fmtDate(start),
-    endMonth   : fmtDate(end),
+    startMonth : start,
+    endMonth   : endOfMonthYmd(start),
     customPrice: 0,
     addOnId: null,
   }
@@ -1059,6 +1041,12 @@ const buildSubscriptionPayload = (mod: any) => {
 const goToStep3 = async () => {
   try {
     loading.value = true
+    if (!editSubId.value) {
+      await invoiceService.createInvoicesSubscriptions(hotelId, invoicesSubscriptionsPayload.value)
+      toastStore.show({ type: 'success', title: t('subscriptions.toast.createdTitle'), message: 'Invoice generated' })
+      currentStep.value = 3
+      return
+    }
     const ORDER = ['pms', 'pos', 'mobile-app', 'analytics', 'crm', 'channel-manager']
 
     const sortedModules = [...selectedModules.value].sort(

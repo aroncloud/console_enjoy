@@ -12,6 +12,7 @@ export interface Invoice {
   description: string | null
   billingDate: string | null
   createdAt: string
+  isSent?: boolean
 }
 
 export interface InvoicePaginated {
@@ -77,6 +78,9 @@ export const invoiceService = {
 
   getInvoiceSubscription: (id: number) =>
     api.get(`/console/invoices-subscriptions/${id}`).then((r) => r.data),
+
+  resendInvoiceSubscriptionEmail: (id: number) =>
+    api.post(`/console/invoices-subscriptions/${id}/resend-email`, {}).then((r) => r.data),
 
   createInvoicesSubscriptions: (hotelId: number, data: InvoicesSubscriptionsPayload) =>
     api.post(`/console/hotels/${hotelId}/invoices-subscriptions`, data).then((r) => r.data),

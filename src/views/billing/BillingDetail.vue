@@ -21,6 +21,17 @@
         <div class="flex items-center gap-2">
           <button
             v-if="invoice"
+            @click="resendEmail"
+            class="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            :title="emailSent ? 'Email envoyé' : 'Renvoyer email'"
+            :disabled="emailLoading"
+          >
+            <Loader2 v-if="emailLoading" :size="16" class="animate-spin" />
+            <Mail v-else :size="16" :class="emailSent ? 'text-emerald-500' : undefined" />
+            Email
+          </button>
+          <button
+            v-if="invoice"
             @click="openInvoicePdf"
             class="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             title="PDF"
@@ -247,7 +258,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useToastStore } from '../../composables/toast'
@@ -256,7 +267,7 @@ import { formatCurrency } from '../../components/Utilities/function'
 import BaseModal from '../../components/Modal/BaseModal.vue'
 import BaseInput from '../../components/FormElements/Input.vue'
 import BaseSelect from '../../components/FormElements/Select.vue'
-import { ArrowLeft, FileText, ReceiptText, PlusCircle, Loader2 } from 'lucide-vue-next'
+import { ArrowLeft, FileText, ReceiptText, PlusCircle, Loader2, Mail } from 'lucide-vue-next'
 
 const { t } = useI18n()
 const toastore = useToastStore()
@@ -268,6 +279,7 @@ const loading = ref(false)
 const invoice = ref<any | null>(null)
 const invoicePdfLoading = ref(false)
 const receiptPdfLoading = ref(false)
+const emailLoading = ref(false)
 
 const lastPayment = ref<any | null>(null)
 const lastReceipt = ref<any | null>(null)
@@ -299,10 +311,25 @@ const normalizeCurrency = (value: any) => {
 }
 
 const displayCurrency = computed(() => normalizeCurrency(invoice.value?.currency))
+const emailSent = computed(() => Boolean(invoice.value?.isSent ?? invoice.value?.is_sent ?? invoice.value?.emailSent ?? invoice.value?.email_sent))
+
+const getTodayYmd = () => {
+  const now = new Date()
+  const y = now.getFullYear()
+  const m = String(now.getMonth() + 1).padStart(2, '0')
+  const d = String(now.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
 
 const canAddPayment = computed(() => {
   const status = invoice.value?.status
   return status === 'pending' || status === 'failed' || status === 'due'
+})
+
+watch(showAddPayment, (isOpen) => {
+  if (!isOpen) return
+  if (!paymentDateYmd.value) paymentDateYmd.value = getTodayYmd()
+  if (!paymentCurrency.value) paymentCurrency.value = normalizeCurrency(invoice.value?.currency)
 })
 
 const formatDay = (value: any) => {
@@ -391,6 +418,22 @@ const openReceiptPdf = async () => {
     toastore.show({ title: t('common.error'), message: t('common.genericError'), type: 'error' })
   } finally {
     receiptPdfLoading.value = false
+  }
+}
+
+const resendEmail = async () => {
+  if (!invoiceId.value) return
+  if (emailLoading.value) return
+  emailLoading.value = true
+  try {
+    await invoiceService.resendInvoiceSubscriptionEmail(invoiceId.value)
+    if (invoice.value) invoice.value.isSent = true
+    toastore.show({ title: t('billing.table.title'), message: 'Email envoyé', type: 'success' })
+  } catch (e) {
+    console.error(e)
+    toastore.show({ title: t('common.error'), message: t('common.genericError'), type: 'error' })
+  } finally {
+    emailLoading.value = false
   }
 }
 

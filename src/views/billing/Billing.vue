@@ -164,10 +164,16 @@
                 :class="row.status === 'failed'
                   ? 'text-red-400 hover:text-red-600'
                   : 'text-slate-400 hover:text-purple-500'"
-                :title="row.status === 'failed' ? t('billing.actions.sendFollowUp') : t('billing.actions.sendReminder')"
+                :title="isInvoiceEmailSent(row) ? 'Email envoyé' : 'Renvoyer email'"
+                :disabled="emailLoadingId === Number(row?.id)"
+                @click="resendEmail(row)"
               >
-                <Megaphone v-if="row.status === 'failed'" :size="16" />
-                <Mail v-else :size="16" />
+                <Loader2 v-if="emailLoadingId === Number(row?.id)" :size="16" class="animate-spin" />
+                <Mail
+                  v-else
+                  :size="16"
+                  :class="isInvoiceEmailSent(row) ? 'text-emerald-500' : undefined"
+                />
               </button>
 
             </div>
@@ -188,7 +194,7 @@ import { useToastStore } from '../../composables/toast'
 import { useRouter } from 'vue-router'
 import {
   Banknote, Clock, TriangleAlert, ChartLine,
-  Mail, Megaphone,
+  Mail,
   CheckCircle,
   FileText, ReceiptText, Eye, Loader2
 } from 'lucide-vue-next'
@@ -220,6 +226,7 @@ const statsData = ref<any>(null)
 const limit = ref(5)
 const pdfLoadingId = ref<number | null>(null)
 const receiptLoadingId = ref<number | null>(null)
+const emailLoadingId = ref<number | null>(null)
 
 // ── Quotas ───────────────────
 const quotaItems = ref<any[]>([])
@@ -243,6 +250,27 @@ const markInvoiceAsPaid = async (id: number) => {
 const goToInvoiceDetails = (row: any) => {
   if (!row?.id) return
   router.push({ name: 'billing-detail', params: { id: String(row.id) } })
+}
+
+const isInvoiceEmailSent = (row: any) => {
+  return Boolean(row?.isSent ?? row?.is_sent ?? row?.emailSent ?? row?.email_sent)
+}
+
+const resendEmail = async (row: any) => {
+  const id = Number(row?.id)
+  if (!id) return
+  if (emailLoadingId.value === id) return
+  emailLoadingId.value = id
+  try {
+    await invoiceService.resendInvoiceSubscriptionEmail(id)
+    row.isSent = true
+    toastore.show({ title: t('billing.table.title'), message: 'Email envoyé', type: 'success' })
+  } catch (e) {
+    console.error(e)
+    toastore.show({ title: t('common.error'), message: t('common.genericError'), type: 'error' })
+  } finally {
+    if (emailLoadingId.value === id) emailLoadingId.value = null
+  }
 }
 
 
